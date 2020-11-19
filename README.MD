@@ -17,7 +17,7 @@
 ```js
 import { ffmpeg } from "./ffmpegWrapper.ts";
 let videoRender = new ffmpeg("PATHTOFFMPEG", "PATHTOVIDEOFILE");
-videoRender.videoBitrate(1000).save("./ree.mp4");
+videoRender.videoBitrate(1000).save("./example.mp4");
 ```
 <hr>
 <h2>Documentation</h2>
