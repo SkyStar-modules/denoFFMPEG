@@ -21,7 +21,7 @@ videoRender.videoBitrate(1000).save("./example.mp4");
 ```
 <hr>
 <h2>Documentation</h2>
-<h3>All documentation for every method is explained <a href=>here</a>
+<h3>All documentation for every method is explained <a href=https://github.com/MierenManz/DenoFFMPEG-Docs>here</a>
 <br>Everything else should be fairly easy</h3><br><hr>
 <h2>Contributing</h2>
 <h3>If you want to add a filter or a feature just make a pull request. I won't pull code modifications, but I will add filter interfaces</h3>
