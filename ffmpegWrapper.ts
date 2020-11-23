@@ -2,7 +2,7 @@
 * Written & Maintained by only Christiaan 'MierenMans' van Boheemen
 * Property of Christiaan van Boheemen
 */
-import * as path from "https://deno.land/std@0.76.0/path/mod.ts";
+import * as path from "https://deno.land/std@0.78.0/path/mod.ts";
 import EventEmitter from "https://deno.land/std@0.78.0/node/events.ts";
 import { Filters, Spawn } from "./interfaces.ts";
 
