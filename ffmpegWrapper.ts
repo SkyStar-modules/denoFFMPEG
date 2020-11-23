@@ -4,7 +4,18 @@
 */
 import * as path from "https://deno.land/std@0.78.0/path/mod.ts";
 import EventEmitter from "https://deno.land/std@0.78.0/node/events.ts";
-import { Filters, Spawn } from "./interfaces.ts";
+
+interface Filters {
+    filterName: string,
+    options: Object,
+    custom: string
+}
+
+interface Spawn {
+    ffmpegDir: string,
+    input: string,
+    fatalError?: boolean
+}
 
 export class ffmpeg extends EventEmitter {
     private input:      string        =    "";
