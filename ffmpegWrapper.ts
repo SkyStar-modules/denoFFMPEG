@@ -14,6 +14,7 @@ export class ffmpeg extends EventEmitter {
     private abitrate:   Array<string> =   [];
     private filters:    Array<string> =   [];
     private vidCodec:   Array<string> =   [];
+    private audCodec:   Array<string> =   [];
     private aBR:        number        =    0;
     private vBR:        number        =    0;
     private fatalError: boolean       = true;
@@ -36,6 +37,12 @@ export class ffmpeg extends EventEmitter {
         this.outputFile = path.resolve(output);
         this.run();
         return;
+    }
+    public audioCodec(codec: string, options: Object): this {
+        this.audCodec = ["-c:a", codec];
+        if (codec == "" || codec == "null" || codec == "undefined") this.audCodec = ["-c:a", "undefined"];
+        Object.entries(options).forEach(x => this.audCodec.push("-" + x[0], x[1]));
+        return this;
     }
     public videoCodec(codec: string, options: Object): this {
         this.vidCodec = ["-c:v", codec];
@@ -69,28 +76,19 @@ export class ffmpeg extends EventEmitter {
         if (cbr == true) this.vbitrate = ['-maxrate', String(bitR), '-minrate', String(bitR), "-b:v", String(bitR), '-bufsize', '3M'];
         return this;
     }
-    public addFilters(FilterArray: Array<Filters>): this {
-        if (FilterArray) {
-            FilterArray.forEach(obj => {
-                switch (obj.filterName) {
-                    case "yadif_cuda":
-                    case "yadif":
-                        this.filters.push(`${obj.filterName}=${obj.options.mode}:${obj.options.parity}:${obj.options.deint}`);
-                        break;
-                    case "drawtext":
-                        this.filters.push(`drawtext="fontfile='${obj.options.fontfile}': fontcolor='${obj.options.fontcolor}': fontsize='${obj.options.fontsize}': x='${obj.options.x}': y='${obj.options.y}': shadowcolor='${obj.options.shadowcolor}': shadowx='${obj.options.shadowx}': shadowy='${obj.options.shadowy}': text='${obj.options.text}'`);
-                        break;
-                    // allow for custom filters. Should be a full line
-                    default:
-                        this.filters.push(obj.custom);
-                        break;
-                }
+    public addFilters(Filters: Array<Filters>): this {
+        Filters.forEach(x => {
+            let temp: string = x.filterName + '="';
+            Object.entries(x.options).forEach((j, i) => {
+                if (i > 0) {temp += `: ${j[0]}='${j[1]}'`} else {temp += `${j[0]}='${j[1]}'`}
             })
-        }
+            this.filters.push(temp)
+        })
         return this;
     }
     private errorCheck(): void {
         let error: Array<string> = [];
+        if (this.audCodec.length > 0 && this.audCodec.join("").includes("undefined") || this.audCodec.includes("null")) error.push("one or more audio codec options are undefined")
         if (this.vidCodec.length > 0 && this.vidCodec.join("").includes("undefined") || this.vidCodec.includes("null")) error.push("one or more video codec options are undefined")
         if (this.vbitrate.length > 0 && this.vBR !== 0 && Number.isNaN(this.vBR) == true) error.push("video Bitrate is NaN");
         if (this.abitrate.length > 0 && this.aBR !== 0 && Number.isNaN(this.aBR) == true) error.push("audio Bitrate is NaN");
@@ -106,7 +104,8 @@ export class ffmpeg extends EventEmitter {
         return;
     }
     private formatting(): Array<string> {
-        let temp = [this.ffmpegDir, "-i", this.input]; // Add required commands
+        let temp = [this.ffmpegDir, "-y", "-i", this.input]; // Add required commands
+        if (this.audCodec.length > 0) this.audCodec.forEach(x => temp.push(x))
         if (this.vidCodec.length > 0) this.vidCodec.forEach(x => temp.push(x)); // Push video codec
         if (this.filters.length > 0) temp.push("-vf", this.filters.join(",")); // Push all Filters
         if (this.abitrate.length > 0) this.abitrate.forEach(x => temp.push(x)); // Push audio bitrate
