@@ -13,6 +13,7 @@ export class ffmpeg extends EventEmitter {
     private vbitrate:   Array<string> =   [];
     private abitrate:   Array<string> =   [];
     private filters:    Array<string> =   [];
+    private vidCodec:   Array<string> =   [];
     private aBR:        number        =    0;
     private vBR:        number        =    0;
     private fatalError: boolean       = true;
@@ -21,7 +22,7 @@ export class ffmpeg extends EventEmitter {
         super();
         this.input = path.resolve(ffmpeg.input); // input file location, mag later worden gespecified
         this.ffmpegDir = path.resolve(ffmpeg.ffmpegDir); // mag ./dir/ffmpeg.exe zijn. mag later worden gespecified
-        if (ffmpeg.fatalError === false) this.fatalError = false;
+        if (ffmpeg.fatalError === false || FE === false) this.fatalError = false;
     }
     public setFfmpegPath(ffmpegDir: string): this {
         if (ffmpegDir) this.ffmpegDir = path.resolve(ffmpegDir);
@@ -35,6 +36,12 @@ export class ffmpeg extends EventEmitter {
         this.outputFile = path.resolve(output);
         this.run();
         return;
+    }
+    public videoCodec(codec: string, options: Object): this {
+        this.vidCodec = ["-c:v", codec];
+        if (codec == "" || codec == "null" || codec == "undefined") this.vidCodec = ["-c:v", "undefined"];
+        Object.entries(options).forEach(x => this.vidCodec.push("-" + x[0], x[1]));
+        return this;
     }
     public audioBitrate(bitrate: number): this {
         this.aBR = bitrate;
@@ -84,12 +91,13 @@ export class ffmpeg extends EventEmitter {
     }
     private errorCheck(): void {
         let error: Array<string> = [];
-        if (this.vbitrate && this.vBR !== 0 && Number.isNaN(this.vBR) == true) error.push("video Bitrate is NaN");
-        if (this.abitrate && this.aBR !== 0 && Number.isNaN(this.aBR) == true) error.push("audio Bitrate is NaN");
+        if (this.vidCodec.length > 0 && this.vidCodec.join("").includes("undefined") || this.vidCodec.includes("null")) error.push("one or more video codec options are undefined")
+        if (this.vbitrate.length > 0 && this.vBR !== 0 && Number.isNaN(this.vBR) == true) error.push("video Bitrate is NaN");
+        if (this.abitrate.length > 0 && this.aBR !== 0 && Number.isNaN(this.aBR) == true) error.push("audio Bitrate is NaN");
         if (!this.input) error.push("No input specified!");
         if (!this.outputFile || this.outputFile == "") error.push("No output specified!");
         if (!this.ffmpegDir || this.ffmpegDir == "") error.push("No ffmpeg directory specified!");
-        if (this.filters.join("").includes("undefined")) error.push("Filters were selected, but the field is incorrect or empty");
+        if (this.filters.length > 0 && this.filters.join("").includes("undefined")) error.push("Filters were selected, but the field is incorrect or empty");
         if (error.join("") !== "") {
             let errors: string = error.join("\r\n");
             super.emit('error', errors);
@@ -99,9 +107,10 @@ export class ffmpeg extends EventEmitter {
     }
     private formatting(): Array<string> {
         let temp = [this.ffmpegDir, "-i", this.input]; // Add required commands
-        if (this.filters.length !== 0) temp.push("-vf", this.filters.join(",")); // Push all Filters
-        if (this.abitrate.length !== 0) this.abitrate.forEach(x => {temp.push(x)}) // Push audio bitrate
-        if (this.vbitrate.length !== 0) this.vbitrate.forEach(x => {temp.push(x)}); // Push video bitrate
+        if (this.vidCodec.length > 0) this.vidCodec.forEach(x => temp.push(x)); // Push video codec
+        if (this.filters.length > 0) temp.push("-vf", this.filters.join(",")); // Push all Filters
+        if (this.abitrate.length > 0) this.abitrate.forEach(x => temp.push(x)); // Push audio bitrate
+        if (this.vbitrate.length > 0) this.vbitrate.forEach(x => temp.push(x)); // Push video bitrate
         temp.push(this.outputFile);
         return temp;
     }
