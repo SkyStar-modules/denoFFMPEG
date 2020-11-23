@@ -7,17 +7,18 @@ import EventEmitter from "https://deno.land/std@0.78.0/node/events.ts";
 import { Filters, Spawn } from "./interfaces.ts";
 
 export class ffmpeg extends EventEmitter {
-    private input:      string        =   "";
-    private ffmpegDir:  string        =   "";
-    private outputFile: string        =   "";
-    private vbitrate:   Array<string> =   [];
-    private abitrate:   Array<string> =   [];
-    private filters:    Array<string> =   [];
-    private vidCodec:   Array<string> =   [];
-    private audCodec:   Array<string> =   [];
-    private aBR:        number        =    0;
-    private vBR:        number        =    0;
-    private fatalError: boolean       = true;
+    private input:      string        =    "";
+    private ffmpegDir:  string        =    "";
+    private outputFile: string        =    "";
+    private vbitrate:   Array<string> =    [];
+    private abitrate:   Array<string> =    [];
+    private filters:    Array<string> =    [];
+    private vidCodec:   Array<string> =    [];
+    private audCodec:   Array<string> =    [];
+    private aBR:        number        =     0;
+    private vBR:        number        =     0;
+    private fatalError: boolean       =  true;
+    private noaudio:    boolean       = false;
 
     public constructor(ffmpeg: Spawn, FE: boolean) {
         super();
@@ -37,6 +38,10 @@ export class ffmpeg extends EventEmitter {
         this.outputFile = path.resolve(output);
         this.run();
         return;
+    }
+    public noAudio(): this {
+        this.noaudio = true;
+        return this;
     }
     public audioCodec(codec: string, options: Object): this {
         this.audCodec = ["-c:a", codec];
@@ -105,7 +110,8 @@ export class ffmpeg extends EventEmitter {
     }
     private formatting(): Array<string> {
         let temp = [this.ffmpegDir, "-y", "-i", this.input]; // Add required commands
-        if (this.audCodec.length > 0) this.audCodec.forEach(x => temp.push(x))
+        if (this.noaudio) temp.push("-an")
+        if (this.audCodec.length > 0) this.audCodec.forEach(x => temp.push(x)); // Push audio codec
         if (this.vidCodec.length > 0) this.vidCodec.forEach(x => temp.push(x)); // Push video codec
         if (this.filters.length > 0) temp.push("-vf", this.filters.join(",")); // Push all Filters
         if (this.abitrate.length > 0) this.abitrate.forEach(x => temp.push(x)); // Push audio bitrate
