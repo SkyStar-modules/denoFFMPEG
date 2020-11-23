@@ -4,7 +4,7 @@
 */
 import * as path from "https://deno.land/std@0.76.0/path/mod.ts";
 import EventEmitter from "https://deno.land/std@0.78.0/node/events.ts";
-import { Filters } from "./interfaces.ts";
+import { Filters, Spawn } from "./interfaces.ts";
 
 export class ffmpeg extends EventEmitter {
     private input:      string        =   "";
@@ -17,10 +17,11 @@ export class ffmpeg extends EventEmitter {
     private vBR:        number        =    0;
     private fatalError: boolean       = true;
 
-    public constructor(ffmpegDir: string, input: string) {
+    public constructor(ffmpeg: Spawn, FE: boolean) {
         super();
-        this.input = path.resolve(input); // input file location, mag later worden gespecified
-        this.ffmpegDir = path.resolve(ffmpegDir); // mag ./dir/ffmpeg.exe zijn. mag later worden gespecified
+        this.input = path.resolve(ffmpeg.input); // input file location, mag later worden gespecified
+        this.ffmpegDir = path.resolve(ffmpeg.ffmpegDir); // mag ./dir/ffmpeg.exe zijn. mag later worden gespecified
+        if (ffmpeg.fatalError === false) this.fatalError = false;
     }
     public setFfmpegPath(ffmpegDir: string): this {
         if (ffmpegDir) this.ffmpegDir = path.resolve(ffmpegDir);
@@ -37,7 +38,7 @@ export class ffmpeg extends EventEmitter {
     }
     public audioBitrate(bitrate: number): this {
         this.aBR = bitrate;
-        this.abitrate = ["-b:a", String(bitrate)]
+        this.abitrate = ["-b:a", String(bitrate)];
         return this;
     }
     public videoBitrate(bitrate: number|string, cbr: boolean = true): this {
@@ -48,17 +49,17 @@ export class ffmpeg extends EventEmitter {
             case "mb/s":
             case "mbps":
             case "m":
-                bitR = Number.parseInt(brString) * 1000000
+                bitR = Number.parseInt(brString) * 1000000;
                 break;
             case "kb/s":
             case "kbps":
             case "k":
             default:
-                bitR = Number.parseInt(brString) * 1000
+                bitR = Number.parseInt(brString) * 1000;
                 break;
         }
-        this.vbitrate = ['-maxrate', String(bitR * 2), '-minrate', String(bitR / 4), "-b:v", String(bitR), '-bufsize', String(bitR * 5)]
-        if (cbr == true) this.vbitrate = ['-maxrate', String(bitR), '-minrate', String(bitR), "-b:v", String(bitR), '-bufsize', '3M']
+        this.vbitrate = ['-maxrate', String(bitR * 2), '-minrate', String(bitR / 4), "-b:v", String(bitR), '-bufsize', String(bitR * 5)];
+        if (cbr == true) this.vbitrate = ['-maxrate', String(bitR), '-minrate', String(bitR), "-b:v", String(bitR), '-bufsize', '3M'];
         return this;
     }
     public addFilters(FilterArray: Array<Filters>): this {
@@ -67,10 +68,10 @@ export class ffmpeg extends EventEmitter {
                 switch (obj.filterName) {
                     case "yadif_cuda":
                     case "yadif":
-                        this.filters.push(`${obj.filterName}=${obj.options.mode}:${obj.options.parity}:${obj.options.deint}`)
+                        this.filters.push(`${obj.filterName}=${obj.options.mode}:${obj.options.parity}:${obj.options.deint}`);
                         break;
                     case "drawtext":
-                        this.filters.push(`drawtext="fontfile='${obj.options.fontfile}': fontcolor='${obj.options.fontcolor}': fontsize='${obj.options.fontsize}': x='${obj.options.x}': y='${obj.options.y}': shadowcolor='${obj.options.shadowcolor}': shadowx='${obj.options.shadowx}': shadowy='${obj.options.shadowy}': text='${obj.options.text}'`)
+                        this.filters.push(`drawtext="fontfile='${obj.options.fontfile}': fontcolor='${obj.options.fontcolor}': fontsize='${obj.options.fontsize}': x='${obj.options.x}': y='${obj.options.y}': shadowcolor='${obj.options.shadowcolor}': shadowx='${obj.options.shadowx}': shadowy='${obj.options.shadowy}': text='${obj.options.text}'`);
                         break;
                     // allow for custom filters. Should be a full line
                     default:
@@ -107,7 +108,6 @@ export class ffmpeg extends EventEmitter {
     private async run() {
         await this.errorCheck();
         let ree = await this.formatting()
-        console.log(ree)
         const p = Deno.run({
             cmd: ree,
             stderr: "piped",

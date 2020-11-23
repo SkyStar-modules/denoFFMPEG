@@ -24,3 +24,9 @@ export interface Filters {
     options: DrawText&Yadif&AvgBlur
     custom: string
 }
+
+export interface Spawn {
+    ffmpegDir: string,
+    input: string,
+    fatalError?: boolean
+}
