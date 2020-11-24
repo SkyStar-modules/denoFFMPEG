@@ -30,7 +30,7 @@ export class ffmpeg extends EventEmitter {
     private vBR:        number        =     0;
     private fatalError: boolean       =  true;
     private noaudio:    boolean       = false;
-
+    
     public constructor(ffmpeg: Spawn, FE: boolean) {
         super();
         this.input = path.resolve(ffmpeg.input); // input file location, mag later worden gespecified
@@ -92,14 +92,17 @@ export class ffmpeg extends EventEmitter {
         if (cbr == true) this.vbitrate = ['-maxrate', String(bitR), '-minrate', String(bitR), "-b:v", String(bitR), '-bufsize', '3M'];
         return this;
     }
-    public addFilters(Filters: Array<Filters>): this {
+    public addFilters(Filters:Array<Filters>): this {
+        let start: number = new Date().getTime();
         Filters.forEach(x => {
             let temp: string = x.filterName + '="';
             Object.entries(x.options).forEach((j, i) => {
+                console.log(j + String(i));
                 if (i > 0) {temp += `: ${j[0]}='${j[1]}'`} else {temp += `${j[0]}='${j[1]}'`}
             })
             this.filters.push(temp)
         })
+        console.log(new Date().getTime() - start)
         return this;
     }
     private errorCheck(): void {
@@ -132,14 +135,12 @@ export class ffmpeg extends EventEmitter {
     }
     private async run() {
         await this.errorCheck();
-        let ree = await this.formatting()
         const p = Deno.run({
-            cmd: ree,
+            cmd: await this.formatting(),
             stderr: "piped",
             stdout: "piped"
         });
         let error: string = new TextDecoder("utf-8").decode(await p.stderrOutput());
-        console.log(error)
         if (error.includes("Conversion failed!")) super.emit('error', error);
         let status = await p.status();
         await p.close();
