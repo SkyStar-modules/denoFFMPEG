@@ -15,7 +15,7 @@
 <h2> Example </h2>
 
 ```js
-import { ffmpeg } from "./ffmpegWrapper.ts";
+import { ffmpeg } from "./mod.ts";
 let videoRender = new ffmpeg("PATHTOFFMPEG", "PATHTOVIDEOFILE");
 videoRender.videoBitrate(1000).save("./example.mp4");
 ```
@@ -26,7 +26,22 @@ videoRender.videoBitrate(1000).save("./example.mp4");
 <h2>Contributing</h2>
 <h3>If you want to add a filter or a feature just make a pull request. I won't pull code modifications, but I will add filter interfaces</h3>
 <br><hr>
-<h2>Authors or Acknowledgments</h2>
+<h2>Changelog</h2>
+<h2>1.1</h2>
+<ul>
+<li>Rewrote filters</li>
+<li>Rewrote constructor. It now uses an object</li>
+<li>intergrated interfaces into mod.ts</li>
+<li>Added audio and video codec method</li>
+<li>Added audio bitrate & noaudio</li>
+</ul>
+<br>
+<h2>1.0</h2>
+<ul>
+<li>Added buggy ffmpeg wrapper</li>
+</ul>
+<br><hr>
+<h2>Authors & Acknowledgments</h2>
 <ul>
 <li>Christiaan "MierenMans" van Boheemen - Author</li>
 <li>Robin "Dubbel" Noort - Wrapper Idea</li>
