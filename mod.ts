@@ -2,8 +2,8 @@
 * Written & Maintained by only Christiaan 'MierenMans' van Boheemen
 * Property of Christiaan van Boheemen
 */
-import * as path from "https://deno.land/std@0.78.0/path/mod.ts";
-import EventEmitter from "https://deno.land/std@0.78.0/node/events.ts";
+import * as path from "https://deno.land/std@0.79.0/path/mod.ts";
+import EventEmitter from "https://deno.land/std@0.79.0/node/events.ts";
 
 interface Filters {
     filterName: string,
