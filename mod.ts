@@ -7,8 +7,7 @@ import EventEmitter from "https://deno.land/std@0.78.0/node/events.ts";
 
 interface Filters {
     filterName: string,
-    options: Object,
-    custom: string
+    options: Object
 }
 
 interface Spawn {
@@ -92,17 +91,14 @@ export class ffmpeg extends EventEmitter {
         if (cbr == true) this.vbitrate = ['-maxrate', String(bitR), '-minrate', String(bitR), "-b:v", String(bitR), '-bufsize', '3M'];
         return this;
     }
-    public addFilters(Filters:Array<Filters>): this {
-        let start: number = new Date().getTime();
+    public addFilters(...Filters:Array<Filters>): this {
         Filters.forEach(x => {
             let temp: string = x.filterName + '="';
             Object.entries(x.options).forEach((j, i) => {
-                console.log(j + String(i));
                 if (i > 0) {temp += `: ${j[0]}='${j[1]}'`} else {temp += `${j[0]}='${j[1]}'`}
             })
             this.filters.push(temp)
         })
-        console.log(new Date().getTime() - start)
         return this;
     }
     private errorCheck(): void {
