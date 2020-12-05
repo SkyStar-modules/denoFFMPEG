@@ -16,7 +16,7 @@
 
 ```js
 import { ffmpeg } from "./mod.ts";
-let videoRender = new ffmpeg('/dev/video0', { ffmpegDir: '/dev/ffmpeg' })
+let videoRender = new ffmpeg('./dev/video0', { ffmpegDir: './dev/ffmpeg' })
 videoRender.videoBitrate(1000).save('./output.mp4');
 ```
 --- 
@@ -33,13 +33,13 @@ var render = new ffmpeg();
 You may pass a single input file or both input file and configuration object to the constructor.
 ```js
 import { ffmpeg } from "./mod.ts";
-new ffmpeg('/path/to/video0', { ffmpegDir: '/path/to/ffmpeg'})
+new ffmpeg('./path/to/video0', { ffmpegDir: './path/to/ffmpeg'})
 ```
 
 ```js
 import { ffmpeg } from "./mod.ts";
-new ffmpeg({ ffmpegDir: '/path/to/ffmpeg'})
-    .input('/path/to/video0')
+new ffmpeg({ ffmpegDir: './path/to/ffmpeg'})
+    .input('./path/to/video0')
 ```
 
 ~~the options are the following:~~
@@ -53,19 +53,19 @@ This functionality will be added in v1.2
 
 You can only use one input for Ffmpeg. More support will be added in v1.2  
 An input can be:
-* a file name (eg. `/path/to/file.avi`);
-* an image pattern (eg. `/path/to/frame%03d.png`);
+* a file name (eg. `./path/to/file.avi`);
+* an image pattern (eg. `./path/to/frame%03d.png`);
 
 ```js
 // Note that all denoFFMPEG methods are chainable
 // currently the last input path will be used
 new ffmpeg()
-  .input('/path/to/input1.avi')
+  .input('./path/to/input1.avi')
 
 // Passing an input to the constructor is the same as calling .input()
-new ffmpeg('/path/to/input1.avi') // <= this one will be ignored
-  .input('/path/to/input2.avi')   // <= this one will also be ignored
-  .input('/path/to/input3.avi');
+new ffmpeg('./path/to/input1.avi') // <= this one will be ignored
+  .input('./path/to/input2.avi')   // <= this one will also be ignored
+  .input('./path/to/input3.avi');
 ```
 This functionality will be added in v1.2
 ## Audio options
@@ -77,13 +77,13 @@ The following methods change the audio stream(s) in the produced output.
 Disables audio in the output and remove any previously set audio option.
 
 ```js
-new ffmpeg('/path/to/file.avi').noAudio();
+new ffmpeg('./path/to/file.avi').noAudio();
 ```
 
 ### audioCodec(codec): set audio codec
 
 ```js
-new ffmpeg('/path/to/file.avi').audioCodec('libmp3lame');
+new ffmpeg('./path/to/file.avi').audioCodec('libmp3lame');
 ```
 
 ~~denoFFMPEG checks for codec availability before actually running the command, and throws an error when a specified audio codec is not available.~~  
@@ -96,9 +96,9 @@ This method is used to enforce a constant bitrate;~~use `audioQuality()` to enco
 `audioQuality()` method will be added in v1.2
 
 ```js
-new ffmpeg('/path/to/file.avi').audioBitrate(128);
-new ffmpeg('/path/to/file.avi').audioBitrate('128');
-new ffmpeg('/path/to/file.avi').audioBitrate('128k');
+new ffmpeg('./path/to/file.avi').audioBitrate(128);
+new ffmpeg('./path/to/file.avi').audioBitrate('128');
+new ffmpeg('./path/to/file.avi').audioBitrate('128k');
 ```
  ---
 ## Video options
@@ -110,13 +110,13 @@ The following methods change the video stream(s) in the produced output.
 This method disables video output and removes any previously set video option.
 
 ```js
-new ffmpeg('/path/to/file.avi').noVideo();
+new ffmpeg('./path/to/file.avi').noVideo();
 ```
 
 ### videoCodec('codec'): set video codec
 
 ```js
-new ffmpeg('/path/to/file.avi').videoCodec('libx264');
+new ffmpeg('./path/to/file.avi').videoCodec('libx264');
 ```
 
 ~~denoFFMPEG checks for codec availability before actually running the command, and throws an error when a specified video codec is not available.~~  
@@ -129,10 +129,10 @@ Sets the target video bitrate in kbps.  The `bitrate` argument may be a number o
 Keep in mind that, depending on the codec used, enforcing a constant bitrate often comes at the cost of quality.  The best way to have a constant video bitrate without losing too much quality is to use 2-pass encoding (not supported yet).
 
 ```js
-new ffmpeg('/path/to/file.avi').videoBitrate(1000);
-new ffmpeg('/path/to/file.avi').videoBitrate('1000');
-new ffmpeg('/path/to/file.avi').videoBitrate('1000k');
-new ffmpeg('/path/to/file.avi').videoBitrate('1000k', false);
+new ffmpeg('./path/to/file.avi').videoBitrate(1000);
+new ffmpeg('./path/to/file.avi').videoBitrate('1000');
+new ffmpeg('./path/to/file.avi').videoBitrate('1000k');
+new ffmpeg('./path/to/file.avi').videoBitrate('1000k', false);
 ```
 
 ### videoFilters(filter...): add custom video filters
@@ -166,7 +166,7 @@ new ffmpeg().videoFilters(
 path to your output file. eg `./output.mp4` or `C:/full/path/to/output.mp4`
 
 ```js
-new ffmpeg().save('/path/to/output.mp4');
+new ffmpeg().save('./path/to/output.mp4');
 ```
 ---
 ## Changelog
@@ -189,11 +189,10 @@ new ffmpeg().save('/path/to/output.mp4');
 ## 1.0
 -  Added buggy ffmpeg wrapper
 ---
-<h2>Authors or Acknowledgments</h2>
-<ul>
-<li>Christiaan "MierenMans" van Boheemen - Author</li>
-<li>Robin "Dubbel" Noort - Wrapper Idea</li>
-</ul>
+## Authors or Acknowledgments
+- Christiaan "MierenMans" van Boheemen - Author
+- [crowlKats](https://github.com/crowlKats) - Helping with everything that I didn't know
+- Robin "Dubbel" Noort - Wrapper Idea
 <br>
 
 <h1>License</h1>
