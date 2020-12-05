@@ -234,20 +234,20 @@ new ffmpeg().on('progress', progressOBJ => {
 ---
 ## Changelog
 ## 1.1
-- added noAudio() method
-- added noVideo() method
-- added 'progress' eventEmitter
-- added audiobitrate() method
-- rewrote videoFilters() method for better filtering
+- *added* noAudio() method
+- *added* noVideo() method
+- *added* 'progress' eventEmitter
+- *added* audiobitrate() method
+- *rewrote* videoFilters() method for better filtering
 <br><br>
-- changed addFilters() => videoFilters()
-- changed ffmpegWrapper.ts => mod.ts
-- changed [std@0.79.0/node/events.ts](https://deno.land/std@0.79.0/node/events.ts) => [event@0.2.0](https://deno.land/x/event@0.2.0)
-- merged interfaces.ts & mod.ts
+- *changed* addFilters() => videoFilters()
+- *changed* ffmpegWrapper.ts => mod.ts
+- *changed* [std@0.79.0/node/events.ts](https://deno.land/std@0.79.0/node/events.ts) => [event@0.2.0](https://deno.land/x/event@0.2.0)
+- *merged* interfaces.ts & mod.ts
 <br><br>
-- fucked up a bunch
-- removed deprecated code
-- updated external libs
+- *fucked* up a bunch
+- *removed* deprecated code
+- *updated* external libs
 <br><br>
 ## 1.0
 -  Added buggy ffmpeg wrapper
