@@ -13,7 +13,7 @@
 ---
 
 ## Basic example
-
+`save()` is used to start the render process. you should always use `save()` as last option
 ```js
 import { ffmpeg } from "./mod.ts";
 let videoRender = new ffmpeg('./dev/video0', { ffmpegDir: './dev/ffmpeg' })
@@ -30,7 +30,7 @@ import { ffmpeg } from "./mod.ts";
 var render = new ffmpeg();
 ```
 
-You may pass a single input file or both input file and configuration object to the constructor.
+You may pass a single input file and configuration object to the constructor.
 ```js
 import { ffmpeg } from "./mod.ts";
 new ffmpeg('./path/to/video0', { ffmpegDir: './path/to/ffmpeg'})
@@ -163,10 +163,73 @@ new ffmpeg().videoFilters(
 ```
 
 ### save('path'): path to output file
-path to your output file. eg `./output.mp4` or `C:/full/path/to/output.mp4`
+path to your output file. eg `./output.mp4` or `C:/full/path/to/output.mp4`  
+Save should always be specified to run ffmpeg
 
 ```js
 new ffmpeg().save('./path/to/output.mp4');
+```
+## Misc options
+
+### on('event', func): event listener
+listen to one of the events and do something with it
+`end`, `error` and `progress`
+the first two indicate that ffmpeg has stopped.  
+Either by being finished or because ffmpeg/denoFFMPEG threw an error
+
+```js
+new ffmpeg().on('error', errorSTRING => {
+  console.log(error);
+}).save('./savefile.mp4');
+
+
+new ffmpeg().on('end', statusOBJ => {
+  console.log(JSON.Stringify(statusOBJ));
+}).save('./savefile.mp4');
+// Object values for
+// statusOBJ {
+//   success: boolean;
+//   code: number
+// }
+
+new ffmpeg().on('progress', progressOBJ => {
+  console.log(JSON.Stringify(progressOBJ));
+}).save('./savefile.mp4');
+// Object values for 
+// progressOBJ {
+//   ETA: Date;
+//   percentage: number 
+// }
+```
+### off('event', func): same as on('event', func) but just once
+listen to one of the events and fire once
+`end`, `error` and `progress`
+the first two indicate that ffmpeg has stopped.  
+Either by being finished or because ffmpeg/denoFFMPEG threw an error
+
+```js
+new ffmpeg().on('error', errorSTRING => {
+  console.log(error);
+}).save('./savefile.mp4');
+
+
+new ffmpeg().on('end', statusOBJ => {
+  console.log(JSON.Stringify(statusOBJ));
+}).save('./savefile.mp4');
+// Object values for
+// statusOBJ {
+//   success: boolean;
+//   code: number
+// }
+
+new ffmpeg().on('progress', progressOBJ => {
+  console.log(JSON.Stringify(progressOBJ));
+}).save('./savefile.mp4');
+// Object values for 
+// progressOBJ {
+//   ETA: Date;
+//   percentage: number 
+// }
 ```
 ---
 ## Changelog
@@ -191,7 +254,7 @@ new ffmpeg().save('./path/to/output.mp4');
 ---
 ## Authors or Acknowledgments
 - Christiaan "MierenMans" van Boheemen - Author
-- [crowlKats](https://github.com/crowlKats) - Helping with everything that I didn't know
+- [crowlKats](https://github.com/crowlKats) - Made [event@0.2.0](https://deno.land/x/event@0.2.0) chainable for me :)
 - Robin "Dubbel" Noort - Wrapper Idea
 <br>
 
