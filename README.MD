@@ -62,12 +62,18 @@ An input can be:
 new ffmpeg()
   .input('./path/to/input1.avi')
 
+
+// You can also use links
+new ffmpeg('http://samples.ffmpeg.org/MPEG-4/video.mp4',{ ffmpegDir: './path/to/ffmpeg'})
+.save('./coolvideo.mp4');
+
+
 // Passing an input to the constructor is the same as calling .input()
 new ffmpeg('./path/to/input1.avi') // <= this one will be ignored
   .input('./path/to/input2.avi')   // <= this one will also be ignored
   .input('./path/to/input3.avi');
 ```
-This functionality will be added in v1.2
+This functionality will be added later on
 ## Audio options
 
 The following methods change the audio stream(s) in the produced output.
@@ -233,6 +239,8 @@ new ffmpeg().on('progress', progressOBJ => {
 ```
 ---
 ## Changelog
+## 1.1.1
+- *added* url input's
 ## 1.1
 - *added* noAudio() method
 - *added* noVideo() method

@@ -5,6 +5,7 @@
 import * as path from "https://deno.land/std@0.79.0/path/mod.ts";
 import { EventEmitter } from "https://deno.land/x/event@0.2.0/mod.ts";
 import { readLines } from "https://deno.land/std@0.79.0/io/mod.ts";
+import { assert } from "https://deno.land/std@0.79.0/testing/asserts.ts"
 type Events = {
     progress: [Progress];
     end: [Status];
@@ -28,7 +29,7 @@ interface Spawn {
 }
 interface Status {
     success: boolean;
-    code: number
+    code: number;
 }
 interface Progress {
     ETA: Date;
@@ -44,6 +45,7 @@ export class ffmpeg extends EventEmitter<Events> {
     #filters:       Array<string> =    [];
     #vidCodec:      Array<string> =    [];
     #audCodec:      Array<string> =    [];
+    #stderr:        Array<string> =    [];
     #aBR:           number        =     0;
     #vBR:           number        =     0;
     #noAudio:       boolean       = false;
@@ -53,13 +55,13 @@ export class ffmpeg extends EventEmitter<Events> {
         super();
         param.forEach(x => {
             if (typeof x == "string") {
-                this.#input = path.resolve(x);
+                this.#input = x;
             }
             if (typeof x == "object") {
                 Object.entries(x).forEach(j => {
                     switch (j[0].toLowerCase()) {
                         case "source":
-                            this.#input = path.resolve(j[1]);
+                            this.#input = j[1];
                             break;
                         case "ffmpegdir":
                             this.#ffmpegDir = path.resolve(j[1]);
@@ -74,11 +76,11 @@ export class ffmpeg extends EventEmitter<Events> {
         return this;
     }
     public inputFile(input: string): this {
-        this.#input = path.resolve(input);
+        this.#input = input;
         return this;
     }
     public save(output: string): void {
-        this.#outputFile = path.resolve(output);
+        this.#outputFile = output;
         this.PRIVATE_METHOD_DONT_FUCKING_USE_run();
         return;
     }
@@ -186,7 +188,7 @@ export class ffmpeg extends EventEmitter<Events> {
         temp.push("-progress", "pipe:2", this.#outputFile);
         return temp;
     }
-    private async PRIVATE_METHOD_DONT_FUCKING_USE_getStdout() {
+    private async PRIVATE_METHOD_DONT_FUCKING_USE_getStdout(): Promise<void> {
         let i = 0;
         let temp: Array<string> = [];
         let stderrStart = true;
@@ -195,6 +197,7 @@ export class ffmpeg extends EventEmitter<Events> {
         let totalFrames = NaN;
         for await (const line of readLines(this.#Process.stderr!)) {
             if (line) {
+                if (stderrStart) this.#stderr.push(line);
                 if (stderrStart === true && i == 7) {
                     const dur: string = line.trim().replaceAll("Duration: ", "");
                     const timeArr: Array<string> = dur.substr(0, dur.indexOf(",")).split(":");
@@ -215,12 +218,11 @@ export class ffmpeg extends EventEmitter<Events> {
                         frame = Number.parseInt(temp[1].replaceAll("frame=", "").trim());
                         fps = Number.parseFloat(temp[2].replaceAll("fps=", "").trim()) + 0.01;
                     }
-                    const sumshit: Progress = {
+                    const progressOBJ: Progress = {
                         ETA: new Date(Date.now() + (totalFrames - frame) / fps * 1000),
                         percentage: Number.parseFloat((frame / totalFrames * 100).toFixed(2))
                     }
-                    console.log("ree3")
-                    if (!Number.isNaN(fps) && !Number.isNaN(frame)) super.emit('progress', sumshit);
+                    if (!Number.isNaN(fps) && !Number.isNaN(frame)) super.emit('progress', progressOBJ);
                     i = 0;
                     temp = [];
                 }
@@ -228,7 +230,7 @@ export class ffmpeg extends EventEmitter<Events> {
             }
         }
     }
-    private async PRIVATE_METHOD_DONT_FUCKING_USE_run() {
+    private async PRIVATE_METHOD_DONT_FUCKING_USE_run(): Promise<void> {
         await this.PRIVATE_METHOD_DONT_FUCKING_USE_errorCheck();
         this.#Process = Deno.run({
             cmd: await this.PRIVATE_METHOD_DONT_FUCKING_USE_formatting(),
@@ -238,7 +240,7 @@ export class ffmpeg extends EventEmitter<Events> {
         this.PRIVATE_METHOD_DONT_FUCKING_USE_getStdout();
         const status = await this.#Process.status()
         await this.#Process.close();
-        if (status.success == false)
+        if (status.success == false) super.emit('error', this.#stderr.join('\r\n'))
         super.emit('end', status);
     }
 }
