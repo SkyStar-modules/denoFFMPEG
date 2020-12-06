@@ -43,6 +43,7 @@ new ffmpeg({ ffmpegDir: './path/to/ffmpeg'})
 ```
 
 the options are the following:
+* `ffmpegdir`: set the ffmpeg path `./relative/path/to/ffmpeg.exe` or `C:/full/path/to/ffmpeg.exe`
 * `source`: ffmpeg input source
 * `niceness`: ffmpeg niceness value, between -20 and 20; ignored on Windows platforms (defaults to 0)
 ### Specifying inputs
@@ -51,7 +52,8 @@ You can only use one input for Ffmpeg. More support will be added in v1.2
 An input can be:
 * a file name (eg. `./path/to/file.avi`);
 * an image pattern (eg. `./path/to/frame%03d.png`);
-
+* a link to a video (eg. `http://samples.ffmpeg.org/MPEG-4/video.mp4`);
+* and most protocols [link here](https://ffmpeg.org/ffmpeg-protocols.html)
 ```js
 // Note that all denoFFMPEG methods are chainable
 // currently the last input path will be used
@@ -67,84 +69,58 @@ new ffmpeg('http://samples.ffmpeg.org/MPEG-4/video.mp4',{ ffmpegDir: './path/to/
 // Passing an input to the constructor is the same as calling .input()
 new ffmpeg('./path/to/input1.avi') // <= this one will be ignored
   .input('./path/to/input2.avi')   // <= this one will also be ignored
-  .input('./path/to/input3.avi');
+  .input('./path/to/input3.avi'); // <= this is the input
 ```
 multiple input support will be added later on
 ## Audio options
-
 The following methods change the audio stream(s) in the produced output.
-
 ### noAudio(): disable audio altogether
-
 Disables audio in the output and remove any previously set audio option.
-
 ```js
 new ffmpeg('./path/to/file.avi').noAudio();
 ```
-
 ### audioCodec(codec): set audio codec
-
 ```js
 new ffmpeg('./path/to/file.avi').audioCodec('libmp3lame');
 ```
-
-~~denoFFMPEG checks for codec availability before actually running the command, and throws an error when a specified audio codec is not available.~~  
-^^ This will be added in v1.2
+denoFFMPEG checks for codec availability before actually running the command, and throws an error when a specified audio codec is not available.
 
 ### audioBitrate(bitrate): set audio bitrate
-
 Sets the audio bitrate in kbps. The `bitrate` parameter may be a number or a string with an optional `k` suffix.  
-This method is used to enforce a constant bitrate;~~use `audioQuality()` to encode using a variable bitrate~~  
-`audioQuality()` method will be added in v1.2
-
+This method is used to enforce a constant bitrate;  
+use `audioQuality()` to encode using a variable bitrate
 ```js
 new ffmpeg('./path/to/file.avi').audioBitrate(128);
 new ffmpeg('./path/to/file.avi').audioBitrate('128');
 new ffmpeg('./path/to/file.avi').audioBitrate('128k');
 ```
- ---
+---
 ## Video options
-
 The following methods change the video stream(s) in the produced output.
-
 ### noVideo(): disable video altogether
-
 This method disables video output and removes any previously set video option.
-
 ```js
 new ffmpeg('./path/to/file.avi').noVideo();
 ```
-
 ### videoCodec('codec'): set video codec
-
 ```js
 new ffmpeg('./path/to/file.avi').videoCodec('libx264');
 ```
-
-~~denoFFMPEG checks for codec availability before actually running the command, and throws an error when a specified video codec is not available.~~  
-^^ This will be added in v1.2
-
+denoFFMPEG checks for codec availability before actually running the command, and throws an error when a specified video codec is not available.
 ### videoBitrate(bitrate[, constant=true]): set video bitrate
-
-Sets the target video bitrate in kbps.  The `bitrate` argument may be a number or a string with an optional `k` or `m` suffix.  The `constant` argument specifies whether a constant bitrate should be enforced (defaults to false).
-
-Keep in mind that, depending on the codec used, enforcing a constant bitrate often comes at the cost of quality.  The best way to have a constant video bitrate without losing too much quality is to use 2-pass encoding (not supported yet).
-
+Sets the target video bitrate in kbps.  The `bitrate` argument may be a number or a string with an optional `k` or `m` suffix.  The `constant` argument specifies whether a constant bitrate should be enforced (defaults to true).
 ```js
 new ffmpeg('./path/to/file.avi').videoBitrate(1000);
 new ffmpeg('./path/to/file.avi').videoBitrate('1000');
 new ffmpeg('./path/to/file.avi').videoBitrate('1000k');
 new ffmpeg('./path/to/file.avi').videoBitrate('1000k', false);
 ```
-
 ### videoFilters(filter...): add custom video filters
-
 This method enables adding custom video filters.  You may add multiple filters at once by passing either several arguments or an array.  See the Ffmpeg documentation for available filters and their syntax.
 
 Each filter pased to this method can only be a filter specification object with the following keys:
 * `filterName`: filter name
 * `options`: optional; use object mapping option names to values (eg. `{ t: 'in', s: 0, n: 30 }`).  When `options` is not specified, the filter will be added without any options.
-
 ```js
 new ffmpeg().videoFilters(
   {
@@ -163,30 +139,24 @@ new ffmpeg().videoFilters(
   }
 )
 ```
-
 ### save('path'): path to output file
 path to your output file. eg `./output.mp4` or `C:/full/path/to/output.mp4`  
-Save should always be specified to run ffmpeg
-
+`save('path')` or `pipe()` should either be specified to run ffmpeg
 ```js
 new ffmpeg().save('./path/to/output.mp4');
 ```
-
 ### pipe(): pipe to `on('data')` listener
 pipe output to `on('data')` listener for handling data yourself.  
 *Recommended* to always specify the videoCodec with `videoCodec('codecname')`
-
 ```js
 new ffmpeg().videoCodec('codecname').pipe();
 ```
 ## Misc options
-
 ### on('event', func): event listener
 listen to one of the events and do something with it
 `end`, `error` and `progress`
 the first two indicate that ffmpeg has stopped.  
 Either by being finished or because ffmpeg/denoFFMPEG threw an error
-
 ```js
 new ffmpeg().on('error', errorSTRING => {
   console.log(error);
@@ -216,7 +186,6 @@ listen to one of the events and fire once
 `end`, `error` and `progress`
 the first two indicate that ffmpeg has stopped.  
 Either by being finished or because ffmpeg/denoFFMPEG threw an error
-
 ```js
 new ffmpeg().on('error', errorSTRING => {
   console.log(error);
@@ -243,7 +212,6 @@ new ffmpeg().on('progress', progressOBJ => {
 ```
 ---
 ## Changelog
-
 ## 1.1.1
 - *added* url input's
 <br><br>
