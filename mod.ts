@@ -4,6 +4,7 @@
 */
 import { EventEmitter } from "https://deno.land/x/event@0.2.0/mod.ts";
 import { readLines } from "https://deno.land/std@0.79.0/io/mod.ts";
+import { assert, assertEquals } from "https://deno.land/std@0.79.0/testing/asserts.ts";
 
 type Events = {
     progress: [Progress];
@@ -17,10 +18,8 @@ interface Filters {
     options: Record<string, unknown>
 }
 interface SpawnOptions {
-    timeout: number;
     niceness: number;
-    logger: string;
-    stdoutLines: number
+    source: string;
 }
 interface Spawn {
     ffmpegDir: string;
@@ -39,6 +38,7 @@ export class ffmpeg extends EventEmitter<Events> {
     #input:         string        =    "";
     #ffmpegDir:     string        =    "";
     #outputFile:    string        =    "";
+    #niceness:      string        =    "";
     #vbitrate:      Array<string> =    [];
     #abitrate:      Array<string> =    [];
     #filters:       Array<string> =    [];
@@ -50,21 +50,33 @@ export class ffmpeg extends EventEmitter<Events> {
     #noAudio:       boolean       = false;
     #noVideo:       boolean       = false;
     #outputPipe:    boolean       = false;
+    #inputIsURL:    boolean       = false;
     #Process!:      Deno.Process;
     public constructor(...param: Array<string|Spawn>) {
         super();
         param.forEach(x => {
             if (typeof x == "string") {
+                if (x.includes('http')) {
+                    console.log("THIS IS A LINK")
+                    this.#inputIsURL = true;
+                }
                 this.#input = x;
             }
             if (typeof x == "object") {
                 Object.entries(x).forEach(j => {
                     switch (j[0].toLowerCase()) {
                         case "source":
+                            if (String(j[1]).includes('http')) {
+                                console.log("THIS IS A LINK")
+                                this.#inputIsURL = true;
+                            }
                             this.#input = j[1];
                             break;
                         case "ffmpegdir":
                             this.#ffmpegDir = j[1];
+                            break;
+                        case "niceness":
+                            if (Deno.build.os !== "windows") this.#niceness = j[1];
                     }
                 })
             }
@@ -149,30 +161,34 @@ export class ffmpeg extends EventEmitter<Events> {
         }
     }
     private async PRIVATE_METHOD_DONT_FUCKING_USE_getProgress(): Promise<void> {
-        let i = 0;
+        let i = 1;
         let temp: Array<string> = [];
         let stderrStart = true;
         let timeS = NaN;
         let bitrate = NaN;
         let totalFrames = NaN;
+        let encFound = 0;
         for await (const line of readLines(this.#Process.stderr!)) {
             if (line) {
-                if (stderrStart) {
+                if (line.includes('encoder')) encFound++
+                if (stderrStart === true) {
                     this.#stderr.push(line);
-                    if (i == 7) {
+                    if ((i == 8 && !this.#inputIsURL) || (i == 7 && this.#inputIsURL)) {
+                        console.log(line)
                         const dur: string = line.trim().replaceAll("Duration: ", "");
                         const timeArr: Array<string> = dur.substr(0, dur.indexOf(",")).split(":");
                         timeS = ((Number.parseFloat(timeArr[0]) * 60 + parseFloat(timeArr[1])) * 60 + parseFloat(timeArr[2]));
                     }
-                    if (i == 8) {
+                    if ((i == 9 && !this.#inputIsURL) || (i == 8 && this.#inputIsURL)) {
                         const string: string = line.trim();
                         bitrate = Number.parseFloat(string.substr(string.indexOf('], '), string.indexOf('kb/s,') - string.indexOf('], ')).replaceAll("], ", "").trim()); 
                         totalFrames = timeS * Number.parseFloat(string.substr(string.indexOf('kb/s,'), string.indexOf('fps') - string.indexOf('kb/s,')).replaceAll("kb/s,", "").trim());
                     }
-                    if (i == 38) {i = 0;stderrStart = false;}
+                    if (line.includes("encoder") && (encFound > 3 || i >= 49)) {i = 0;stderrStart = false;}
                 } else {
                     if (i < 13) temp.push(line);
                     if (i == 12) {
+                        console.log(temp)
                         if (temp[0] == "progress=end") return;
                         let frame: number = Number.parseInt(temp[0].replaceAll("frame=", "").trim());
                         let fps: number = Number.parseFloat(temp[1].replaceAll("fps=", "").trim()) + 0.01;
@@ -212,7 +228,9 @@ export class ffmpeg extends EventEmitter<Events> {
         return;
     }
     private PRIVATE_METHOD_DONT_FUCKING_USE_formatting(): Array<string> {
-        const temp = [this.#ffmpegDir, "-hide_banner", "-nostats","-y", "-i", this.#input];
+        const temp = [this.#ffmpegDir];
+        if (this.#niceness !== "") temp.push(this.#niceness);
+        temp.push("-hide_banner", "-nostats","-y", "-i", this.#input)
         if (this.#noAudio) {
             temp.push("-an")
             this.PRIVATE_METHOD_DONT_FUCKING_USE_clear("audio");
