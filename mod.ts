@@ -2,14 +2,14 @@
 * Written & Maintained by only Christiaan 'MierenMans' van Boheemen
 * Property of Christiaan van Boheemen
 */
-import * as path from "https://deno.land/std@0.79.0/path/mod.ts";
 import { EventEmitter } from "https://deno.land/x/event@0.2.0/mod.ts";
 import { readLines } from "https://deno.land/std@0.79.0/io/mod.ts";
-import { assert } from "https://deno.land/std@0.79.0/testing/asserts.ts"
+
 type Events = {
     progress: [Progress];
     end: [Status];
-    error: [string]
+    error: [string];
+    data:[string]
 }
 
 interface Filters {
@@ -50,6 +50,7 @@ export class ffmpeg extends EventEmitter<Events> {
     #vBR:           number        =     0;
     #noAudio:       boolean       = false;
     #noVideo:       boolean       = false;
+    #outputPipe:    boolean       = false;
     #Process!:      Deno.Process;
     public constructor(...param: Array<string|Spawn>) {
         super();
@@ -64,7 +65,7 @@ export class ffmpeg extends EventEmitter<Events> {
                             this.#input = j[1];
                             break;
                         case "ffmpegdir":
-                            this.#ffmpegDir = path.resolve(j[1]);
+                            this.#ffmpegDir = j[1];
                     }
                 })
             }
@@ -72,7 +73,7 @@ export class ffmpeg extends EventEmitter<Events> {
         return this;
     }
     public setFfmpegPath(ffmpegDir: string): this {
-        if (ffmpegDir) this.#ffmpegDir = path.resolve(ffmpegDir);
+        this.#ffmpegDir = ffmpegDir;
         return this;
     }
     public inputFile(input: string): this {
@@ -91,6 +92,11 @@ export class ffmpeg extends EventEmitter<Events> {
     public noVideo(): this {
         this.#noVideo = true;
         return this;
+    }
+    public pipe(): void {
+        this.#outputPipe = true;
+        this.PRIVATE_METHOD_DONT_FUCKING_USE_run();
+        return;
     }
     public audioCodec(codec: string, options: Record<string, string>): this {
         this.#audCodec = ["-c:a", codec];
@@ -143,7 +149,7 @@ export class ffmpeg extends EventEmitter<Events> {
         if (this.#vbitrate.length > 0 && (this.#vBR == 0 || Number.isNaN(this.#vBR) == true)) {error.push("video Bitrate is NaN")}
         if (this.#abitrate.length > 0 && (this.#aBR == 0 || Number.isNaN(this.#aBR) == true)) {error.push("audio Bitrate is NaN")}
         if (!this.#input) {error.push("No input specified!")}
-        if (!this.#outputFile || this.#outputFile == "") {error.push("No output specified!")}
+        if ((!this.#outputFile || this.#outputFile == "") && !this.#outputPipe) {error.push("No output specified!")}
         if (!this.#ffmpegDir || this.#ffmpegDir == "") {error.push("No ffmpeg directory specified!")}
         if (this.#filters.length > 0 && this.#filters.join("").includes("undefined")) {error.push("Filters were selected, but the field is incorrect or empty")}
         if (error.join("") !== "") {
@@ -185,10 +191,22 @@ export class ffmpeg extends EventEmitter<Events> {
         if (this.#filters.length > 0) temp.push("-vf", this.#filters.join(","))
         if (this.#abitrate.length > 0) this.#abitrate.forEach(x => temp.push(x))
         if (this.#vbitrate.length > 0) this.#vbitrate.forEach(x => temp.push(x))
-        temp.push("-progress", "pipe:2", this.#outputFile);
+        temp.push("-progress", "pipe:2")
+        if (this.#outputPipe) {
+            temp.push("-f", "h264", "pipe:1")
+        } else {
+            temp.push(this.#outputFile)
+        }
         return temp;
     }
-    private async PRIVATE_METHOD_DONT_FUCKING_USE_getStdout(): Promise<void> {
+    private async PRIVATE_METHOD_DONT_FUCKING_USE_getPipingData(): Promise<void> {
+        for await (const line of readLines(this.#Process.stdout!)) {
+            if (line) {
+                super.emit('data', line)
+            }
+        }
+    }
+    private async PRIVATE_METHOD_DONT_FUCKING_USE_getProgress(): Promise<void> {
         let i = 0;
         let temp: Array<string> = [];
         let stderrStart = true;
@@ -237,10 +255,11 @@ export class ffmpeg extends EventEmitter<Events> {
             stderr: "piped",
             stdout: "piped"
         });
-        this.PRIVATE_METHOD_DONT_FUCKING_USE_getStdout();
-        const status = await this.#Process.status()
+        if (this.#outputPipe) this.PRIVATE_METHOD_DONT_FUCKING_USE_getPipingData();
+        this.PRIVATE_METHOD_DONT_FUCKING_USE_getProgress();
+        const status = await this.#Process.status();
         await this.#Process.close();
-        if (status.success == false) super.emit('error', this.#stderr.join('\r\n'))
+        if (status.success == false) super.emit('error', this.#stderr.join('\r\n'));
         super.emit('end', status);
     }
 }
