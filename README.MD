@@ -73,7 +73,7 @@ new ffmpeg('./path/to/input1.avi') // <= this one will be ignored
   .input('./path/to/input2.avi')   // <= this one will also be ignored
   .input('./path/to/input3.avi');
 ```
-This functionality will be added later on
+multiple input support will be added later on
 ## Audio options
 
 The following methods change the audio stream(s) in the produced output.
