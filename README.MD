@@ -42,13 +42,9 @@ new ffmpeg({ ffmpegDir: './path/to/ffmpeg'})
     .input('./path/to/video0')
 ```
 
-~~the options are the following:~~
-* ~~`source`: ffmpeg input source~~
-* ~~`timeout`: ffmpeg timeout in seconds (defaults to no timeout)~~
-* ~~`niceness`: ffmpeg niceness value, between -20 and 20; ignored on Windows platforms (defaults to 0)~~
-* ~~`logger`: logger string with `debug`, `info`, `warning`, `error`, `fatal`, `verbose` and `quiet` methods (defaults to quiet)~~  
-
-This functionality will be added in v1.2
+the options are the following:
+* `source`: ffmpeg input source
+* `niceness`: ffmpeg niceness value, between -20 and 20; ignored on Windows platforms (defaults to 0)
 ### Specifying inputs
 
 You can only use one input for Ffmpeg. More support will be added in v1.2  
