@@ -175,6 +175,14 @@ Save should always be specified to run ffmpeg
 ```js
 new ffmpeg().save('./path/to/output.mp4');
 ```
+
+### pipe(): pipe to `on('data')` listener
+pipe output to `on('data')` listener for handling data yourself.  
+*Recommended* to always specify the videoCodec with `videoCodec('codecname')`
+
+```js
+new ffmpeg().videoCodec('codecname').pipe();
+```
 ## Misc options
 
 ### on('event', func): event listener
