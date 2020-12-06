@@ -16,16 +16,15 @@ interface Filters {
     filterName: string;
     options: Record<string, unknown>
 }
-// interface SpawnOptions {
-//     timeout: number,
-//     niceness: number,
-//     logger: string,
-//     stdoutLines: number
-// }
+interface SpawnOptions {
+    timeout: number;
+    niceness: number;
+    logger: string;
+    stdoutLines: number
+}
 interface Spawn {
     ffmpegDir: string;
-    // options: SpawnOptions,
-    fatalError?: boolean
+    options: SpawnOptions
 }
 interface Status {
     success: boolean;
@@ -142,21 +141,57 @@ export class ffmpeg extends EventEmitter<Events> {
         })
         return this;
     }
-    private PRIVATE_METHOD_DONT_FUCKING_USE_errorCheck(): void {
-        const error: Array<string> = [];
-        if (this.#audCodec.length > 0 && (this.#audCodec.join("").includes("undefined") || this.#audCodec.includes("null"))) {error.push("one or more audio codec options are undefined")}
-        if (this.#vidCodec.length > 0 && (this.#vidCodec.join("").includes("undefined") || this.#vidCodec.includes("null"))) {error.push("one or more video codec options are undefined")}
-        if (this.#vbitrate.length > 0 && (this.#vBR == 0 || Number.isNaN(this.#vBR) == true)) {error.push("video Bitrate is NaN")}
-        if (this.#abitrate.length > 0 && (this.#aBR == 0 || Number.isNaN(this.#aBR) == true)) {error.push("audio Bitrate is NaN")}
-        if (!this.#input) {error.push("No input specified!")}
-        if ((!this.#outputFile || this.#outputFile == "") && !this.#outputPipe) {error.push("No output specified!")}
-        if (!this.#ffmpegDir || this.#ffmpegDir == "") {error.push("No ffmpeg directory specified!")}
-        if (this.#filters.length > 0 && this.#filters.join("").includes("undefined")) {error.push("Filters were selected, but the field is incorrect or empty")}
-        if (error.join("") !== "") {
-            const errors: string = error.join("\r\n");
-            super.emit('error', errors);
+    private async PRIVATE_METHOD_DONT_FUCKING_USE_getPipingData(): Promise<void> {
+        for await (const line of readLines(this.#Process.stdout!)) {
+            if (line) {
+                super.emit('data', line)
+            }
         }
-        return;
+    }
+    private async PRIVATE_METHOD_DONT_FUCKING_USE_getProgress(): Promise<void> {
+        let i = 0;
+        let temp: Array<string> = [];
+        let stderrStart = true;
+        let timeS = NaN;
+        let bitrate = NaN;
+        let totalFrames = NaN;
+        for await (const line of readLines(this.#Process.stderr!)) {
+            if (line) {
+                if (stderrStart) {
+                    this.#stderr.push(line);
+                    if (i == 7) {
+                        const dur: string = line.trim().replaceAll("Duration: ", "");
+                        const timeArr: Array<string> = dur.substr(0, dur.indexOf(",")).split(":");
+                        timeS = ((Number.parseFloat(timeArr[0]) * 60 + parseFloat(timeArr[1])) * 60 + parseFloat(timeArr[2]));
+                    }
+                    if (i == 8) {
+                        const string: string = line.trim();
+                        bitrate = Number.parseFloat(string.substr(string.indexOf('], '), string.indexOf('kb/s,') - string.indexOf('], ')).replaceAll("], ", "").trim()); 
+                        totalFrames = timeS * Number.parseFloat(string.substr(string.indexOf('kb/s,'), string.indexOf('fps') - string.indexOf('kb/s,')).replaceAll("kb/s,", "").trim());
+                    }
+                    if (i == 38) {i = 0;stderrStart = false;}
+                } else {
+                    if (i < 13) temp.push(line);
+                    if (i == 12) {
+                        if (temp[0] == "progress=end") return;
+                        let frame: number = Number.parseInt(temp[0].replaceAll("frame=", "").trim());
+                        let fps: number = Number.parseFloat(temp[1].replaceAll("fps=", "").trim()) + 0.01;
+                        if (temp[0].includes("frame=  ")) {
+                            frame = Number.parseInt(temp[1].replaceAll("frame=", "").trim());
+                            fps = Number.parseFloat(temp[2].replaceAll("fps=", "").trim()) + 0.01;
+                        }
+                        const progressOBJ: Progress = {
+                            ETA: new Date(Date.now() + (totalFrames - frame) / fps * 1000),
+                            percentage: Number.parseFloat((frame / totalFrames * 100).toFixed(2))
+                        }
+                        if (!Number.isNaN(fps) && !Number.isNaN(frame)) super.emit('progress', progressOBJ);
+                        i = 0;
+                        temp = [];
+                    }
+                }
+                i++
+            }
+        }
     }
     private PRIVATE_METHOD_DONT_FUCKING_USE_clear(input: string): void {
         switch (input.toLowerCase()) {
@@ -199,54 +234,21 @@ export class ffmpeg extends EventEmitter<Events> {
         }
         return temp;
     }
-    private async PRIVATE_METHOD_DONT_FUCKING_USE_getPipingData(): Promise<void> {
-        for await (const line of readLines(this.#Process.stdout!)) {
-            if (line) {
-                super.emit('data', line)
-            }
+    private PRIVATE_METHOD_DONT_FUCKING_USE_errorCheck(): void {
+        const error: Array<string> = [];
+        if (this.#audCodec.length > 0 && (this.#audCodec.join("").includes("undefined") || this.#audCodec.includes("null"))) {error.push("one or more audio codec options are undefined")}
+        if (this.#vidCodec.length > 0 && (this.#vidCodec.join("").includes("undefined") || this.#vidCodec.includes("null"))) {error.push("one or more video codec options are undefined")}
+        if (this.#vbitrate.length > 0 && (this.#vBR == 0 || Number.isNaN(this.#vBR) == true)) {error.push("video Bitrate is NaN")}
+        if (this.#abitrate.length > 0 && (this.#aBR == 0 || Number.isNaN(this.#aBR) == true)) {error.push("audio Bitrate is NaN")}
+        if (!this.#input) {error.push("No input specified!")}
+        if ((!this.#outputFile || this.#outputFile == "") && !this.#outputPipe) {error.push("No output specified!")}
+        if (!this.#ffmpegDir || this.#ffmpegDir == "") {error.push("No ffmpeg directory specified!")}
+        if (this.#filters.length > 0 && this.#filters.join("").includes("undefined")) {error.push("Filters were selected, but the field is incorrect or empty")}
+        if (error.join("") !== "") {
+            const errors: string = error.join("\r\n");
+            super.emit('error', errors);
         }
-    }
-    private async PRIVATE_METHOD_DONT_FUCKING_USE_getProgress(): Promise<void> {
-        let i = 0;
-        let temp: Array<string> = [];
-        let stderrStart = true;
-        let timeS = NaN;
-        let bitrate = NaN;
-        let totalFrames = NaN;
-        for await (const line of readLines(this.#Process.stderr!)) {
-            if (line) {
-                if (stderrStart) this.#stderr.push(line);
-                if (stderrStart === true && i == 7) {
-                    const dur: string = line.trim().replaceAll("Duration: ", "");
-                    const timeArr: Array<string> = dur.substr(0, dur.indexOf(",")).split(":");
-                    timeS = ((Number.parseFloat(timeArr[0]) * 60 + parseFloat(timeArr[1])) * 60 + parseFloat(timeArr[2]));
-                }
-                if (stderrStart === true && i == 8) {
-                    const string: string = line.trim();
-                    bitrate = Number.parseFloat(string.substr(string.indexOf('], '), string.indexOf('kb/s,') - string.indexOf('], ')).replaceAll("], ", "").trim()); 
-                    totalFrames = timeS * Number.parseFloat(string.substr(string.indexOf('kb/s,'), string.indexOf('fps') - string.indexOf('kb/s,')).replaceAll("kb/s,", "").trim());
-                }
-                if (stderrStart === false && i < 13) temp.push(line)
-                if (stderrStart === true && i == 38) {i = 0;stderrStart = false;}
-                if (stderrStart === false && i == 12) {
-                    if (temp[0] == "progress=end") return;
-                    let frame: number = Number.parseInt(temp[0].replaceAll("frame=", "").trim());
-                    let fps: number = Number.parseFloat(temp[1].replaceAll("fps=", "").trim()) + 0.01;
-                    if (temp[0].includes("frame=  ")) {
-                        frame = Number.parseInt(temp[1].replaceAll("frame=", "").trim());
-                        fps = Number.parseFloat(temp[2].replaceAll("fps=", "").trim()) + 0.01;
-                    }
-                    const progressOBJ: Progress = {
-                        ETA: new Date(Date.now() + (totalFrames - frame) / fps * 1000),
-                        percentage: Number.parseFloat((frame / totalFrames * 100).toFixed(2))
-                    }
-                    if (!Number.isNaN(fps) && !Number.isNaN(frame)) super.emit('progress', progressOBJ);
-                    i = 0;
-                    temp = [];
-                }
-                i++
-            }
-        }
+        return;
     }
     private async PRIVATE_METHOD_DONT_FUCKING_USE_run(): Promise<void> {
         await this.PRIVATE_METHOD_DONT_FUCKING_USE_errorCheck();
