@@ -239,8 +239,11 @@ new ffmpeg().on('progress', progressOBJ => {
 ```
 ---
 ## Changelog
+
 ## 1.1.1
 - *added* url input's
+<br><br>
+- *changed* variable **sumshit** => to **progressOBJ**
 ## 1.1
 - *added* noAudio() method
 - *added* noVideo() method
