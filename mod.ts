@@ -180,11 +180,11 @@ export class ffmpeg extends EventEmitter<Events> {
             temp.push("-vn");
             this.PRIVATE_METHOD_DONT_FUCKING_USE_clear("video")
         }
-        if (this.#audCodec.length > 0) this.#audCodec.forEach(x => temp.push(x)) // Push audio codec
-        if (this.#vidCodec.length > 0) this.#vidCodec.forEach(x => temp.push(x)) // Push video codec
-        if (this.#filters.length > 0) temp.push("-vf", this.#filters.join(",")) // Push all Filters
-        if (this.#abitrate.length > 0) this.#abitrate.forEach(x => temp.push(x)) // Push audio bitrate
-        if (this.#vbitrate.length > 0) this.#vbitrate.forEach(x => temp.push(x)) // Push video bitrate
+        if (this.#audCodec.length > 0) this.#audCodec.forEach(x => temp.push(x))
+        if (this.#vidCodec.length > 0) this.#vidCodec.forEach(x => temp.push(x))
+        if (this.#filters.length > 0) temp.push("-vf", this.#filters.join(","))
+        if (this.#abitrate.length > 0) this.#abitrate.forEach(x => temp.push(x))
+        if (this.#vbitrate.length > 0) this.#vbitrate.forEach(x => temp.push(x))
         temp.push("-progress", "pipe:2", this.#outputFile);
         return temp;
     }
