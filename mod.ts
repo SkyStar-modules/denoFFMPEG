@@ -21,7 +21,7 @@ interface Filters {
 interface Spawn {
     ffmpegDir: string;
     niceness: number;
-    source: string;
+    fatalerror: boolean
 }
 interface Status {
     success: boolean;
@@ -49,38 +49,29 @@ export class FfmpegCommand extends EventEmitter<Events> {
     #noVideo:       boolean       = false;
     #outputPipe:    boolean       = false;
     #inputIsURL:    boolean       = false;
+    #fatalError:    boolean       =  true;
     #Process!:      Deno.Process;
-    public constructor(...param: Array<string|Spawn>) {
+    public constructor(input: string, options?:Spawn) {
         super();
-        param.forEach(x => {
-            if (typeof x == null) return this;
-            if (typeof x == "string") {
-                if (x.includes('http')) {
-                    this.#inputIsURL = true;
+        if (input.includes('http')) this.#inputIsURL = true;
+        this.#input = input;
+        if (options) {
+            console.log(typeof options)
+            Object.entries(options).forEach((j: Array<string>) => {
+                switch (j[0].toLowerCase()) {
+                    case "fatalerror":
+                        this.#fatalError = Boolean(j[1]);
+                    case "ffmpegdir":
+                        this.#ffmpegDir = j[1];
+                        break;
+                    case "niceness":
+                        if (Deno.build.os !== "windows") this.#niceness = j[1];
+                        break;
+                    default:
+                        throw new Error('Option "' + j[0] + '" not found! Please remove')
                 }
-                this.#input = x;
-            }
-            if (typeof x == "object") {
-                Object.entries(x).forEach((j: Array<string>) => {
-                    switch (j[0].toLowerCase()) {
-                        case "source":
-                            if (j[1].includes('http')) {
-                                this.#inputIsURL = true;
-                            }
-                            this.#input = j[1];
-                            break;
-                        case "ffmpegdir":
-                            this.#ffmpegDir = j[1];
-                            break;
-                        case "niceness":
-                            if (Deno.build.os !== "windows") this.#niceness = j[1];
-                            break;
-                        default:
-                            throw new Error('Option "' + j[0] + '" not found! Please remove')
-                    }
-                })
-            }
-        })
+            })
+        }
         return this;
     }
     public setFfmpegPath(ffmpegDir: string): this {
@@ -269,7 +260,7 @@ export class FfmpegCommand extends EventEmitter<Events> {
         }
         return;
     }
-    private async PRIVATE_METHOD_DONT_FUCKING_USE_run(): Promise<void> {
+    private async PRIVATE_METHOD_DONT_FUCKING_USE_run(): Promise<boolean> {
         await this.PRIVATE_METHOD_DONT_FUCKING_USE_errorCheck();
         this.#Process = Deno.run({
             cmd: await this.PRIVATE_METHOD_DONT_FUCKING_USE_formatting(),
@@ -282,9 +273,10 @@ export class FfmpegCommand extends EventEmitter<Events> {
         await this.#Process.close();
         if (status.success == false) super.emit('error', this.#stderr.join('\r\n'));
         super.emit('end', status);
+        return true;
     }
 }
 
-export default function ffmpeg(...param: Array<string|Spawn>): FfmpegCommand {
-    return new FfmpegCommand(param);
+export default function ffmpeg(input:string, options?: Spawn): FfmpegCommand {
+    return new FfmpegCommand(input, options);
 }
