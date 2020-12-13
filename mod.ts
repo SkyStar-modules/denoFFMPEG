@@ -3,27 +3,25 @@
 * Property of Christiaan van Boheemen
 */
 import { EventEmitter } from "https://deno.land/x/event@0.2.0/mod.ts";
-import { readLines } from "https://deno.land/std@0.79.0/io/mod.ts";
-import { assert, assertEquals } from "https://deno.land/std@0.79.0/testing/asserts.ts";
+import { readLines } from "https://deno.land/std@0.80.0/io/mod.ts";
 
 type Events = {
     progress: [Progress];
     end: [Status];
     error: [string];
-    data:[string]
+    data:[string];
+    warn: [string];
+    test: [string];
 }
 
 interface Filters {
     filterName: string;
-    options: Record<string, unknown>
-}
-interface SpawnOptions {
-    niceness: number;
-    source: string;
+    options: Record<string, number>
 }
 interface Spawn {
     ffmpegDir: string;
-    options: SpawnOptions
+    niceness: number;
+    source: string;
 }
 interface Status {
     success: boolean;
@@ -34,7 +32,7 @@ interface Progress {
     percentage: number 
 }
 
-export class ffmpeg extends EventEmitter<Events> {
+export class FfmpegCommand extends EventEmitter<Events> {
     #input:         string        =    "";
     #ffmpegDir:     string        =    "";
     #outputFile:    string        =    "";
@@ -55,19 +53,18 @@ export class ffmpeg extends EventEmitter<Events> {
     public constructor(...param: Array<string|Spawn>) {
         super();
         param.forEach(x => {
+            if (typeof x == null) return this;
             if (typeof x == "string") {
                 if (x.includes('http')) {
-                    console.log("THIS IS A LINK")
                     this.#inputIsURL = true;
                 }
                 this.#input = x;
             }
             if (typeof x == "object") {
-                Object.entries(x).forEach(j => {
+                Object.entries(x).forEach((j: Array<string>) => {
                     switch (j[0].toLowerCase()) {
                         case "source":
-                            if (String(j[1]).includes('http')) {
-                                console.log("THIS IS A LINK")
+                            if (j[1].includes('http')) {
                                 this.#inputIsURL = true;
                             }
                             this.#input = j[1];
@@ -77,6 +74,9 @@ export class ffmpeg extends EventEmitter<Events> {
                             break;
                         case "niceness":
                             if (Deno.build.os !== "windows") this.#niceness = j[1];
+                            break;
+                        default:
+                            throw new Error('Option "' + j[0] + '" not found! Please remove')
                     }
                 })
             }
@@ -84,11 +84,11 @@ export class ffmpeg extends EventEmitter<Events> {
         return this;
     }
     public setFfmpegPath(ffmpegDir: string): this {
-        this.#ffmpegDir = ffmpegDir;
+        if (ffmpegDir) this.#ffmpegDir = ffmpegDir;
         return this;
     }
     public inputFile(input: string): this {
-        this.#input = input;
+        if (input) this.#input = input;
         return this;
     }
     public save(output: string): void {
@@ -112,7 +112,7 @@ export class ffmpeg extends EventEmitter<Events> {
     public audioCodec(codec: string, options: Record<string, string>): this {
         this.#audCodec = ["-c:a", codec];
         if (codec == "" || codec == "null" || codec == "undefined") this.#audCodec = ["-c:a", "undefined"];
-        Object.entries(options).forEach(x => this.#audCodec.push("-" + x[0], x[1]));
+        if (options) Object.entries(options).forEach(x => this.#audCodec.push("-" + x[0], x[1]));
         return this;
     }
     public videoCodec(codec: string, options: Record<string, string>): this {
@@ -127,7 +127,7 @@ export class ffmpeg extends EventEmitter<Events> {
         return this;
     }
     public videoBitrate(bitrate: number|string, cbr = true): this {
-        const brString = String(bitrate);
+        const brString: string = String(bitrate);
         this.#vBR = parseInt(brString);
         let bitR: number;
         switch (brString.charAt(brString.length-1).toLowerCase()) {
@@ -153,6 +153,8 @@ export class ffmpeg extends EventEmitter<Events> {
         })
         return this;
     }
+    // everything after this comment is not intended to be used by a user.
+    // Please don't try to use the methods or anything. Leave them be
     private async PRIVATE_METHOD_DONT_FUCKING_USE_getPipingData(): Promise<void> {
         for await (const line of readLines(this.#Process.stdout!)) {
             if (line) {
@@ -174,7 +176,6 @@ export class ffmpeg extends EventEmitter<Events> {
                 if (stderrStart === true) {
                     this.#stderr.push(line);
                     if ((i == 8 && !this.#inputIsURL) || (i == 7 && this.#inputIsURL)) {
-                        console.log(line)
                         const dur: string = line.trim().replaceAll("Duration: ", "");
                         const timeArr: Array<string> = dur.substr(0, dur.indexOf(",")).split(":");
                         timeS = ((Number.parseFloat(timeArr[0]) * 60 + parseFloat(timeArr[1])) * 60 + parseFloat(timeArr[2]));
@@ -188,7 +189,6 @@ export class ffmpeg extends EventEmitter<Events> {
                 } else {
                     if (i < 13) temp.push(line);
                     if (i == 12) {
-                        console.log(temp)
                         if (temp[0] == "progress=end") return;
                         let frame: number = Number.parseInt(temp[0].replaceAll("frame=", "").trim());
                         let fps: number = Number.parseFloat(temp[1].replaceAll("fps=", "").trim()) + 0.01;
@@ -229,7 +229,8 @@ export class ffmpeg extends EventEmitter<Events> {
     }
     private PRIVATE_METHOD_DONT_FUCKING_USE_formatting(): Array<string> {
         const temp = [this.#ffmpegDir];
-        if (this.#niceness !== "") temp.push(this.#niceness);
+        if (this.#niceness !== "") temp.push("-n", this.#niceness);
+
         temp.push("-hide_banner", "-nostats","-y", "-i", this.#input)
         if (this.#noAudio) {
             temp.push("-an")
@@ -282,4 +283,8 @@ export class ffmpeg extends EventEmitter<Events> {
         if (status.success == false) super.emit('error', this.#stderr.join('\r\n'));
         super.emit('end', status);
     }
+}
+
+export default function ffmpeg(...param: Array<string|Spawn>): FfmpegCommand {
+    return new FfmpegCommand(param);
 }
