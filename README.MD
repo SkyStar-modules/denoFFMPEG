@@ -15,8 +15,8 @@
 ## Basic example
 `save()` is used to start the render process. you should always use `save()` as last option
 ```js
-import { ffmpeg } from "./mod.ts";
-let videoRender = new ffmpeg('./dev/video0', { ffmpegDir: './dev/ffmpeg' })
+import ffmpeg from "./mod.ts";
+let videoRender = ffmpeg({ source: './dev/video0', ffmpegDir: './dev/ffmpeg' })
 videoRender.videoBitrate(1000).save('./output.mp4');
 ```
 --- 
@@ -26,20 +26,24 @@ videoRender.videoBitrate(1000).save('./output.mp4');
 The denoFFMPEG module returns a constructor that you can use to instanciate FFmpeg commands.
 
 ```js
-import { ffmpeg } from "./mod.ts";
-var render = new ffmpeg();
+import ffmpeg from "./mod.ts";
+let render = ffmpeg();
+
+//or use ffmpeg class
+import { FfmpegClass } from "./mod.ts";
+let render = new FfmpegClass();
 ```
 
 You may pass a single input file and configuration object to the constructor.
 ```js
-import { ffmpeg } from "./mod.ts";
-new ffmpeg('./path/to/video0', { ffmpegDir: './path/to/ffmpeg'})
+import ffmpeg from "./mod.ts";
+let render = ffmpeg({source:'./path/to/video0', ffmpegDir: './path/to/ffmpeg'})
 ```
 
 ```js
-import { ffmpeg } from "./mod.ts";
-new ffmpeg({ ffmpegDir: './path/to/ffmpeg'})
-    .input('./path/to/video0')
+import ffmpeg from "./mod.ts";
+ffmpeg({ ffmpegDir: './path/to/ffmpeg'})
+  .input('./path/to/video0')
 ```
 
 the options are the following:
@@ -48,26 +52,25 @@ the options are the following:
 * `niceness`: ffmpeg niceness value, between -20 and 20; ignored on Windows platforms (defaults to 0)
 ### Specifying inputs
 
-You can only use one input for Ffmpeg. More support will be added in v1.2  
+
 An input can be:
 * a file name (eg. `./path/to/file.avi`);
 * an image pattern (eg. `./path/to/frame%03d.png`);
 * a link to a video (eg. `http://samples.ffmpeg.org/MPEG-4/video.mp4`);
-* and most protocols [link here](https://ffmpeg.org/ffmpeg-protocols.html)
 ```js
 // Note that all denoFFMPEG methods are chainable
 // currently the last input path will be used
-new ffmpeg()
+ffmpeg()
   .input('./path/to/input1.avi')
 
 
 // You can also use links
-new ffmpeg('http://samples.ffmpeg.org/MPEG-4/video.mp4',{ ffmpegDir: './path/to/ffmpeg'})
-.save('./coolvideo.mp4');
+ffmpeg({source:'http://samples.ffmpeg.org/MPEG-4/video.mp4', ffmpegDir: './path/to/ffmpeg'})
+  .save('./coolvideo.mp4');
 
 
 // Passing an input to the constructor is the same as calling .input()
-new ffmpeg('./path/to/input1.avi') // <= this one will be ignored
+let render = ffmpeg({source:'./path/to/file.avi'}) // <= this one will be ignored
   .input('./path/to/input2.avi')   // <= this one will also be ignored
   .input('./path/to/input3.avi'); // <= this is the input
 ```
@@ -77,22 +80,22 @@ The following methods change the audio stream(s) in the produced output.
 ### noAudio(): disable audio altogether
 Disables audio in the output and remove any previously set audio option.
 ```js
-new ffmpeg('./path/to/file.avi').noAudio();
+ffmpeg({source:'./path/to/file.avi'}).noAudio();
 ```
 ### audioCodec(codec): set audio codec
 ```js
-new ffmpeg('./path/to/file.avi').audioCodec('libmp3lame');
+ffmpeg({source:'./path/to/file.avi'}).audioCodec('libmp3lame');
 ```
 denoFFMPEG checks for codec availability before actually running the command, and throws an error when a specified audio codec is not available.
 
 ### audioBitrate(bitrate): set audio bitrate
 Sets the audio bitrate in kbps. The `bitrate` parameter may be a number or a string with an optional `k` suffix.  
 This method is used to enforce a constant bitrate;  
-use `audioQuality()` to encode using a variable bitrate
+~~use `audioQuality()` to encode using a variable bitrate~~
 ```js
-new ffmpeg('./path/to/file.avi').audioBitrate(128);
-new ffmpeg('./path/to/file.avi').audioBitrate('128');
-new ffmpeg('./path/to/file.avi').audioBitrate('128k');
+ffmpeg({source:'./path/to/file.avi'}).audioBitrate(128);
+ffmpeg({source:'./path/to/file.avi'}).audioBitrate('128');
+ffmpeg({source:'./path/to/file.avi'}).audioBitrate('128k');
 ```
 ---
 ## Video options
@@ -100,20 +103,20 @@ The following methods change the video stream(s) in the produced output.
 ### noVideo(): disable video altogether
 This method disables video output and removes any previously set video option.
 ```js
-new ffmpeg('./path/to/file.avi').noVideo();
+ffmpeg({source: './path/to/file.avi'}).noVideo();
 ```
 ### videoCodec('codec'): set video codec
 ```js
-new ffmpeg('./path/to/file.avi').videoCodec('libx264');
+ffmpeg({source: './path/to/file.avi'}).videoCodec('libx264');
 ```
-denoFFMPEG checks for codec availability before actually running the command, and throws an error when a specified video codec is not available.
+~~denoFFMPEG checks for codec availability before actually running the command, and throws an error when a specified video codec is not available.~~
 ### videoBitrate(bitrate[, constant=true]): set video bitrate
 Sets the target video bitrate in kbps.  The `bitrate` argument may be a number or a string with an optional `k` or `m` suffix.  The `constant` argument specifies whether a constant bitrate should be enforced (defaults to true).
 ```js
-new ffmpeg('./path/to/file.avi').videoBitrate(1000);
-new ffmpeg('./path/to/file.avi').videoBitrate('1000');
-new ffmpeg('./path/to/file.avi').videoBitrate('1000k');
-new ffmpeg('./path/to/file.avi').videoBitrate('1000k', false);
+ffmpeg({source: './path/to/file.avi'}).videoBitrate(1000);
+ffmpeg({source: './path/to/file.avi'}).videoBitrate('1000');
+ffmpeg({source: './path/to/file.avi'}).videoBitrate('1000k');
+ffmpeg({source: './path/to/file.avi'}).videoBitrate('1000k', false);
 ```
 ### videoFilters(filter...): add custom video filters
 This method enables adding custom video filters.  You may add multiple filters at once by passing either several arguments or an array.  See the Ffmpeg documentation for available filters and their syntax.
@@ -122,7 +125,7 @@ Each filter pased to this method can only be a filter specification object with 
 * `filterName`: filter name
 * `options`: optional; use object mapping option names to values (eg. `{ t: 'in', s: 0, n: 30 }`).  When `options` is not specified, the filter will be added without any options.
 ```js
-new ffmpeg().videoFilters(
+ffmpeg().videoFilters(
   {
     filterName: "drawtext",
     options: {
@@ -143,13 +146,14 @@ new ffmpeg().videoFilters(
 path to your output file. eg `./output.mp4` or `C:/full/path/to/output.mp4`  
 `save('path')` or `pipe()` should either be specified to run ffmpeg
 ```js
-new ffmpeg().save('./path/to/output.mp4');
+ffmpeg().save('./path/to/output.mp4');
 ```
 ### pipe(): pipe to `on('data')` listener
-pipe output to `on('data')` listener for handling data yourself.  
+pipe stream output to `on('data')` listener for handling data yourself.
+~~You can also use `pipe('await')` to let the data be returned when done rendering~~
 *Recommended* to always specify the videoCodec with `videoCodec('codecname')`
 ```js
-new ffmpeg().videoCodec('codecname').pipe();
+ffmpeg().videoCodec('codecname').pipe();
 ```
 ## Misc options
 ### on('event', func): event listener
@@ -158,12 +162,12 @@ listen to one of the events and do something with it
 the first two indicate that ffmpeg has stopped.  
 Either by being finished or because ffmpeg/denoFFMPEG threw an error
 ```js
-new ffmpeg().on('error', errorSTRING => {
+ffmpeg().on('error', errorSTRING => {
   console.log(error);
 }).save('./savefile.mp4');
 
 
-new ffmpeg().on('end', statusOBJ => {
+ffmpeg().on('end', statusOBJ => {
   console.log(JSON.Stringify(statusOBJ));
 }).save('./savefile.mp4');
 // Object values for
@@ -172,7 +176,7 @@ new ffmpeg().on('end', statusOBJ => {
 //   code: number
 // }
 
-new ffmpeg().on('progress', progressOBJ => {
+ffmpeg().on('progress', progressOBJ => {
   console.log(JSON.Stringify(progressOBJ));
 }).save('./savefile.mp4');
 // Object values for 
@@ -187,12 +191,12 @@ listen to one of the events and fire once
 the first two indicate that ffmpeg has stopped.  
 Either by being finished or because ffmpeg/denoFFMPEG threw an error
 ```js
-new ffmpeg().on('error', errorSTRING => {
+ffmpeg().on('error', errorSTRING => {
   console.log(error);
 }).save('./savefile.mp4');
 
 
-new ffmpeg().on('end', statusOBJ => {
+ffmpeg().on('end', statusOBJ => {
   console.log(JSON.Stringify(statusOBJ));
 }).save('./savefile.mp4');
 // Object values for
@@ -201,7 +205,7 @@ new ffmpeg().on('end', statusOBJ => {
 //   code: number
 // }
 
-new ffmpeg().on('progress', progressOBJ => {
+ffmpeg().on('progress', progressOBJ => {
   console.log(JSON.Stringify(progressOBJ));
 }).save('./savefile.mp4');
 // Object values for 
@@ -212,6 +216,15 @@ new ffmpeg().on('progress', progressOBJ => {
 ```
 ---
 ## Changelog
+## 1.2
+- *added* pipe method
+- *added* 'data' eventEmitter for pipe method
+- *added* fatalError in constructor object
+- *added* ffmpeg function as default export. Use `import namehere from "./mod.ts"` for the function and `import {FfmpegClass} from "./mod.ts"`
+- *rewrote* constructor into one parameter with an object for everything. Check docs
+<br><br>
+- *changed* constructer. Now it is one object like with the following options `ffmpegDir`, `niceness`(not used on windows), `fatalError`(on by default) and `source` which is the inputfile  
+You don't need to specify all these, but you can
 ## 1.1.1
 - *added* url input's
 <br><br>
@@ -238,7 +251,6 @@ new ffmpeg().on('progress', progressOBJ => {
 ## Authors or Acknowledgments
 - Christiaan "MierenMans" van Boheemen - Author
 - [crowlKats](https://github.com/crowlKats) - Made [event@0.2.0](https://deno.land/x/event@0.2.0) chainable for me :)
-- Robin "Dubbel" Noort - Wrapper Idea
 <br>
 
 <h1>License</h1>
