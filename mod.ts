@@ -12,7 +12,7 @@ type Events = {
     data:[string];
     warn: [string];
     test: [string];
-}
+};
 
 interface Filters {
     filterName: string;
@@ -56,7 +56,6 @@ export class FfmpegCommand extends EventEmitter<Events> {
         if (input.includes('http')) this.#inputIsURL = true;
         this.#input = input;
         if (options) {
-            console.log(typeof options)
             Object.entries(options).forEach((j: Array<string>) => {
                 switch (j[0].toLowerCase()) {
                     case "fatalerror":
@@ -139,19 +138,15 @@ export class FfmpegCommand extends EventEmitter<Events> {
             let temp: string = x.filterName + '="';
             Object.entries(x.options).forEach((j, i) => {
                 if (i > 0) {temp += `: ${j[0]}='${j[1]}'`} else {temp += `${j[0]}='${j[1]}'`}
-            })
+            });
             this.#filters.push(temp);
-        })
+        });
         return this;
     }
-    // everything after this comment is not intended to be used by a user.
-    // Please don't try to use the methods or anything. Leave them be
     private async PRIVATE_METHOD_DONT_FUCKING_USE_getPipingData(): Promise<void> {
         for await (const line of readLines(this.#Process.stdout!)) {
-            if (line) {
-                super.emit('data', line)
-            }
-        }
+            if (line) super.emit('data', line);
+        }  
     }
     private async PRIVATE_METHOD_DONT_FUCKING_USE_getProgress(): Promise<void> {
         let i = 1;
@@ -163,7 +158,7 @@ export class FfmpegCommand extends EventEmitter<Events> {
         let encFound = 0;
         for await (const line of readLines(this.#Process.stderr!)) {
             if (line) {
-                if (line.includes('encoder')) encFound++
+                if (line.includes('encoder')) encFound++;
                 if (stderrStart === true) {
                     this.#stderr.push(line);
                     if ((i == 8 && !this.#inputIsURL) || (i == 7 && this.#inputIsURL)) {
@@ -186,11 +181,11 @@ export class FfmpegCommand extends EventEmitter<Events> {
                         if (temp[0].includes("frame=  ")) {
                             frame = Number.parseInt(temp[1].replaceAll("frame=", "").trim());
                             fps = Number.parseFloat(temp[2].replaceAll("fps=", "").trim()) + 0.01;
-                        }
+                        };
                         const progressOBJ: Progress = {
                             ETA: new Date(Date.now() + (totalFrames - frame) / fps * 1000),
                             percentage: Number.parseFloat((frame / totalFrames * 100).toFixed(2))
-                        }
+                        };
                         if (!Number.isNaN(fps) && !Number.isNaN(frame)) super.emit('progress', progressOBJ);
                         i = 0;
                         temp = [];
@@ -214,7 +209,8 @@ export class FfmpegCommand extends EventEmitter<Events> {
                 this.#filters = [];
                 break;
             default:
-                throw new Error("tried to clear input. But no input was specified!\r\nIf you see this. Something is probably fucked")
+                if (this.#fatalError) throw new Error("tried to clear input. But no input was specified!\r\nIf you see this. Something is probably fucked");
+                console.error("tried to clear input. But no input was specified!\r\nIf you see this. Something is probably fucked");
         }
         return;
     }
@@ -222,41 +218,42 @@ export class FfmpegCommand extends EventEmitter<Events> {
         const temp = [this.#ffmpegDir];
         if (this.#niceness !== "") temp.push("-n", this.#niceness);
 
-        temp.push("-hide_banner", "-nostats","-y", "-i", this.#input)
+        temp.push("-hide_banner", "-nostats","-y", "-i", this.#input);
         if (this.#noAudio) {
-            temp.push("-an")
+            temp.push("-an");
             this.PRIVATE_METHOD_DONT_FUCKING_USE_clear("audio");
         }
         if (this.#noVideo) {
             temp.push("-vn");
-            this.PRIVATE_METHOD_DONT_FUCKING_USE_clear("video")
+            this.PRIVATE_METHOD_DONT_FUCKING_USE_clear("video");
         }
-        if (this.#audCodec.length > 0) this.#audCodec.forEach(x => temp.push(x))
-        if (this.#vidCodec.length > 0) this.#vidCodec.forEach(x => temp.push(x))
-        if (this.#filters.length > 0) temp.push("-vf", this.#filters.join(","))
-        if (this.#abitrate.length > 0) this.#abitrate.forEach(x => temp.push(x))
-        if (this.#vbitrate.length > 0) this.#vbitrate.forEach(x => temp.push(x))
-        temp.push("-progress", "pipe:2")
+        if (this.#audCodec.length > 0) this.#audCodec.forEach(x => temp.push(x));
+        if (this.#vidCodec.length > 0) this.#vidCodec.forEach(x => temp.push(x));
+        if (this.#filters.length > 0) temp.push("-vf", this.#filters.join(","));
+        if (this.#abitrate.length > 0) this.#abitrate.forEach(x => temp.push(x));
+        if (this.#vbitrate.length > 0) this.#vbitrate.forEach(x => temp.push(x));
+        temp.push("-progress", "pipe:2");
         if (this.#outputPipe) {
-            temp.push("-f", "h264", "pipe:1")
+            temp.push("-f", "h264", "pipe:1");
         } else {
-            temp.push(this.#outputFile)
+            temp.push(this.#outputFile);
         }
         return temp;
     }
     private PRIVATE_METHOD_DONT_FUCKING_USE_errorCheck(): void {
-        const error: Array<string> = [];
-        if (this.#audCodec.length > 0 && (this.#audCodec.join("").includes("undefined") || this.#audCodec.includes("null"))) {error.push("one or more audio codec options are undefined")}
-        if (this.#vidCodec.length > 0 && (this.#vidCodec.join("").includes("undefined") || this.#vidCodec.includes("null"))) {error.push("one or more video codec options are undefined")}
-        if (this.#vbitrate.length > 0 && (this.#vBR == 0 || Number.isNaN(this.#vBR) == true)) {error.push("video Bitrate is NaN")}
-        if (this.#abitrate.length > 0 && (this.#aBR == 0 || Number.isNaN(this.#aBR) == true)) {error.push("audio Bitrate is NaN")}
-        if (!this.#input) {error.push("No input specified!")}
-        if ((!this.#outputFile || this.#outputFile == "") && !this.#outputPipe) {error.push("No output specified!")}
-        if (!this.#ffmpegDir || this.#ffmpegDir == "") {error.push("No ffmpeg directory specified!")}
-        if (this.#filters.length > 0 && this.#filters.join("").includes("undefined")) {error.push("Filters were selected, but the field is incorrect or empty")}
-        if (error.join("") !== "") {
-            const errors: string = error.join("\r\n");
-            super.emit('error', errors);
+        const errors: Array<string> = [];
+        if (this.#audCodec.length > 0 && (this.#audCodec.join("").includes("undefined") || this.#audCodec.includes("null"))) {errors.push("one or more audio codec options are undefined")}
+        if (this.#vidCodec.length > 0 && (this.#vidCodec.join("").includes("undefined") || this.#vidCodec.includes("null"))) {errors.push("one or more video codec options are undefined")}
+        if (this.#vbitrate.length > 0 && (this.#vBR == 0 || Number.isNaN(this.#vBR) == true)) {errors.push("video Bitrate is NaN")}
+        if (this.#abitrate.length > 0 && (this.#aBR == 0 || Number.isNaN(this.#aBR) == true)) {errors.push("audio Bitrate is NaN")}
+        if (!this.#input) {errors.push("No input specified!")}
+        if ((!this.#outputFile || this.#outputFile == "") && !this.#outputPipe) {errors.push("No output specified!")}
+        if (!this.#ffmpegDir || this.#ffmpegDir == "") {errors.push("No ffmpeg directory specified!")}
+        if (this.#filters.length > 0 && this.#filters.join("").includes("undefined")) {errors.push("Filters were selected, but the field is incorrect or empty")}
+        if (errors.length > 0) {
+            const errorList: string = errors.join("\r\n");
+            super.emit('error', errorList);
+            if (this.#fatalError) throw new Error(errorList);
         }
         return;
     }
