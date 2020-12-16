@@ -21,7 +21,8 @@ interface Filters {
 interface Spawn {
     ffmpegDir: string;
     niceness: number;
-    fatalerror: boolean
+    fatalError: boolean;
+    source: string;
 }
 interface Status {
     success: boolean;
@@ -32,7 +33,7 @@ interface Progress {
     percentage: number 
 }
 
-export class FfmpegCommand extends EventEmitter<Events> {
+export class FfmpegClass extends EventEmitter<Events> {
     #input:         string        =    "";
     #ffmpegDir:     string        =    "";
     #outputFile:    string        =    "";
@@ -51,10 +52,8 @@ export class FfmpegCommand extends EventEmitter<Events> {
     #inputIsURL:    boolean       = false;
     #fatalError:    boolean       =  true;
     #Process!:      Deno.Process;
-    public constructor(input: string, options?:Spawn) {
+    public constructor(options?:Spawn) {
         super();
-        if (input.includes('http')) this.#inputIsURL = true;
-        this.#input = input;
         if (options) {
             Object.entries(options).forEach((j: Array<string>) => {
                 switch (j[0].toLowerCase()) {
@@ -66,6 +65,9 @@ export class FfmpegCommand extends EventEmitter<Events> {
                     case "niceness":
                         if (Deno.build.os !== "windows") this.#niceness = j[1];
                         break;
+                    case "source":
+                        if (j[1].includes('http')) this.#inputIsURL = true;
+                        this.#input = j[1];
                     default:
                         throw new Error('Option "' + j[0] + '" not found! Please remove')
                 }
@@ -268,12 +270,14 @@ export class FfmpegCommand extends EventEmitter<Events> {
         this.PRIVATE_METHOD_DONT_FUCKING_USE_getProgress();
         const status = await this.#Process.status();
         await this.#Process.close();
-        if (status.success == false) super.emit('error', this.#stderr.join('\r\n'));
+        if (status.success == false) {
+            super.emit('error', this.#stderr.join('\r\n'));
+        }
         super.emit('end', status);
         return true;
     }
 }
 
-export default function ffmpeg(input:string, options?: Spawn): FfmpegCommand {
-    return new FfmpegCommand(input, options);
+export default function ffmpeg(options?: Spawn): FfmpegClass {
+    return new FfmpegClass(options);
 }
