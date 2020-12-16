@@ -34,23 +34,23 @@ interface Progress {
 }
 
 export class FfmpegClass extends EventEmitter<Events> {
-    #input:         string        =    "";
-    #ffmpegDir:     string        =    "";
-    #outputFile:    string        =    "";
-    #niceness:      string        =    "";
+    #input                        =    "";
+    #ffmpegDir                    =    "";
+    #outputFile                   =    "";
+    #niceness                     =    "";
     #vbitrate:      Array<string> =    [];
     #abitrate:      Array<string> =    [];
     #filters:       Array<string> =    [];
     #vidCodec:      Array<string> =    [];
     #audCodec:      Array<string> =    [];
     #stderr:        Array<string> =    [];
-    #aBR:           number        =     0;
-    #vBR:           number        =     0;
-    #noAudio:       boolean       = false;
-    #noVideo:       boolean       = false;
-    #outputPipe:    boolean       = false;
-    #inputIsURL:    boolean       = false;
-    #fatalError:    boolean       =  true;
+    #aBR                          =     0;
+    #vBR                          =     0;
+    #noAudio                      = false;
+    #noVideo                      = false;
+    #outputPipe                   = false;
+    #inputIsURL                   = false;
+    #fatalError                   =  true;
     #Process!:      Deno.Process;
     public constructor(options?:Spawn) {
         super();
@@ -59,6 +59,7 @@ export class FfmpegClass extends EventEmitter<Events> {
                 switch (j[0].toLowerCase()) {
                     case "fatalerror":
                         this.#fatalError = Boolean(j[1]);
+                        break;
                     case "ffmpegdir":
                         this.#ffmpegDir = j[1];
                         break;
@@ -68,8 +69,9 @@ export class FfmpegClass extends EventEmitter<Events> {
                     case "source":
                         if (j[1].includes('http')) this.#inputIsURL = true;
                         this.#input = j[1];
+                        break;
                     default:
-                        throw new Error('Option "' + j[0] + '" not found! Please remove')
+                        throw 'Option "' + j[0] + '" not found! Please remove';
                 }
             })
         }
@@ -83,11 +85,6 @@ export class FfmpegClass extends EventEmitter<Events> {
         if (input) this.#input = input;
         return this;
     }
-    public save(output: string): void {
-        this.#outputFile = output;
-        this.PRIVATE_METHOD_DONT_FUCKING_USE_run();
-        return;
-    }
     public noAudio(): this {
         this.#noAudio = true;
         return this;
@@ -95,11 +92,6 @@ export class FfmpegClass extends EventEmitter<Events> {
     public noVideo(): this {
         this.#noVideo = true;
         return this;
-    }
-    public pipe(): void {
-        this.#outputPipe = true;
-        this.PRIVATE_METHOD_DONT_FUCKING_USE_run();
-        return;
     }
     public audioCodec(codec: string, options: Record<string, string>): this {
         this.#audCodec = ["-c:a", codec];
@@ -119,7 +111,7 @@ export class FfmpegClass extends EventEmitter<Events> {
         return this;
     }
     public videoBitrate(bitrate: number|string, cbr = true): this {
-        const brString: string = String(bitrate);
+        const brString = String(bitrate);
         this.#vBR = parseInt(brString);
         let bitR: number;
         switch (brString.charAt(brString.length-1).toLowerCase()) {
@@ -144,6 +136,16 @@ export class FfmpegClass extends EventEmitter<Events> {
             this.#filters.push(temp);
         });
         return this;
+    }
+    public pipe(): void {
+        this.#outputPipe = true;
+        this.PRIVATE_METHOD_DONT_FUCKING_USE_run();
+        return;
+    }
+    public save(output: string): void {
+        this.#outputFile = output;
+        this.PRIVATE_METHOD_DONT_FUCKING_USE_run();
+        return;
     }
     private async PRIVATE_METHOD_DONT_FUCKING_USE_getPipingData(): Promise<void> {
         for await (const line of readLines(this.#Process.stdout!)) {
@@ -183,7 +185,7 @@ export class FfmpegClass extends EventEmitter<Events> {
                         if (temp[0].includes("frame=  ")) {
                             frame = Number.parseInt(temp[1].replaceAll("frame=", "").trim());
                             fps = Number.parseFloat(temp[2].replaceAll("fps=", "").trim()) + 0.01;
-                        };
+                        }
                         const progressOBJ: Progress = {
                             ETA: new Date(Date.now() + (totalFrames - frame) / fps * 1000),
                             percentage: Number.parseFloat((frame / totalFrames * 100).toFixed(2))
@@ -259,7 +261,7 @@ export class FfmpegClass extends EventEmitter<Events> {
         }
         return;
     }
-    private async PRIVATE_METHOD_DONT_FUCKING_USE_run(): Promise<boolean> {
+    private async PRIVATE_METHOD_DONT_FUCKING_USE_run(): Promise<void> {
         await this.PRIVATE_METHOD_DONT_FUCKING_USE_errorCheck();
         this.#Process = Deno.run({
             cmd: await this.PRIVATE_METHOD_DONT_FUCKING_USE_formatting(),
@@ -274,7 +276,7 @@ export class FfmpegClass extends EventEmitter<Events> {
             super.emit('error', this.#stderr.join('\r\n'));
         }
         super.emit('end', status);
-        return true;
+        return;
     }
 }
 
