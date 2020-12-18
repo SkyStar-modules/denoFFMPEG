@@ -185,6 +185,7 @@ ffmpeg().on('progress', progressOBJ => {
 //   percentage: number 
 // }
 ```
+
 ### off('event', func): same as on('event', func) but just once
 listen to one of the events and fire once
 `end`, `error` and `progress`
