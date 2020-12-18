@@ -19,10 +19,10 @@ interface Filters {
     options: Record<string, number>
 }
 interface Spawn {
-    ffmpegDir: string;
-    niceness: number;
-    fatalError: boolean;
-    source: string;
+    ffmpegDir?: string;
+    niceness?: number;
+    fatalError?: boolean;
+    source?: string;
 }
 interface Status {
     success: boolean;
