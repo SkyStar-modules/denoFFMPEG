@@ -63,67 +63,91 @@ An input can be:
 ffmpeg()
   .input('./path/to/input1.avi')
 
-
 // You can also use links
 ffmpeg({source:'http://samples.ffmpeg.org/MPEG-4/video.mp4', ffmpegDir: './path/to/ffmpeg'})
   .save('./coolvideo.mp4');
-
 
 // Passing an input to the constructor is the same as calling .input()
 let render = ffmpeg({source:'./path/to/file.avi'}) // <= this one will be ignored
   .input('./path/to/input2.avi')   // <= this one will also be ignored
   .input('./path/to/input3.avi'); // <= this is the input
 ```
+
 multiple input support will be added later on
+
 ## Audio options
+
 The following methods change the audio stream(s) in the produced output.
+
 ### noAudio(): disable audio altogether
+
 Disables audio in the output and remove any previously set audio option.
+
 ```js
 ffmpeg({source:'./path/to/file.avi'}).noAudio();
 ```
+
 ### audioCodec(codec): set audio codec
+
 ```js
 ffmpeg({source:'./path/to/file.avi'}).audioCodec('libmp3lame');
 ```
+
 denoFFMPEG checks for codec availability before actually running the command, and throws an error when a specified audio codec is not available.
 
 ### audioBitrate(bitrate): set audio bitrate
+
 Sets the audio bitrate in kbps. The `bitrate` parameter may be a number or a string with an optional `k` suffix.  
 This method is used to enforce a constant bitrate;  
 ~~use `audioQuality()` to encode using a variable bitrate~~
+
 ```js
 ffmpeg({source:'./path/to/file.avi'}).audioBitrate(128);
 ffmpeg({source:'./path/to/file.avi'}).audioBitrate('128');
 ffmpeg({source:'./path/to/file.avi'}).audioBitrate('128k');
 ```
+
 ---
+
 ## Video options
+
 The following methods change the video stream(s) in the produced output.
+
 ### noVideo(): disable video altogether
+
 This method disables video output and removes any previously set video option.
+
 ```js
 ffmpeg({source: './path/to/file.avi'}).noVideo();
 ```
+
 ### videoCodec('codec'): set video codec
+
 ```js
 ffmpeg({source: './path/to/file.avi'}).videoCodec('libx264');
 ```
+
 ~~denoFFMPEG checks for codec availability before actually running the command, and throws an error when a specified video codec is not available.~~
+
 ### videoBitrate(bitrate[, constant=true]): set video bitrate
+
 Sets the target video bitrate in kbps.  The `bitrate` argument may be a number or a string with an optional `k` or `m` suffix.  The `constant` argument specifies whether a constant bitrate should be enforced (defaults to true).
+
 ```js
 ffmpeg({source: './path/to/file.avi'}).videoBitrate(1000);
 ffmpeg({source: './path/to/file.avi'}).videoBitrate('1000');
 ffmpeg({source: './path/to/file.avi'}).videoBitrate('1000k');
 ffmpeg({source: './path/to/file.avi'}).videoBitrate('1000k', false);
 ```
+
 ### videoFilters(filter...): add custom video filters
+
 This method enables adding custom video filters.  You may add multiple filters at once by passing either several arguments or an array.  See the Ffmpeg documentation for available filters and their syntax.
 
 Each filter pased to this method can only be a filter specification object with the following keys:
 * `filterName`: filter name
 * `options`: optional; use object mapping option names to values (eg. `{ t: 'in', s: 0, n: 30 }`).  When `options` is not specified, the filter will be added without any options.
+
 ```js
 ffmpeg().videoFilters(
   {
@@ -142,30 +166,38 @@ ffmpeg().videoFilters(
   }
 )
 ```
+
 ### save('path'): path to output file
+
 path to your output file. eg `./output.mp4` or `C:/full/path/to/output.mp4`  
 `save('path')` or `pipe()` should either be specified to run ffmpeg
+
 ```js
 ffmpeg().save('./path/to/output.mp4');
 ```
+
 ### pipe(): pipe to `on('data')` listener
+
 pipe stream output to `on('data')` listener for handling data yourself.
 ~~You can also use `pipe('await')` to let the data be returned when done rendering~~
 *Recommended* to always specify the videoCodec with `videoCodec('codecname')`
+
 ```js
 ffmpeg().videoCodec('codecname').pipe();
 ```
+
 ## Misc options
 ### on('event', func): event listener
+
 listen to one of the events and do something with it
 `end`, `error` and `progress`
 the first two indicate that ffmpeg has stopped.  
 Either by being finished or because ffmpeg/denoFFMPEG threw an error
+
 ```js
 ffmpeg().on('error', errorSTRING => {
   console.log(error);
 }).save('./savefile.mp4');
-
 
 ffmpeg().on('end', statusOBJ => {
   console.log(JSON.Stringify(statusOBJ));
@@ -187,15 +219,16 @@ ffmpeg().on('progress', progressOBJ => {
 ```
 
 ### off('event', func): same as on('event', func) but just once
+
 listen to one of the events and fire once
 `end`, `error` and `progress`
 the first two indicate that ffmpeg has stopped.  
 Either by being finished or because ffmpeg/denoFFMPEG threw an error
+
 ```js
 ffmpeg().on('error', errorSTRING => {
   console.log(error);
 }).save('./savefile.mp4');
-
 
 ffmpeg().on('end', statusOBJ => {
   console.log(JSON.Stringify(statusOBJ));
@@ -215,7 +248,9 @@ ffmpeg().on('progress', progressOBJ => {
 //   percentage: number 
 // }
 ```
+
 ---
+
 ## Changelog
 ## 1.2
 - *added* pipe method
