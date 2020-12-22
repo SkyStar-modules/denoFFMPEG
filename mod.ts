@@ -16,7 +16,7 @@ type Events = {
 
 interface Filters {
     filterName: string;
-    options: Record<string, number>
+    options: Record<string, unknown>;
 }
 interface Spawn {
     ffmpegDir?: string;
@@ -30,28 +30,28 @@ interface Status {
 }
 interface Progress {
     ETA: Date;
-    percentage: number 
+    percentage: number;
 }
 
 export class FfmpegClass extends EventEmitter<Events> {
-    #input                        =    "";
-    #ffmpegDir                    =    "";
-    #outputFile                   =    "";
-    #niceness                     =    "";
-    #vbitrate:      Array<string> =    [];
-    #abitrate:      Array<string> =    [];
-    #filters:       Array<string> =    [];
-    #vidCodec:      Array<string> =    [];
-    #audCodec:      Array<string> =    [];
-    #stderr:        Array<string> =    [];
-    #aBR                          =     0;
-    #vBR                          =     0;
-    #noAudio                      = false;
-    #noVideo                      = false;
-    #outputPipe                   = false;
-    #inputIsURL                   = false;
-    #fatalError                   =  true;
-    #Process!:      Deno.Process;
+    #input                            =    "";
+    #ffmpegDir                        =    "";
+    #outputFile                       =    "";
+    #niceness                         =    "";
+    #vbitrate:      Array<string>     =    [];
+    #abitrate:      Array<string>     =    [];
+    #filters:       Array<string>     =    [];
+    #vidCodec:      Array<string>     =    [];
+    #audCodec:      Array<string>     =    [];
+    #stderr:        Array<string>     =    [];
+    #aBR                              =     0;
+    #vBR                              =     0;
+    #noAudio                          = false;
+    #noVideo                          = false;
+    #outputPipe                       = false;
+    #inputIsURL                       = false;
+    #fatalError                       =  true;
+    #Process!:                   Deno.Process;
     public constructor(options?:Spawn) {
         super();
         if (options) {
@@ -137,20 +137,10 @@ export class FfmpegClass extends EventEmitter<Events> {
         });
         return this;
     }
-    public pipe(): void {
-        this.#outputPipe = true;
-        this.PRIVATE_METHOD_DONT_FUCKING_USE_run();
-        return;
-    }
     public save(output: string): void {
         this.#outputFile = output;
         this.PRIVATE_METHOD_DONT_FUCKING_USE_run();
         return;
-    }
-    private async PRIVATE_METHOD_DONT_FUCKING_USE_getPipingData(): Promise<void> {
-        for await (const line of readLines(this.#Process.stdout!)) {
-            if (line) super.emit('data', line);
-        }  
     }
     private async PRIVATE_METHOD_DONT_FUCKING_USE_getProgress(): Promise<void> {
         let i = 1;
@@ -236,12 +226,7 @@ export class FfmpegClass extends EventEmitter<Events> {
         if (this.#filters.length > 0) temp.push("-vf", this.#filters.join(","));
         if (this.#abitrate.length > 0) this.#abitrate.forEach(x => temp.push(x));
         if (this.#vbitrate.length > 0) this.#vbitrate.forEach(x => temp.push(x));
-        temp.push("-progress", "pipe:2");
-        if (this.#outputPipe) {
-            temp.push("-f", "h264", "pipe:1");
-        } else {
-            temp.push(this.#outputFile);
-        }
+        temp.push("-progress", "pipe:2", this.#outputFile);
         return temp;
     }
     private PRIVATE_METHOD_DONT_FUCKING_USE_errorCheck(): void {
@@ -268,12 +253,11 @@ export class FfmpegClass extends EventEmitter<Events> {
             stderr: "piped",
             stdout: "piped"
         });
-        if (this.#outputPipe) this.PRIVATE_METHOD_DONT_FUCKING_USE_getPipingData();
         this.PRIVATE_METHOD_DONT_FUCKING_USE_getProgress();
         const status = await this.#Process.status();
         await this.#Process.close();
         if (status.success == false) {
-            super.emit('error', this.#stderr.join('\r\n'));
+            super.emit('error', this.#stderr.join('\n'));
         }
         super.emit('end', status);
         return;
