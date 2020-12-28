@@ -151,7 +151,8 @@ export class Processing {
      */
     private async __WaitProcess(): Promise<void> {
         await this.Process.stderrOutput();
-        this.Process.close()
+        this.Process.stdout!.close();
+        this.Process.close();
         return;
     }
     private async __test(): Promise<void> {
