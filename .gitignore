@@ -1,6 +1,4 @@
 .vscode
 ffmpeg
-test.js
-minifier.js
-oaktest.js
-test.mp4
+test.ts
+*.mp4
