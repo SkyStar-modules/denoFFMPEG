@@ -21,14 +21,14 @@ export class FfmpegClass extends Processing {
             Object.entries(options).forEach((j: Array<string>) => {
                 switch (j[0].toLowerCase()) {
                     case "ffmpegdir":
-                        this.__ffmpegDir = j[1];
+                        this.ffmpegDir = j[1];
                         break;
                     case "niceness":
-                        if (Deno.build.os !== "windows") this.__niceness = j[1];
+                        if (Deno.build.os !== "windows") this.niceness = j[1];
                         break;
                     case "source":
-                        if (j[1].includes('http')) this.__inputIsURL = true;
-                        this.__input = j[1];
+                        if (j[1].includes('http')) this.inputIsURL = true;
+                        this.input = j[1];
                         break;
                     default:
                         throw 'Option "' + j[0] + '" not found! Please remove it';
@@ -44,7 +44,7 @@ export class FfmpegClass extends Processing {
      * 
      */
     public setFfmpegPath(ffmpegPath: string): this {
-        if (ffmpegPath) this.__ffmpegDir = ffmpegPath;
+        if (ffmpegPath) this.ffmpegDir = ffmpegPath;
         return this;
     }
     /**
@@ -54,7 +54,7 @@ export class FfmpegClass extends Processing {
      * 
      */
     public inputFile(input: string): this {
-        if (input) this.__input = input;
+        if (input) this.input = input;
         return this;
     }
     /**
@@ -62,7 +62,7 @@ export class FfmpegClass extends Processing {
      * 
      */
     public noAudio(): this {
-        this.__noaudio = true;
+        this.noaudio = true;
         return this;
     }
     /**
@@ -70,7 +70,7 @@ export class FfmpegClass extends Processing {
      * 
      */
     public noVideo(): this {
-        this.__novideo = true;
+        this.novideo = true;
         return this;
     }
     /**
@@ -81,9 +81,9 @@ export class FfmpegClass extends Processing {
      *
      */
     public audioCodec(codec: string, options: Record<string, string>): this {
-        this.__audCodec = ["-c:a", codec];
-        if (codec == "" || codec == "null" || codec == "undefined") this.__audCodec = ["-c:a", "undefined"];
-        if (options) Object.entries(options).forEach(x => this.__audCodec.push("-" + x[0], x[1]));
+        this.audCodec = ["-c:a", codec];
+        if (codec == "" || codec == "null" || codec == "undefined") this.audCodec = ["-c:a", "undefined"];
+        if (options) Object.entries(options).forEach(x => this.audCodec.push("-" + x[0], x[1]));
         return this;
     }
     /**
@@ -94,9 +94,9 @@ export class FfmpegClass extends Processing {
      *
      */
     public videoCodec(codec: string, options: Record<string, string>): this {
-        this.__vidCodec = ["-c:v", codec];
-        if (codec == "" || codec == "null" || codec == "undefined") this.__vidCodec = ["-c:v", "undefined"];
-        if (options) Object.entries(options).forEach(x => this.__vidCodec.push("-" + x[0], x[1]));
+        this.vidCodec = ["-c:v", codec];
+        if (codec == "" || codec == "null" || codec == "undefined") this.vidCodec = ["-c:v", "undefined"];
+        if (options) Object.entries(options).forEach(x => this.vidCodec.push("-" + x[0], x[1]));
         return this;
     }
     /**
@@ -106,8 +106,8 @@ export class FfmpegClass extends Processing {
      * 
      */
     public audioBitrate(bitrate: number): this {
-        this.__aBR = bitrate;
-        this.__abitrate = ["-b:a", String(bitrate)];
+        this.aBR = bitrate;
+        this.abitrate = ["-b:a", String(bitrate)];
         return this;
     }
     /**
@@ -119,7 +119,7 @@ export class FfmpegClass extends Processing {
      */
     public videoBitrate(bitrate: number|string, cbr = true): this {
         const brString = String(bitrate);
-        this.__vBR = parseInt(brString);
+        this.vBR = parseInt(brString);
         let bitR: number;
         switch (brString.charAt(brString.length-1).toLowerCase()) {
             case "m":
@@ -130,8 +130,8 @@ export class FfmpegClass extends Processing {
                 bitR = parseInt(brString) * 1000;
                 break;
         }
-        this.__vbitrate = ['-maxrate', String(bitR), '-minrate', String(bitR), "-b:v", String(bitR), '-bufsize', '3M'];
-        if (cbr == false) this.__vbitrate = ['-maxrate', String(bitR * 2), '-minrate', String(bitR / 4), "-b:v", String(bitR), '-bufsize', String(bitR * 5)];
+        this.vbitrate = ['-maxrate', String(bitR), '-minrate', String(bitR), "-b:v", String(bitR), '-bufsize', '3M'];
+        if (cbr == false) this.vbitrate = ['-maxrate', String(bitR * 2), '-minrate', String(bitR / 4), "-b:v", String(bitR), '-bufsize', String(bitR * 5)];
         return this;
     }
     /**
@@ -146,7 +146,7 @@ export class FfmpegClass extends Processing {
             Object.entries(x.options).forEach((j, i) => {
                 if (i > 0) {temp += `: ${j[0]}='${j[1]}'`} else {temp += `${j[0]}='${j[1]}'`}
             });
-            this.__filters.push(temp);
+            this.filters.push(temp);
         });
         return this;
     }
@@ -159,7 +159,7 @@ export class FfmpegClass extends Processing {
      * 
      */
     public save(output:string): Promise<void> {
-        this.__outputFile = output;
+        this.outputFile = output;
         return this.__run();
     }
         /**
@@ -171,7 +171,7 @@ export class FfmpegClass extends Processing {
      * 
      */
     public saveWithProgress(output:string): AsyncGenerator<Progress,void,void> {
-        this.__outputFile = output;
+        this.outputFile = output;
         return this.__runWithProgress();
     }
 }
