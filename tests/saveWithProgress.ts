@@ -5,7 +5,7 @@ Deno.test({
         const thing = new FfmpegClass({
             ffmpegDir: "./ffmpeg/ffmpeg.exe",
             source: "./input.mp4"
-        }).saveWithProgress("../ree.mp4");
+        }).saveWithProgress("./ree.mp4");
         for await (const progress of thing) {
             console.log(progress);
         }
