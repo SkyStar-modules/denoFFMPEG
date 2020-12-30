@@ -33,54 +33,62 @@ export class Processing {
      */
     protected async* __getProgress(): AsyncGenerator<Progress,void,void> {
         let i = 1;
-        let temp: Array<string> = [];
+        let temp: string[] = [];
         let stderrStart = true;
         let timeS = NaN;
         let totalFrames = NaN;
         let encFound = 0;
+
         for await (const line of readLines(this.Process.stderr!)) {
-            if (line) {
-                if (line.includes('encoder')) encFound++;
-                if (stderrStart === true) {
-                    this.stderr.push(line);
-                    if ((i == 8 && !this.inputIsURL) || (i == 7 && this.inputIsURL)) {
-                        const dur: string = line.trim().replaceAll("Duration: ", "");
-                        const timeArr: Array<string> = dur.substr(0, dur.indexOf(",")).split(":");
-                        timeS = ((Number.parseFloat(timeArr[0]) * 60 + parseFloat(timeArr[1])) * 60 + parseFloat(timeArr[2]));
-                    }
-                    if ((i == 9 && !this.inputIsURL) || (i == 8 && this.inputIsURL)) {
-                        const string: string = line.trim();
-                        totalFrames = timeS * Number.parseFloat(string.substr(string.indexOf('kb/s,'), string.indexOf('fps') - string.indexOf('kb/s,')).replaceAll("kb/s,", "").trim());
-                    }
-                    if (line.includes("encoder") && (encFound > 3 || i >= 49)) {
-                        i = 0;
-                        stderrStart = false;
-                    }
-                } else {
-                    if (line === "progress=end") break;
-                    if (i < 13) temp.push(line);
-                    if (i == 12) {
-                        let stdFrame: number = Number.parseInt(temp[0].replaceAll("frame=", "").trim());
-                        let stdFPS: number = Number.parseFloat(temp[1].replaceAll("fps=", "").trim()) + 0.01;
-                        if (temp[0].includes("frame=  ")) {
-                            stdFrame = Number.parseInt(temp[1].replaceAll("frame=", "").trim());
-                            stdFPS = Number.parseFloat(temp[2].replaceAll("fps=", "").trim()) + 0.01;
-                        }
-                        const progressOBJ: Progress = {
-                            ETA: new Date(Date.now() + (totalFrames - stdFrame) / stdFPS * 1000),
-                            percentage: Number.parseFloat((stdFrame / totalFrames * 100).toFixed(2))
-                        };
-                        if (!Number.isNaN(stdFPS) && !Number.isNaN(stdFrame)) yield progressOBJ;
-                        i = 0;
-                        temp = [];
-                    }
+            if (line.includes('encoder')) encFound++;
+
+            if (stderrStart === true) {
+                this.stderr.push(line);
+
+                if ((i == 8 && !this.inputIsURL) || (i == 7 && this.inputIsURL)) {
+                    const dur: string = line.trim().replaceAll("Duration: ", "");
+                    const timeArr: string[] = dur.substr(0, dur.indexOf(",")).split(":");
+                    timeS = ((Number.parseFloat(timeArr[0]) * 60 + parseFloat(timeArr[1])) * 60 + parseFloat(timeArr[2]));
                 }
-                i++
+
+                if ((i == 9 && !this.inputIsURL) || (i == 8 && this.inputIsURL)) {
+                    const string: string = line.trim();
+                    totalFrames = timeS * Number.parseFloat(string.substr(string.indexOf('kb/s,'), string.indexOf('fps') - string.indexOf('kb/s,')).replaceAll("kb/s,", "").trim());
+                }
+
+                if (line.includes("encoder") && (encFound > 3 || i >= 49)) {
+                    i = 0;
+                    stderrStart = false;
+                }
+            } else {
+                if (line === "progress=end") break;
+                if (i < 13) temp.push(line);
+                if (i == 12) {
+
+                    let stdFrame: number = Number.parseInt(temp[0].replaceAll("frame=", "").trim());
+                    let stdFPS: number = Number.parseFloat(temp[1].replaceAll("fps=", "").trim()) + 0.01;
+
+                    if (temp[0].includes("frame=  ")) {
+                        stdFrame = Number.parseInt(temp[1].replaceAll("frame=", "").trim());
+                        stdFPS = Number.parseFloat(temp[2].replaceAll("fps=", "").trim()) + 0.01;
+                    }
+
+                    const progressOBJ: Progress = {
+                        ETA: new Date(Date.now() + (totalFrames - stdFrame) / stdFPS * 1000),
+                        percentage: Number.parseFloat((stdFrame / totalFrames * 100).toFixed(2))
+                    }
+
+                    if (!Number.isNaN(stdFPS) && !Number.isNaN(stdFrame)) yield progressOBJ;
+                    i = 0;
+                    temp = [];
+                }
             }
+            i++
         }
+
         await this.__closeProcess();
-        this.Process.stdout!.close();
         this.Process.stderr!.close();
+
         yield {
             ETA: new Date(),
             percentage: 100
@@ -94,18 +102,42 @@ export class Processing {
     private __clear(input: string): void {
         switch (input.toLowerCase()) {
             case "audio":
+
+                if (this.aBR !== 0) {
+                    console.warn("\x1b[0;33;40mWARNING:\x1b[39m video bitrate was selected while no audio mode was selected!\nPlease remove video bitrate");
+                }
+
+                if (this.audCodec.length > 0) {
+                    console.warn("\x1b[0;33;40mWARNING:\x1b[39m video codec was selected while no audio mode was selected!\nPlease remove video codec");
+                }
+
                 this.audCodec = [];
                 this.aBR = 0;
                 this.abitrate = [];
                 break;
+
             case "video":
+
+                if (this.filters.length > 0) {
+                    console.warn("\x1b[0;33;40mWARNING:\x1b[39m video Filters was selected while no video mode was selected!\nPlease remove video filters");
+                }
+
+                if (this.vBR !== 0) {
+                    console.warn("\x1b[0;33;40mWARNING:\x1b[39m video bitrate was selected while no video mode was selected!\nPlease remove video bitrate");
+                }
+
+                if (this.vidCodec.length > 0) {
+                    console.warn("\x1b[0;33;40mWARNING:\x1b[39m video codec was selected while no video mode was selected!\nPlease remove video codec");
+                }
+
                 this.vidCodec = [];
                 this.vBR = 0;
                 this.vbitrate = [];
                 this.filters = [];
                 break;
+
             default:
-                throw "INTERNAL ERROR: 'tried to clear input. But no input was specified!'";
+                throw "\x1b[0;31;40mINTERNAL ERROR:\x1b[39m tried to clear input. But invalid was specified!";
         }
         return;
     }
@@ -113,7 +145,7 @@ export class Processing {
     /**
      * Format & process all data to run ffmpeg
      */
-    private __formatting(): Array<string> {
+    private __formatting(): string[] {
         const temp = [this.ffmpegDir];
         if (this.niceness !== "") temp.push("-n", this.niceness);
 
@@ -121,11 +153,13 @@ export class Processing {
         if (this.noaudio) {
             temp.push("-an");
             this.__clear("audio");
+
         }
         if (this.novideo) {
             temp.push("-vn");
             this.__clear("video");
         }
+
         if (this.audCodec.length > 0) this.audCodec.forEach(x => temp.push(x));
         if (this.vidCodec.length > 0) this.vidCodec.forEach(x => temp.push(x));
         if (this.filters.length > 0) temp.push("-vf", this.filters.join(","));
@@ -139,7 +173,7 @@ export class Processing {
      * Check's for common error's made by the user
      */
     private __errorCheck(): void {
-        const errors: Array<string> = [];
+        const errors: string[] = [];
         if (this.audCodec.length > 0 && (this.audCodec.join("").includes("undefined") || this.audCodec.includes("null"))) {errors.push("one or more audio codec options are undefined")}
         if (this.vidCodec.length > 0 && (this.vidCodec.join("").includes("undefined") || this.vidCodec.includes("null"))) {errors.push("one or more video codec options are undefined")}
         if (this.vbitrate.length > 0 && (this.vBR == 0 || Number.isNaN(this.vBR) == true)) {errors.push("video Bitrate is NaN")}
@@ -160,11 +194,10 @@ export class Processing {
      */
     private async __waitProcess(): Promise<void> {
         await this.Process.stderrOutput();
-        this.Process.stdout!.close();
         this.Process.close();
         return;
     }
-    
+
     /**
      * close method for runWithProgress
      */
@@ -182,7 +215,7 @@ export class Processing {
         this.Process = Deno.run({
             cmd: this.__formatting(),
             stderr: "piped",
-            stdout: "piped"
+            stdout: "null"
         });
         return this.__waitProcess();
     }
@@ -195,7 +228,7 @@ export class Processing {
         this.Process = Deno.run({
             cmd: this.__formatting(),
             stderr: "piped",
-            stdout: "piped"
+            stdout: "null"
         });
         return this.__getProgress();
     }
