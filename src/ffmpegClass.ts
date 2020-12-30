@@ -18,7 +18,7 @@ export class FfmpegClass extends Processing {
     public constructor(options?:Spawn) {
         super();
         if (options) {
-            Object.entries(options).forEach((j: Array<string>) => {
+            Object.entries(options).forEach((j: string[]) => {
                 switch (j[0].toLowerCase()) {
                     case "ffmpegdir":
                         this.ffmpegDir = j[1];
