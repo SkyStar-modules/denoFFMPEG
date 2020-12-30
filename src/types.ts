@@ -11,7 +11,3 @@ export interface Progress {
     ETA: Date;
     percentage: number;
 }
-export interface SomeOBJ {
-    progress: AsyncGenerator<Progress>;
-    finished?: Promise<void>;
-}
