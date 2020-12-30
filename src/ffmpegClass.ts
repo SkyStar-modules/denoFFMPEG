@@ -114,8 +114,8 @@ export class FfmpegClass extends Processing {
      * 
      */
     public audioBitrate(bitrate: number): this {
-        this.aBR = bitrate;
-        this.abitrate = ["-b:a", String(bitrate)];
+        this.aBR = bitrate * 1024;
+        this.abitrate = ["-b:a", String(bitrate * 1024)];
         return this;
     }
 
