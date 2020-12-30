@@ -81,6 +81,10 @@ export class Processing {
         await this.__closeProcess();
         this.Process.stdout!.close();
         this.Process.stderr!.close();
+        yield {
+            ETA: new Date(),
+            percentage: 100
+        };
     }
 
     /**
@@ -160,6 +164,7 @@ export class Processing {
         this.Process.close();
         return;
     }
+    
     /**
      * close method for runWithProgress
      */
