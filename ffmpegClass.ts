@@ -1,4 +1,4 @@
-import { Processing } from "./processor.ts";
+import { Processing } from "./processorClass.ts";
 import { Spawn, Progress, Filters } from "./types.ts";
 
 /**
