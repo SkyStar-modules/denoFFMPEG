@@ -6,7 +6,9 @@ Deno.test({
             ffmpegDir: "./ffmpeg/ffmpeg.exe",
             source: "./input.mp4"
         }).audioBitrate(8).save("./ree.mp4");
-    }
+    },
+    sanitizeOps: true,
+    sanitizeResources: true
 })
 Deno.test({
     name: "audiobitrate feature with progress",
@@ -18,5 +20,7 @@ Deno.test({
         for await (const progress of thing) {
             console.log(progress);
         }
-    }
+    },
+    sanitizeOps: true,
+    sanitizeResources: true
 })

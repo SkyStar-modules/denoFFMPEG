@@ -6,5 +6,7 @@ Deno.test({
             ffmpegDir: "./ffmpeg/ffmpeg.exe",
             source: "./input.mp4"
         }).save("./ree.mp4");
-    }
+    },
+    sanitizeOps: true,
+    sanitizeResources: true
 })

@@ -3,7 +3,9 @@ Deno.test({
     name: "empty constructor feature",
     fn: async() => {
         await new FfmpegClass().inputFile("./input.mp4").setFfmpegPath("./ffmpeg/ffmpeg.exe").save("./ree.mp4");
-    }
+    },
+    sanitizeOps: true,
+    sanitizeResources: true
 })
 Deno.test({
     name: "empty constructor feature with progress",
@@ -12,5 +14,7 @@ Deno.test({
         for await (const progress of thing) {
             console.log(progress);
         }
-    }
+    },
+    sanitizeOps: true,
+    sanitizeResources: true
 })

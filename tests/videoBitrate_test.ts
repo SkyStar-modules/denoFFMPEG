@@ -6,7 +6,9 @@ Deno.test({
             ffmpegDir: "./ffmpeg/ffmpeg.exe",
             source: "./input.mp4"
         }).videoBitrate(1300, true).save("./ree.mp4");
-    }
+    },
+    sanitizeOps: true,
+    sanitizeResources: true
 })
 Deno.test({
     name: "videoBitrate(1300, false) feature",
@@ -15,7 +17,9 @@ Deno.test({
             ffmpegDir: "./ffmpeg/ffmpeg.exe",
             source: "./input.mp4"
         }).videoBitrate(1300, false).save("./ree.mp4");
-    }
+    },
+    sanitizeOps: true,
+    sanitizeResources: true
 })
 Deno.test({
     name: "videoBitrate(1300) feature",
@@ -24,7 +28,9 @@ Deno.test({
             ffmpegDir: "./ffmpeg/ffmpeg.exe",
             source: "./input.mp4"
         }).videoBitrate(1300, true).save("./ree.mp4");
-    }
+    },
+    sanitizeOps: true,
+    sanitizeResources: true
 })
 Deno.test({
     name: "videoBitrate(1300, true) feature with progress",
@@ -36,7 +42,9 @@ Deno.test({
         for await (const obj of progress) {
             console.log(obj)
         }
-    }
+    },
+    sanitizeOps: true,
+    sanitizeResources: true
 })
 Deno.test({
     name: "videoBitrate(1300, false) feature with progress",
@@ -48,7 +56,9 @@ Deno.test({
         for await (const obj of progress) {
             console.log(obj)
         }
-    }
+    },
+    sanitizeOps: true,
+    sanitizeResources: true
 })
 Deno.test({
     name: "videoBitrate(1300) feature with progress",
@@ -60,5 +70,7 @@ Deno.test({
         for await (const obj of progress) {
             console.log(obj)
         }
-    }
+    },
+    sanitizeOps: true,
+    sanitizeResources: true
 })

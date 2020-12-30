@@ -9,5 +9,7 @@ Deno.test({
         for await (const progress of thing) {
             console.log(progress);
         }
-    }
+    },
+    sanitizeOps: true,
+    sanitizeResources: true
 })

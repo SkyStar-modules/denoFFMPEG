@@ -5,7 +5,9 @@ Deno.test({
         await new FfmpegClass({
             ffmpegDir: "./ffmpeg/ffmpeg.exe"
         }).inputFile("./input.mp4").save("./ree.mp4");
-    }
+    },
+    sanitizeOps: true,
+    sanitizeResources: true
 })
 Deno.test({
     name: "inputFile feature with progress",
@@ -16,5 +18,7 @@ Deno.test({
         for await (const progress of thing) {
             console.log(progress);
         }
-    }
+    },
+    sanitizeOps: true,
+    sanitizeResources: true
 })
