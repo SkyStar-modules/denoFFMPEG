@@ -9,10 +9,10 @@ export class FfmpegClass extends Processing {
     /**
      * Make new ffmpeg instance.
      * 
-     * Parameter 1: {
-     *    ffmpegDir?: string,
-     *    niceness?: number | string,
-     *    source?: string
+     * Parameter 1: {  
+     *    ffmpegDir?: string,  
+     *    niceness?: number | string,  
+     *    source?: string  
      * }
      * 
      */
@@ -82,7 +82,7 @@ export class FfmpegClass extends Processing {
     /**
      * Set audio codec
      * 
-     * Parameter 1: codec Audio Codec name
+     * Parameter 1: codec Audio Codec name  
      * Parameter 2: options options object for codec supported options
      *
      */
@@ -96,7 +96,7 @@ export class FfmpegClass extends Processing {
     /**
      * Set video codec
      * 
-     * Parameter 1: codec video Codec name
+     * Parameter 1: codec video Codec name  
      * Parameter 2: options Options object for codec supported options
      *
      */
@@ -122,7 +122,7 @@ export class FfmpegClass extends Processing {
     /**
      * Set video bitrate in mbps or kbps
      * 
-     * Parameter 1: bitrate use bitrate you want in mbps(15m) or kbps(15000k)
+     * Parameter 1: bitrate use bitrate you want in mbps(15m) or kbps(15000k)  
      * Parameter 2: cbr enable constant bitrate (default = true)
      * 
      */
@@ -150,7 +150,7 @@ export class FfmpegClass extends Processing {
      * Parameter 1: Filters Array of filter Objects you want to use for processing
      * 
      */
-    public videoFilters(...Filters:Array<Filters>): this {
+    public videoFilters(...Filters: Filters[]): this {
         Filters.forEach(x => {
             let temp: string = x.filterName + '="';
             Object.entries(x.options).forEach((j, i) => {
