@@ -1,6 +1,6 @@
 import { FfmpegClass } from "../mod.ts";
 Deno.test({
-    name: "Test SaveWithProgress feature",
+    name: "SaveWithProgress feature",
     fn: async() => {
         const thing = new FfmpegClass({
             ffmpegDir: "./ffmpeg/ffmpeg.exe",

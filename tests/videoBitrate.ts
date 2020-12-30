@@ -27,7 +27,7 @@ Deno.test({
     }
 })
 Deno.test({
-    name: "videoBitrate(1300, true) feature",
+    name: "videoBitrate(1300, true) feature with progress",
     fn: async() => {
         const progress = new FfmpegClass({
             ffmpegDir: "./ffmpeg/ffmpeg.exe",
@@ -39,7 +39,7 @@ Deno.test({
     }
 })
 Deno.test({
-    name: "videoBitrate(1300, false) feature",
+    name: "videoBitrate(1300, false) feature with progress",
     fn: async() => {
         const progress = new FfmpegClass({
             ffmpegDir: "./ffmpeg/ffmpeg.exe",
@@ -51,7 +51,7 @@ Deno.test({
     }
 })
 Deno.test({
-    name: "videoBitrate(1300) feature",
+    name: "videoBitrate(1300) feature with progress",
     fn: async() => {
         const progress = new FfmpegClass({
             ffmpegDir: "./ffmpeg/ffmpeg.exe",

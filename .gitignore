@@ -2,3 +2,4 @@
 ffmpeg
 test.ts
 *.mp4
+/tests/template.ts
