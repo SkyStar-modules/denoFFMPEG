@@ -1,0 +1,22 @@
+import { FfmpegClass } from "../mod.ts";
+Deno.test({
+    name: "audiobitrate feature",
+    fn: async() => {
+        await new FfmpegClass({
+            ffmpegDir: "./ffmpeg/ffmpeg.exe",
+            source: "./input.mp4"
+        }).audioBitrate(8).save("./ree.mp4");
+    }
+})
+Deno.test({
+    name: "audiobitrate feature with progress",
+    fn: async() => {
+        const thing = new FfmpegClass({
+            ffmpegDir: "./ffmpeg/ffmpeg.exe",
+            source: "./input.mp4"
+        }).audioBitrate(8).saveWithProgress("./ree.mp4");
+        for await (const progress of thing) {
+            console.log(progress);
+        }
+    }
+})
