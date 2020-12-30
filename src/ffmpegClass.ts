@@ -28,11 +28,11 @@ export class FfmpegClass extends Processing {
                         if (Deno.build.os !== "windows") this.niceness = j[1];
                         break;
                     case "source":
-                        if (j[1].includes('http')) this.inputIsURL = true;
+                        if (j[1].includes("http")) this.inputIsURL = true;
                         this.input = j[1];
                         break;
                     default:
-                        throw 'Option "' + j[0] + '" not found! Please remove it';
+                        console.warn("\x1b[0;33;40mWARNING:\x1b[39m option '" + j[0] + "' not found! Please remove it");
                 }
             })
         }
@@ -86,7 +86,7 @@ export class FfmpegClass extends Processing {
      * Parameter 2: options options object for codec supported options
      *
      */
-    public audioCodec(codec: string, options: Record<string, string>): this {
+    public audioCodec(codec: string, options?: Record<string, string>): this {
         this.audCodec = ["-c:a", codec];
         if (codec == "" || codec == "null" || codec == "undefined") this.audCodec = ["-c:a", "undefined"];
         if (options) Object.entries(options).forEach(x => this.audCodec.push("-" + x[0], x[1]));
@@ -100,10 +100,10 @@ export class FfmpegClass extends Processing {
      * Parameter 2: options Options object for codec supported options
      *
      */
-    public videoCodec(codec: string, options: Record<string, string>): this {
+    public videoCodec(codec: string, options?: Record<string, number|string>): this {
         this.vidCodec = ["-c:v", codec];
         if (codec == "" || codec == "null" || codec == "undefined") this.vidCodec = ["-c:v", "undefined"];
-        if (options) Object.entries(options).forEach(x => this.vidCodec.push("-" + x[0], x[1]));
+        if (options) Object.entries(options).forEach(x => this.vidCodec.push("-" + x[0], String(x[1])));
         return this;
     }
 
@@ -132,11 +132,11 @@ export class FfmpegClass extends Processing {
         let bitR: number;
         switch (brString.charAt(brString.length-1).toLowerCase()) {
             case "m":
-                bitR = parseInt(brString) * 1000000;
+                bitR = parseInt(brString) * 1048576;
                 break;
             case "k":
             default:
-                bitR = parseInt(brString) * 1000;
+                bitR = parseInt(brString) * 1024;
                 break;
         }
         this.vbitrate = ['-maxrate', String(bitR), '-minrate', String(bitR), "-b:v", String(bitR), '-bufsize', '3M'];
