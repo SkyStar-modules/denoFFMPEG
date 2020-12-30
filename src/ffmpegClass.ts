@@ -5,6 +5,7 @@ import { Spawn, Progress, Filters } from "./types.ts";
  * Public Class for ffmpeg rendering
  */
 export class FfmpegClass extends Processing {
+
     /**
      * Make new ffmpeg instance.
      * 
@@ -37,6 +38,7 @@ export class FfmpegClass extends Processing {
         }
         return this;
     }
+
     /**
      * Set path to the ffmpeg binary file
      * 
@@ -47,6 +49,7 @@ export class FfmpegClass extends Processing {
         if (ffmpegPath) this.ffmpegDir = ffmpegPath;
         return this;
     }
+
     /**
      * Set path to the inputfile
      * 
@@ -57,6 +60,7 @@ export class FfmpegClass extends Processing {
         if (input) this.input = input;
         return this;
     }
+
     /**
      * Disable Audio and remove all audio settings
      * 
@@ -65,6 +69,7 @@ export class FfmpegClass extends Processing {
         this.noaudio = true;
         return this;
     }
+
     /**
      * Disable video and remove all video settings
      * 
@@ -73,6 +78,7 @@ export class FfmpegClass extends Processing {
         this.novideo = true;
         return this;
     }
+
     /**
      * Set audio codec
      * 
@@ -86,6 +92,7 @@ export class FfmpegClass extends Processing {
         if (options) Object.entries(options).forEach(x => this.audCodec.push("-" + x[0], x[1]));
         return this;
     }
+
     /**
      * Set video codec
      * 
@@ -99,6 +106,7 @@ export class FfmpegClass extends Processing {
         if (options) Object.entries(options).forEach(x => this.vidCodec.push("-" + x[0], x[1]));
         return this;
     }
+
     /**
      * Set audio bitrate in kbps
      * 
@@ -110,6 +118,7 @@ export class FfmpegClass extends Processing {
         this.abitrate = ["-b:a", String(bitrate)];
         return this;
     }
+
     /**
      * Set video bitrate in mbps or kbps
      * 
@@ -134,6 +143,7 @@ export class FfmpegClass extends Processing {
         if (cbr == false) this.vbitrate = ['-maxrate', String(bitR * 2), '-minrate', String(bitR / 4), "-b:v", String(bitR), '-bufsize', String(bitR * 5)];
         return this;
     }
+
     /**
      * Set video filters
      * 
@@ -150,6 +160,7 @@ export class FfmpegClass extends Processing {
         });
         return this;
     }
+
     /**
      * set output path and encode
      * 
@@ -162,7 +173,8 @@ export class FfmpegClass extends Processing {
         this.outputFile = output;
         return this.__run();
     }
-        /**
+
+    /**
      * set output path and encode
      * 
      * parameter 1: output set output path

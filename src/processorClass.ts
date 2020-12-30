@@ -1,5 +1,6 @@
 import { Progress } from "./types.ts";
 import { readLines } from "https://deno.land/std@0.80.0/io/mod.ts";
+
 /**
  * Private Class for ffmpeg rendering
  */
@@ -77,10 +78,11 @@ export class Processing {
                 i++
             }
         }
-        await this.__test();
+        await this.__closeProcess();
         this.Process.stdout!.close();
         this.Process.stderr!.close();
     }
+
     /**
      * Clear all filters and everything for audio or video
      * 
@@ -103,6 +105,7 @@ export class Processing {
         }
         return;
     }
+
     /**
      * Format & process all data to run ffmpeg
      */
@@ -127,6 +130,7 @@ export class Processing {
         temp.push("-progress", "pipe:2", this.outputFile);
         return temp;
     }
+
     /**
      * Check's for common error's made by the user
      */
@@ -146,20 +150,25 @@ export class Processing {
         }
         return;
     }
+
     /**
      * Wait method for run
      */
-    private async __WaitProcess(): Promise<void> {
+    private async __waitProcess(): Promise<void> {
         await this.Process.stderrOutput();
         this.Process.stdout!.close();
         this.Process.close();
         return;
     }
-    private async __test(): Promise<void> {
+    /**
+     * close method for runWithProgress
+     */
+    private async __closeProcess(): Promise<void> {
         await this.Process.status();
         this.Process.close();
         return;
     }
+
     /**
      * run method without progress data
      */
@@ -170,8 +179,9 @@ export class Processing {
             stderr: "piped",
             stdout: "piped"
         });
-        return this.__WaitProcess();
+        return this.__waitProcess();
     }
+
     /**
      * run method with progress data
      */
