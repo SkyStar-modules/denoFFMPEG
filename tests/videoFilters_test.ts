@@ -14,7 +14,7 @@ const text:Filters = {
     }
 }
 Deno.test({
-    name: " feature",
+    name: "videoFilter feature",
     fn: async() => {
         await new FfmpegClass({
             ffmpegDir: "./ffmpeg/ffmpeg.exe",
@@ -25,7 +25,7 @@ Deno.test({
     sanitizeResources: true
 })
 Deno.test({
-    name: " feature with progress",
+    name: "videoFilter feature with progress",
     fn: async() => {
         const thing = new FfmpegClass({
             ffmpegDir: "./ffmpeg/ffmpeg.exe",
