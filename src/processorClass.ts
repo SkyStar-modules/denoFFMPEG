@@ -41,30 +41,29 @@ export class Processing {
 
         for await (const line of readLines(this.Process.stderr!)) {
             if (line.includes('encoder')) encFound++;
-
             if (stderrStart === true) {
                 this.stderr.push(line);
 
-                if ((i == 8 && !this.inputIsURL) || (i == 7 && this.inputIsURL)) {
+                if ((i == 8 && !this.inputIsURL) || (i == 6 && this.inputIsURL)) {
                     const dur: string = line.trim().replaceAll("Duration: ", "");
                     const timeArr: string[] = dur.substr(0, dur.indexOf(",")).split(":");
                     timeS = ((Number.parseFloat(timeArr[0]) * 60 + parseFloat(timeArr[1])) * 60 + parseFloat(timeArr[2]));
                 }
 
-                if ((i == 9 && !this.inputIsURL) || (i == 8 && this.inputIsURL)) {
+                if ((i == 9 && !this.inputIsURL) || (i == 7 && this.inputIsURL)) {
                     const string: string = line.trim();
                     totalFrames = timeS * Number.parseFloat(string.substr(string.indexOf('kb/s,'), string.indexOf('fps') - string.indexOf('kb/s,')).replaceAll("kb/s,", "").trim());
                 }
 
-                if (line.includes("encoder") && (encFound > 3 || i >= 49)) {
+                if (line.includes("encoder") && (encFound > 3 || (this.inputIsURL === true && encFound > 2)) || i >= 49) {
                     i = 0;
                     stderrStart = false;
                 }
             } else {
                 if (line === "progress=end") break;
                 if (i < 13) temp.push(line);
-                if (i == 12) {
 
+                if (i == 12) {
                     let stdFrame: number = Number.parseInt(temp[0].replaceAll("frame=", "").trim());
                     let stdFPS: number = Number.parseFloat(temp[1].replaceAll("fps=", "").trim()) + 0.01;
 
@@ -85,10 +84,7 @@ export class Processing {
             }
             i++
         }
-
-        await this.__closeProcess();
-        this.Process.stderr!.close();
-
+        await this.__closeProcess(true);
         yield {
             ETA: new Date(),
             percentage: 100
@@ -192,20 +188,28 @@ export class Processing {
     /**
      * Wait method for run
      */
-    private async __waitProcess(): Promise<void> {
-        await this.Process.stderrOutput();
+    private async __closeProcess(progress:boolean): Promise<void> {
+        let stderr = this.stderr.join("");
+        if (progress === false) {
+            stderr = new TextDecoder().decode(await this.Process.stderrOutput());
+        }
+
+        const status = await this.Process.status();
         this.Process.close();
+
+        if (progress === true) {
+            this.Process.stderr!.close();
+        }
+
+        if (status.success === false) {
+            throw "\x1b[0;31;40mRENDER DIDN'T FINISH:\x1b[39m " + stderr;
+        }
         return;
     }
 
     /**
      * close method for runWithProgress
      */
-    private async __closeProcess(): Promise<void> {
-        await this.Process.status();
-        this.Process.close();
-        return;
-    }
 
     /**
      * run method without progress data
@@ -217,7 +221,7 @@ export class Processing {
             stderr: "piped",
             stdout: "null"
         });
-        return this.__waitProcess();
+        return this.__closeProcess(false);
     }
 
     /**
