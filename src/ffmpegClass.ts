@@ -130,20 +130,16 @@ export class FfmpegClass extends Processing {
      * 
      */
     public videoBitrate(bitrate: number|string, cbr = true): this {
-        const brString = String(bitrate);
+        let brString = String(bitrate);
         this.vBR = parseInt(brString);
-        let bitR: number;
-        switch (brString.charAt(brString.length-1).toLowerCase()) {
-            case "m":
-                bitR = parseInt(brString) * 1048576;
-                break;
-            case "k":
-            default:
-                bitR = parseInt(brString) * 1024;
-                break;
+        const lastChar = brString.charAt(brString.length-1).toLowerCase();
+        if (lastChar !== "m" && lastChar !== "k") {
+            brString += "k";
         }
-        this.vbitrate = ['-maxrate', String(bitR), '-minrate', String(bitR), "-b:v", String(bitR), '-bufsize', '3M'];
-        if (cbr == false) this.vbitrate = ['-maxrate', String(bitR * 2), '-minrate', String(bitR / 4), "-b:v", String(bitR), '-bufsize', String(bitR * 5)];
+        this.vbitrate = ['-maxrate', brString, '-minrate', brString, "-b:v", brString, '-bufsize', '3M'];
+        if (cbr == false) {
+            this.vbitrate = ['-maxrate', String(Number.parseFloat(brString)* 2), '-minrate', String(Number.parseFloat(brString) / 4), "-b:v", String(brString), '-bufsize', String(Number.parseFloat(brString) * 5)];
+        }
         return this;
     }
 
