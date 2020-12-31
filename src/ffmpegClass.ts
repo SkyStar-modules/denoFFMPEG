@@ -57,7 +57,10 @@ export class FfmpegClass extends Processing {
      * 
      */
     public inputFile(input: string): this {
-        if (input) this.input = input;
+        if (input) {
+            this.input = input;
+            if (input.includes("http")) this.inputIsURL = true;
+        }
         return this;
     }
 
