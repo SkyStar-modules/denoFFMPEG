@@ -130,15 +130,15 @@ export class FfmpegClass extends Processing {
      * 
      */
     public videoBitrate(bitrate: number|string, cbr = true): this {
-        let brString = String(bitrate);
+        const brString = String(bitrate);
         this.vBR = parseInt(brString);
-        const lastChar = brString.charAt(brString.length-1).toLowerCase();
+        let lastChar = brString.charAt(brString.length-1).toLowerCase();
         if (lastChar !== "m" && lastChar !== "k") {
-            brString += "k";
+            lastChar = "k";
         }
         this.vbitrate = ['-maxrate', brString, '-minrate', brString, "-b:v", brString, '-bufsize', '3M'];
         if (cbr == false) {
-            this.vbitrate = ['-maxrate', String(Number.parseFloat(brString)* 2), '-minrate', String(Number.parseFloat(brString) / 4), "-b:v", String(brString), '-bufsize', String(Number.parseFloat(brString) * 5)];
+            this.vbitrate = ['-maxrate', String(Number.parseFloat(brString) * 2 + lastChar), '-minrate', String(Number.parseFloat(brString) / 3), "-b:v", String(brString), '-bufsize', String(Number.parseFloat(brString) * 4)];
         }
         return this;
     }
