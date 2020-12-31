@@ -1,5 +1,6 @@
 import { Progress } from "./types.ts";
 import { readLines } from "https://deno.land/std@0.80.0/io/mod.ts";
+import { warning, formatError, ffmpegError, internalError } from "./logger.ts";
 
 /**
  * Private Class for ffmpeg rendering
@@ -100,11 +101,11 @@ export class Processing {
             case "audio":
 
                 if (this.aBR !== 0) {
-                    console.warn("\x1b[0;33;40mWARNING:\x1b[39m video bitrate was selected while no audio mode was selected!\nPlease remove video bitrate");
+                    warning("video bitrate was selected while no audio mode was selected!\nPlease remove video bitrate");
                 }
 
                 if (this.audCodec.length > 0) {
-                    console.warn("\x1b[0;33;40mWARNING:\x1b[39m video codec was selected while no audio mode was selected!\nPlease remove video codec");
+                    warning("video codec was selected while no audio mode was selected!\nPlease remove video codec");
                 }
 
                 this.audCodec = [];
@@ -115,15 +116,15 @@ export class Processing {
             case "video":
 
                 if (this.filters.length > 0) {
-                    console.warn("\x1b[0;33;40mWARNING:\x1b[39m video Filters was selected while no video mode was selected!\nPlease remove video filters");
+                    warning("video Filters was selected while no video mode was selected!\nPlease remove video filters");
                 }
 
                 if (this.vBR !== 0) {
-                    console.warn("\x1b[0;33;40mWARNING:\x1b[39m video bitrate was selected while no video mode was selected!\nPlease remove video bitrate");
+                    warning("video bitrate was selected while no video mode was selected!\nPlease remove video bitrate");
                 }
 
                 if (this.vidCodec.length > 0) {
-                    console.warn("\x1b[0;33;40mWARNING:\x1b[39m video codec was selected while no video mode was selected!\nPlease remove video codec");
+                    warning("video codec was selected while no video mode was selected!\nPlease remove video codec");
                 }
 
                 this.vidCodec = [];
@@ -133,7 +134,7 @@ export class Processing {
                 break;
 
             default:
-                throw "\x1b[0;31;40mINTERNAL ERROR:\x1b[39m tried to clear input. But invalid was specified!";
+                internalError("tried to clear input. But invalid was specified!");
         }
         return;
     }
@@ -179,8 +180,8 @@ export class Processing {
         if (!this.ffmpegDir || this.ffmpegDir == "") {errors.push("No ffmpeg directory specified!")}
         if (this.filters.length > 0 && this.filters.join("").includes("undefined")) {errors.push("Filters were selected, but the field is incorrect or empty")}
         if (errors.length > 0) {
-            const errorList: string = errors.join("\r\n");
-            throw new Error(errorList);
+            const errorList: string = errors.join("\n");
+            formatError(errorList);
         }
         return;
     }
@@ -202,7 +203,7 @@ export class Processing {
         }
 
         if (status.success === false) {
-            throw "\x1b[0;31;40mRENDER DIDN'T FINISH:\x1b[39m " + stderr;
+            ffmpegError(stderr);
         }
         return;
     }
