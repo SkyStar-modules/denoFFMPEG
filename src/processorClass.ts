@@ -6,22 +6,22 @@ import { warning, formatError, ffmpegError, internalError } from "./logger.ts";
  * Private Class for ffmpeg rendering
  */
 export class Processing {
-    protected input                   =    "";
-    protected ffmpegDir               =    "";
-    protected outputFile              =    "";
-    protected niceness                =    "";
-    protected vbitrate: Array<string> =    [];
-    protected abitrate: Array<string> =    [];
-    protected filters:  Array<string> =    [];
-    protected vidCodec: Array<string> =    [];
-    protected audCodec: Array<string> =    [];
-    protected stderr:   Array<string> =    [];
-    protected aBR                     =     0;
-    protected vBR                     =     0;
-    protected noaudio                 = false;
-    protected novideo                 = false;
-    protected outputPipe              = false;
-    protected inputIsURL              = false;
+    protected ffmpegDir                =    "";
+    protected outputFile               =    "";
+    protected niceness                 =    "";
+    protected input:          string[] =    [];
+    protected vbitrate:       string[] =    [];
+    protected abitrate:       string[] =    [];
+    protected videoFilter:    string[] =    [];
+    protected vidCodec:       string[] =    [];
+    protected audCodec:       string[] =    [];
+    protected stderr:         string[] =    [];
+    protected aBR                      =     0;
+    protected vBR                      =     0;
+    protected noaudio                  = false;
+    protected novideo                  = false;
+    protected outputPipe               = false;
+    protected inputIsURL               = false;
     protected Process!: Deno.Process;
 
     /**
@@ -115,7 +115,7 @@ export class Processing {
 
             case "video":
 
-                if (this.filters.length > 0) {
+                if (this.videoFilter.length > 0) {
                     warning("video Filters was selected while no video mode was selected!\nPlease remove video filters");
                 }
 
@@ -130,7 +130,7 @@ export class Processing {
                 this.vidCodec = [];
                 this.vBR = 0;
                 this.vbitrate = [];
-                this.filters = [];
+                this.videoFilter = [];
                 break;
 
             default:
@@ -146,7 +146,10 @@ export class Processing {
         const temp = [this.ffmpegDir];
         if (this.niceness !== "") temp.push("-n", this.niceness);
 
-        temp.push("-hide_banner", "-nostats","-y", "-i", this.input);
+        temp.push("-hide_banner", "-nostats","-y");
+        for (let i = 0; i < this.input.length; i++) {
+            temp.push("-i", this.input[i]);
+        }
         if (this.noaudio) {
             temp.push("-an");
             this.__clear("audio");
@@ -159,7 +162,7 @@ export class Processing {
 
         if (this.audCodec.length > 0) this.audCodec.forEach(x => temp.push(x));
         if (this.vidCodec.length > 0) this.vidCodec.forEach(x => temp.push(x));
-        if (this.filters.length > 0) temp.push("-vf", this.filters.join(","));
+        if (this.videoFilter.length > 0) temp.push("-vf", this.videoFilter.join(","));
         if (this.abitrate.length > 0) this.abitrate.forEach(x => temp.push(x));
         if (this.vbitrate.length > 0) this.vbitrate.forEach(x => temp.push(x));
         temp.push("-progress", "pipe:2", this.outputFile);
@@ -175,10 +178,10 @@ export class Processing {
         if (this.vidCodec.length > 0 && (this.vidCodec.join("").includes("undefined") || this.vidCodec.includes("null"))) {errors.push("one or more video codec options are undefined")}
         if (this.vbitrate.length > 0 && (this.vBR == 0 || Number.isNaN(this.vBR) == true)) {errors.push("video Bitrate is NaN")}
         if (this.abitrate.length > 0 && (this.aBR == 0 || Number.isNaN(this.aBR) == true)) {errors.push("audio Bitrate is NaN")}
-        if (!this.input || this.input === "") {errors.push("No input specified!")}
+        if (this.input.length === 0) {errors.push("No input specified!")}
         if ((!this.outputFile || this.outputFile == "") && !this.outputPipe) {errors.push("No output specified!")}
         if (!this.ffmpegDir || this.ffmpegDir == "") {errors.push("No ffmpeg directory specified!")}
-        if (this.filters.length > 0 && this.filters.join("").includes("undefined")) {errors.push("Filters were selected, but the field is incorrect or empty")}
+        if (this.videoFilter.length > 0 && this.videoFilter.join("").includes("undefined")) {errors.push("Filters were selected, but the field is incorrect or empty")}
         if (errors.length > 0) {
             const errorList: string = errors.join("\n");
             formatError(errorList);

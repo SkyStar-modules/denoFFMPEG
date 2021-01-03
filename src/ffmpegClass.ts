@@ -1,6 +1,6 @@
 import { Processing } from "./processorClass.ts";
 import { Spawn, Progress, Filters } from "./types.ts";
-
+import { warning } from "./logger.ts";
 /**
  * Public Class for ffmpeg rendering
  */
@@ -29,10 +29,10 @@ export class FfmpegClass extends Processing {
                         break;
                     case "source":
                         if (j[1].includes("http")) this.inputIsURL = true;
-                        this.input = j[1];
+                        this.input.push(j[1]);
                         break;
                     default:
-                        console.warn("\x1b[0;33;40mWARNING:\x1b[39m option '" + j[0] + "' not found! Please remove it");
+                        warning("option '" + j[0] + "' not found! Please remove it");
                 }
             })
         }
@@ -46,7 +46,10 @@ export class FfmpegClass extends Processing {
      * 
      */
     public setFfmpegPath(ffmpegPath: string): this {
-        if (ffmpegPath) this.ffmpegDir = ffmpegPath;
+        if (ffmpegPath) {
+            if (this.ffmpegDir.length > 0) warning("changing ffmpeg path from " + this.ffmpegDir + " to " + ffmpegPath);
+            this.ffmpegDir = ffmpegPath;
+        }
         return this;
     }
 
@@ -58,7 +61,7 @@ export class FfmpegClass extends Processing {
      */
     public inputFile(input: string): this {
         if (input) {
-            this.input = input;
+            this.input.push(input);
             if (input.includes("http")) this.inputIsURL = true;
         }
         return this;
@@ -155,7 +158,7 @@ export class FfmpegClass extends Processing {
             Object.entries(x.options).forEach((j, i) => {
                 if (i > 0) {temp += `: ${j[0]}='${j[1]}'`} else {temp += `${j[0]}='${j[1]}'`}
             });
-            this.filters.push(temp);
+            this.videoFilter.push(temp);
         });
         return this;
     }
