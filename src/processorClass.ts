@@ -27,7 +27,7 @@ export class Processing {
     /**
      * Get the progress of the ffmpeg instancegenerator
      * 
-     * Returns: {
+     * Yields: {
      * ETA: Date,
      * percentage: Number
      * }
@@ -65,6 +65,7 @@ export class Processing {
                 if (i < 13) temp.push(line);
 
                 if (i == 12) {
+                    console.log(temp)
                     let stdFrame: number = Number.parseInt(temp[0].replaceAll("frame=", "").trim());
                     let stdFPS: number = Number.parseFloat(temp[1].replaceAll("fps=", "").trim()) + 0.01;
 
@@ -77,7 +78,6 @@ export class Processing {
                         ETA: new Date(Date.now() + (totalFrames - stdFrame) / stdFPS * 1000),
                         percentage: Number.parseFloat((stdFrame / totalFrames * 100).toFixed(2))
                     }
-
                     if (!Number.isNaN(stdFPS) && !Number.isNaN(stdFrame)) yield progressOBJ;
                     i = 0;
                     temp = [];
@@ -160,11 +160,11 @@ export class Processing {
             this.__clear("video");
         }
 
-        if (this.audCodec.length > 0) this.audCodec.forEach(x => temp.push(x));
-        if (this.vidCodec.length > 0) this.vidCodec.forEach(x => temp.push(x));
+        if (this.audCodec.length > 0) temp.concat(this.audCodec);
+        if (this.vidCodec.length > 0) temp.concat(this.vidCodec);
         if (this.videoFilter.length > 0) temp.push("-vf", this.videoFilter.join(","));
-        if (this.abitrate.length > 0) this.abitrate.forEach(x => temp.push(x));
-        if (this.vbitrate.length > 0) this.vbitrate.forEach(x => temp.push(x));
+        if (this.abitrate.length > 0) temp.concat(this.abitrate);
+        if (this.vbitrate.length > 0) temp.concat(this.vbitrate);
         temp.push("-progress", "pipe:2", this.outputFile);
         return temp;
     }
@@ -194,14 +194,14 @@ export class Processing {
      */
     private async __closeProcess(progress:boolean): Promise<void> {
         let stderr = this.stderr.join("");
-        if (progress === false) {
+        if (!progress) {
             stderr = new TextDecoder().decode(await this.Process.stderrOutput());
         }
 
         const status = await this.Process.status();
         this.Process.close();
 
-        if (progress === true) {
+        if (progress) {
             this.Process.stderr!.close();
         }
 
