@@ -5,7 +5,7 @@ Deno.test({
     fn: async() => {
         await new FfmpegClass({
             ffmpegDir: "./ffmpeg/ffmpeg.exe",
-            source: link
+            input: link
         }).save("./ree.mp4");
     },
     sanitizeOps: true,
@@ -16,7 +16,7 @@ Deno.test({
     fn: async() => {
         const thing = new FfmpegClass({
             ffmpegDir: "./ffmpeg/ffmpeg.exe",
-            source: link
+            input: link
         }).saveWithProgress("./ree.mp4");
         for await (const progress of thing) {
             console.log(progress);

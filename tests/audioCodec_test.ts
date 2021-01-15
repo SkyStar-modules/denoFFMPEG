@@ -4,7 +4,7 @@ Deno.test({
     fn: async() => {
         await new FfmpegClass({
             ffmpegDir: "./ffmpeg/ffmpeg.exe",
-            source: "./input.mp4"
+            input: "./input.mp4"
         }).audioCodec("libmp3lame").save("./ree.mp4");
     },
     sanitizeOps: true,
@@ -15,7 +15,7 @@ Deno.test({
     fn: async() => {
         const thing = new FfmpegClass({
             ffmpegDir: "./ffmpeg/ffmpeg.exe",
-            source: "./input.mp4"
+            input: "./input.mp4"
         }).audioCodec("libmp3lame").saveWithProgress("./ree.mp4");
         for await (const progress of thing) {
             console.log(progress);

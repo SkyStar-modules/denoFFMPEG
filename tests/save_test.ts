@@ -4,7 +4,7 @@ Deno.test({
     fn: async() => {
         await new FfmpegClass({
             ffmpegDir: "./ffmpeg/ffmpeg.exe",
-            source: "./input.mp4"
+            input: "./input.mp4"
         }).save("./ree.mp4");
     },
     sanitizeOps: true,
