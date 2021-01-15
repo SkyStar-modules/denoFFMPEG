@@ -6,22 +6,22 @@ import { warning, formatError, ffmpegError, internalError } from "./logger.ts";
  * Private Class for ffmpeg rendering
  */
 export class Processing {
-    protected ffmpegDir                =    "";
-    protected outputFile               =    "";
-    protected niceness                 =    "";
-    protected input:          string[] =    [];
-    protected vbitrate:       string[] =    [];
-    protected abitrate:       string[] =    [];
-    protected videoFilter:    string[] =    [];
-    protected vidCodec:       string[] =    [];
-    protected audCodec:       string[] =    [];
-    protected stderr:         string[] =    [];
-    protected aBR                      =     0;
-    protected vBR                      =     0;
-    protected noaudio                  = false;
-    protected novideo                  = false;
-    protected outputPipe               = false;
-    protected inputIsURL               = false;
+    protected ffmpegDir                = "ffmpeg";
+    protected outputFile               =       "";
+    protected niceness                 =       "";
+    protected input:          string[] =       [];
+    protected vbitrate:       string[] =       [];
+    protected abitrate:       string[] =       [];
+    protected videoFilter:    string[] =       [];
+    protected vidCodec:       string[] =       [];
+    protected audCodec:       string[] =       [];
+    protected stderr:         string[] =       [];
+    protected aBR                      =        0;
+    protected vBR                      =        0;
+    protected noaudio                  =    false;
+    protected novideo                  =    false;
+    protected outputPipe               =    false;
+    protected inputIsURL               =    false;
     protected Process!: Deno.Process;
 
     /**
