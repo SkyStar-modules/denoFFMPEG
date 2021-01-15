@@ -34,24 +34,23 @@ export class Processing {
      */
     protected async* __getProgress(): AsyncGenerator<Progress,void,void> {
         let i = 1;
-        let temp: string[] = [];
         let stderrStart = true;
-        let timeS = NaN;
-        let totalFrames = NaN;
+        let timeS = 0;
+        let totalFrames = 0;
         let encFound = 0;
-
+        let stdFrame = 0;
+        let stdFPS = 0;
         for await (const line of readLines(this.Process.stderr!)) {
             if (line.includes('encoder')) encFound++;
             if (stderrStart === true) {
                 this.stderr.push(line);
-
-                if ((i == 8 && !this.inputIsURL) || (i == 6 && this.inputIsURL)) {
+                if ((i == 7 && !this.inputIsURL) || (i == 6 && this.inputIsURL)) {
                     const dur: string = line.trim().replaceAll("Duration: ", "");
                     const timeArr: string[] = dur.substr(0, dur.indexOf(",")).split(":");
                     timeS = ((Number.parseFloat(timeArr[0]) * 60 + parseFloat(timeArr[1])) * 60 + parseFloat(timeArr[2]));
                 }
 
-                if ((i == 9 && !this.inputIsURL) || (i == 7 && this.inputIsURL)) {
+                if ((i == 8 && !this.inputIsURL) || (i == 7 && this.inputIsURL)) {
                     const string: string = line.trim();
                     totalFrames = timeS * Number.parseFloat(string.substr(string.indexOf('kb/s,'), string.indexOf('fps') - string.indexOf('kb/s,')).replaceAll("kb/s,", "").trim());
                 }
@@ -62,25 +61,19 @@ export class Processing {
                 }
             } else {
                 if (line === "progress=end") break;
-                if (i < 13) temp.push(line);
-
+                if (line.includes("frame=")) {
+                    stdFrame = Number.parseInt(line.replaceAll("frame=", "").trim())
+                }
+                if (line.includes("fps=")) {
+                    stdFPS = Number.parseFloat(line.replaceAll("fps=", "").trim())
+                }
                 if (i == 12) {
-                    console.log(temp)
-                    let stdFrame: number = Number.parseInt(temp[0].replaceAll("frame=", "").trim());
-                    let stdFPS: number = Number.parseFloat(temp[1].replaceAll("fps=", "").trim()) + 0.01;
-
-                    if (temp[0].includes("frame=  ")) {
-                        stdFrame = Number.parseInt(temp[1].replaceAll("frame=", "").trim());
-                        stdFPS = Number.parseFloat(temp[2].replaceAll("fps=", "").trim()) + 0.01;
-                    }
-
                     const progressOBJ: Progress = {
                         ETA: new Date(Date.now() + (totalFrames - stdFrame) / stdFPS * 1000),
                         percentage: Number.parseFloat((stdFrame / totalFrames * 100).toFixed(2))
                     }
-                    if (!Number.isNaN(stdFPS) && !Number.isNaN(stdFrame)) yield progressOBJ;
+                    if (!Number.isNaN(stdFPS) && !Number.isNaN(stdFrame) && !Number.isNaN(stdFPS) && stdFPS !== 0) yield progressOBJ;
                     i = 0;
-                    temp = [];
                 }
             }
             i++
