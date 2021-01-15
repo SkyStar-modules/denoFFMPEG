@@ -1,5 +1,5 @@
 import { Progress } from "./types.ts";
-import { readLines } from "https://deno.land/std@0.80.0/io/mod.ts";
+import { readLines } from "../deps.ts"
 import { warning, formatError, ffmpegError, internalError } from "./logger.ts";
 
 /**
