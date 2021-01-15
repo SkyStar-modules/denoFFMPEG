@@ -13,11 +13,11 @@
 ---
 
 ## Basic example
-`save()` is used to start the render process. you should always use `save()` as last option
+`save()` is used to start the render process. you should always use `save()` or `saveWithProgress()` as last option
 ```js
 import ffmpeg from "./mod.ts";
-let videoRender = ffmpeg({ source: './dev/video0', ffmpegDir: './dev/ffmpeg' })
-videoRender.videoBitrate(1000).save('./output.mp4');
+let videoRender = ffmpeg({ input: './dev/video0', ffmpegDir: './dev/ffmpeg' })
+await videoRender.videoBitrate(1000).save('./output.mp4');
 ```
 --- 
 # Documentation
@@ -33,49 +33,162 @@ let render = ffmpeg();
 import { FfmpegClass } from "./mod.ts";
 let render = new FfmpegClass();
 ```
+## save(outputPath: string)
+`save()` returns a Promise that get's voided once ffmpeg is done rendering
 
----
+```js
+import ffmpeg from "./mod.ts";
 
-## Changelog
-## 1.2
-- *added* pipe method
-- *added* 'data' eventEmitter for pipe method
-- *added* fatalError in constructor object
-- *added* ffmpeg function as default export. Use `import namehere from "./mod.ts"` for the function and `import {FfmpegClass} from "./mod.ts"`
-- *rewrote* constructor into one parameter with an object for everything. Check docs
-<br><br>
-- *changed* constructer. Now it is one object like with the following options `ffmpegDir`, `niceness`(not used on windows), `fatalError`(on by default) and `source` which is the inputfile  
-You don't need to specify all these, but you can
-## 1.1.1
-- *added* url input's
-<br><br>
-- *changed* variable **sumshit** => to **progressOBJ**
-## 1.1
-- *added* noAudio() method
-- *added* noVideo() method
-- *added* 'progress' eventEmitter
-- *added* audiobitrate() method
-- *rewrote* videoFilters() method for better filtering
-<br><br>
-- *changed* addFilters() => videoFilters()
-- *changed* ffmpegWrapper.ts => mod.ts
-- *changed* [std@0.79.0/node/events.ts](https://deno.land/std@0.79.0/node/events.ts) => [event@0.2.0](https://deno.land/x/event@0.2.0)
-- *merged* interfaces.ts & mod.ts
-<br><br>
-- *fucked* up a bunch
-- *removed* deprecated code
-- *updated* external libs
-<br><br>
-## 1.0
--  Added buggy ffmpeg wrapper
+await ffmpeg().save('video.mp4');
+
+//or like this
+let render = ffmpeg().save('video.mp4');
+await render;
+```
+
+## saveWithProgress(outputPath: String)
+`saveWithProgress()` returns an asyncGenerator with an object with 2 keys in it.  
+ETA: which is the estimated time the render is done  
+percentage: The percentage of how far the render is  
+```js
+import ffmpeg from "./mod.ts";
+
+let render = ffmpeg().saveWithProgress("video.mp4");
+
+//this will await the yield to be finished
+for await (const obj of render) {
+    console.log(obj);
+}
+```
+## setFfmpegPath(path: string)
+`setFfmpegPath()` will set the ffmpeg path if this is not set in the constructor
+
+```js
+import ffmpeg from "./mod.ts";
+let render = ffmpeg().setFfmpegPath("./path/to/binary");
+await render.save("video.mp4");
+```
+
+## addInput(path: string)
+`addInput()` will add an input to the list of input's (you need to map them yourself)  
+this means that the first input is input 0 so on and so on  
+path can be a url aswell
+
+```js
+import ffmpeg from "./mod.ts";
+let render = ffmpeg().addInput("./path/to/file");
+await render.save("video.mp4");
+```
+```js
+import ffmpeg from "./mod.ts";
+let render = ffmpeg().addInput("./path/to/file"); // this is input 0
+render.addInput("./path/to/file"); // this is input 1
+await render.save("video.mp4");
+```
+
+## noVideo()
+`noVideo()` will just disable video and remove all video settings
+```js
+import ffmpeg from "./mod.ts";
+let render = ffmpeg().noVideo();
+await render.save("video.mp4");
+```
+
+## noAudio()
+`noAudio()` will just disable audio and remove all audio settings
+```js
+import ffmpeg from "./mod.ts";
+let render = ffmpeg().noAudio();
+await render.save("video.mp4");
+```
+
+## audioCodec(codec: string, options?: Object)
+`audioCodec()` let's you specify which audio codec & options to use  
+options should only be used if you know what you are doing
+```js
+import ffmpeg from "./mod.ts";
+let render = ffmpeg().audioCodec("lib3lame");
+await render.save("video.mp4");
+```
+
+## videoCodec(codec: string, options?: Object)
+`videoCodec()` let's you specify which video codec & options to use  
+options should only be used if you know what you are doing
+```js
+import ffmpeg from "./mod.ts";
+let render = ffmpeg().videoCodec("libx264");
+await render.save("video.mp4");
+```
+
+## audioBitrate(bitrate: number)
+`audioBitrate()` let's you specify the audio bitrate in kbps
+```js
+import ffmpeg from "./mod.ts";
+let render = ffmpeg().audioBitrate(128);
+await render.save("video.mp4");
+```
+
+## videoBitrate(bitrate: string|number, constantBitrate: boolean)
+`videoBitrate()` let's you specify the video bitrate(default is kbps) and if this should be cbr(default) or vbr
+```js
+import ffmpeg from "./mod.ts";
+let render = ffmpeg().videoBitrate(1050);
+await render.save("video.mp4");
+```
+```js
+import ffmpeg from "./mod.ts";
+
+// set the second parameter to false if you want to use VBR
+let render = ffmpeg().videoBitrate("1050k", false);
+await render.save("video.mp4");
+```
+
+## videoFilters(...Filters: Filters[])
+`videoFilters()` let's you use the -vf video filters.
+```ts
+const filters = {
+    filterName: "drawtext", //the filtername you want to use
+    options: {
+        //here you should have all options
+    }
+}
+```
+`drawtext="text=cool guy: fontsize: 60"` will be like this
+```
+{
+    filterName: "drawtext",
+    options: {
+        text: "cool guy",
+        fontsize: 60
+    }
+}
+```
+```js
+import ffmpeg from "./mod.ts";
+let render = ffmpeg().videoFilters(
+    {
+    filterName: "drawtext",
+    options: {
+        text: sentence,
+        fontsize: "60",
+        x: (856 / 2 - 30 * sentence.length / 2),
+        y: "H-240",
+        fontcolor: "white",
+        shadowcolor: "black",
+        shadowx: "2",
+        shadowy: "2",
+    }
+})
+await render.save("video.mp4");
+```
+
 ---
 ## Authors or Acknowledgments
-- Christiaan "MierenMans" van Boheemen - Author
-- [crowlKats](https://github.com/crowlKats) - Made [event@0.2.0](https://deno.land/x/event@0.2.0) chainable for me :)
+- Skyler "MierenMans" van Boheemen - Author
 <br>
 
 <h1>License</h1>
-Copyright 2020 Christiaan "MierenMans" van Boheemen
+Copyright 2021 Skyler "MierenMans" van Boheemen
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
