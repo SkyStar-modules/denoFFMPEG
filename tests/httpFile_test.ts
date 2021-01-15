@@ -30,7 +30,7 @@ Deno.test({
     fn: async() => {
         await new FfmpegClass({
             ffmpegDir: "./ffmpeg/ffmpeg.exe"
-        }).inputFile(link).save("./ree.mp4");
+        }).addInput(link).save("./ree.mp4");
     },
     sanitizeOps: true,
     sanitizeResources: true
@@ -40,7 +40,7 @@ Deno.test({
     fn: async() => {
         const thing = new FfmpegClass({
             ffmpegDir: "./ffmpeg/ffmpeg.exe"
-        }).inputFile(link).saveWithProgress("./ree.mp4");
+        }).addInput(link).saveWithProgress("./ree.mp4");
         for await (const progress of thing) {
             console.log(progress);
         }
