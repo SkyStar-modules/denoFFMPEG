@@ -15,7 +15,7 @@
 ## Basic example
 `save()` is used to start the render process. you should always use `save()` or `saveWithProgress()` as last option
 ```js
-import ffmpeg from "./mod.ts";
+import { ffmpeg } from "./mod.ts";
 let videoRender = ffmpeg({ input: './dev/video0', ffmpegDir: './dev/ffmpeg' })
 await videoRender.videoBitrate(1000).save('./output.mp4');
 ```
@@ -26,7 +26,7 @@ await videoRender.videoBitrate(1000).save('./output.mp4');
 The denoFFMPEG module returns a constructor that you can use to instanciate FFmpeg commands.
 
 ```js
-import ffmpeg from "./mod.ts";
+import { ffmpeg } from "./mod.ts";
 let render = ffmpeg();
 
 //or use ffmpeg class
@@ -37,7 +37,7 @@ let render = new FfmpegClass();
 `save()` returns a Promise that get's voided once ffmpeg is done rendering
 
 ```js
-import ffmpeg from "./mod.ts";
+import { ffmpeg } from "./mod.ts";
 
 await ffmpeg().save('video.mp4');
 
@@ -51,7 +51,7 @@ await render;
 ETA: which is the estimated time the render is done  
 percentage: The percentage of how far the render is  
 ```js
-import ffmpeg from "./mod.ts";
+import { ffmpeg } from "./mod.ts";
 
 let render = ffmpeg().saveWithProgress("video.mp4");
 
@@ -64,7 +64,7 @@ for await (const obj of render) {
 `setFfmpegPath()` will set the ffmpeg path if this is not set in the constructor
 
 ```js
-import ffmpeg from "./mod.ts";
+import { ffmpeg } from "./mod.ts";
 let render = ffmpeg().setFfmpegPath("./path/to/binary");
 await render.save("video.mp4");
 ```
@@ -75,12 +75,12 @@ this means that the first input is input 0 so on and so on
 path can be a url aswell
 
 ```js
-import ffmpeg from "./mod.ts";
+import { ffmpeg } from "./mod.ts";
 let render = ffmpeg().addInput("./path/to/file");
 await render.save("video.mp4");
 ```
 ```js
-import ffmpeg from "./mod.ts";
+import { ffmpeg } from "./mod.ts";
 let render = ffmpeg().addInput("./path/to/file"); // this is input 0
 render.addInput("./path/to/file"); // this is input 1
 await render.save("video.mp4");
@@ -89,7 +89,7 @@ await render.save("video.mp4");
 ## noVideo()
 `noVideo()` will just disable video and remove all video settings
 ```js
-import ffmpeg from "./mod.ts";
+import { ffmpeg } from "./mod.ts";
 let render = ffmpeg().noVideo();
 await render.save("video.mp4");
 ```
@@ -97,7 +97,7 @@ await render.save("video.mp4");
 ## noAudio()
 `noAudio()` will just disable audio and remove all audio settings
 ```js
-import ffmpeg from "./mod.ts";
+import { ffmpeg } from "./mod.ts";
 let render = ffmpeg().noAudio();
 await render.save("video.mp4");
 ```
@@ -106,7 +106,7 @@ await render.save("video.mp4");
 `audioCodec()` let's you specify which audio codec & options to use  
 options should only be used if you know what you are doing
 ```js
-import ffmpeg from "./mod.ts";
+import { ffmpeg } from "./mod.ts";
 let render = ffmpeg().audioCodec("lib3lame");
 await render.save("video.mp4");
 ```
@@ -115,7 +115,7 @@ await render.save("video.mp4");
 `videoCodec()` let's you specify which video codec & options to use  
 options should only be used if you know what you are doing
 ```js
-import ffmpeg from "./mod.ts";
+import { ffmpeg } from "./mod.ts";
 let render = ffmpeg().videoCodec("libx264");
 await render.save("video.mp4");
 ```
@@ -123,7 +123,7 @@ await render.save("video.mp4");
 ## audioBitrate(bitrate: number)
 `audioBitrate()` let's you specify the audio bitrate in kbps
 ```js
-import ffmpeg from "./mod.ts";
+import { ffmpeg } from "./mod.ts";
 let render = ffmpeg().audioBitrate(128);
 await render.save("video.mp4");
 ```
@@ -131,12 +131,12 @@ await render.save("video.mp4");
 ## videoBitrate(bitrate: string|number, constantBitrate: boolean)
 `videoBitrate()` let's you specify the video bitrate(default is kbps) and if this should be cbr(default) or vbr
 ```js
-import ffmpeg from "./mod.ts";
+import { ffmpeg } from "./mod.ts";
 let render = ffmpeg().videoBitrate(1050);
 await render.save("video.mp4");
 ```
 ```js
-import ffmpeg from "./mod.ts";
+import { ffmpeg } from "./mod.ts";
 
 // set the second parameter to false if you want to use VBR
 let render = ffmpeg().videoBitrate("1050k", false);
@@ -164,14 +164,15 @@ const filters = {
 }
 ```
 ```js
-import ffmpeg from "./mod.ts";
+import { ffmpeg } from "./mod.ts";
+
 let render = ffmpeg().videoFilters(
     {
     filterName: "drawtext",
     options: {
-        text: sentence,
+        text: "cool thing",
         fontsize: "60",
-        x: (856 / 2 - 30 * sentence.length / 2),
+        x: (856 / 2 - 30 * "cool thing".length / 2),
         y: "H-240",
         fontcolor: "white",
         shadowcolor: "black",

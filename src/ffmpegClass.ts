@@ -191,6 +191,6 @@ export class FfmpegClass extends Processing {
     }
 }
 
-export default function ffmpeg(options?: Spawn): FfmpegClass {
+export function ffmpeg(options?: Spawn): FfmpegClass {
     return new FfmpegClass(options);
 }
