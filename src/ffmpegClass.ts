@@ -48,7 +48,7 @@ export class FfmpegClass extends Processing {
      */
     public setFfmpegPath(ffmpegPath: string): this {
         if (ffmpegPath) {
-            if (this.ffmpegDir.length > 0) warning("changing ffmpeg path from " + this.ffmpegDir + " to " + ffmpegPath);
+            if (this.ffmpegDir.length > 0 && this.ffmpegDir !== "ffmpeg") warning("changing ffmpeg path from " + this.ffmpegDir + " to " + ffmpegPath);
             this.ffmpegDir = ffmpegPath;
         }
         return this;
