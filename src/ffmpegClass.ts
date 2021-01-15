@@ -156,7 +156,7 @@ export class FfmpegClass extends Processing {
         Filters.forEach(x => {
             let temp: string = x.filterName + '="';
             Object.entries(x.options).forEach((j, i) => {
-                if (i > 0) {temp += `: ${j[0]}='${j[1]}'`} else {temp += `${j[0]}='${j[1]}'`}
+                if (i > 0) {temp += `: ${j[0]}=${j[1]}`} else {temp += `${j[0]}=${j[1]}`}
             });
             this.videoFilter.push(temp);
         });
