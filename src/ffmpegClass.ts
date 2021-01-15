@@ -12,7 +12,7 @@ export class FfmpegClass extends Processing {
      * Parameter 1: {  
      *    ffmpegDir?: string,  
      *    niceness?: number | string,  
-     *    source?: string  
+     *    input?: string  
      * }
      * 
      */
@@ -25,9 +25,10 @@ export class FfmpegClass extends Processing {
                         this.ffmpegDir = j[1];
                         break;
                     case "niceness":
+                        if (Deno.build.os === "windows") warning("Niceness is set while using windows\nPlease remove it because it isn't needed")
                         if (Deno.build.os !== "windows") this.niceness = j[1];
                         break;
-                    case "source":
+                    case "input":
                         if (j[1].includes("http")) this.inputIsURL = true;
                         this.input.push(j[1]);
                         break;

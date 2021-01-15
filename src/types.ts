@@ -5,7 +5,7 @@ export interface Filters {
 export interface Spawn {
     ffmpegDir?: string;
     niceness?: number|string;
-    source?: string;
+    input?: string;
 }
 export interface Progress {
     ETA: Date;
