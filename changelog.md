@@ -13,6 +13,7 @@
 - *removed* default export use `import { ffmpeg } from "./mod.ts";` or use  
 `import { FfmpegClass } from "./mod.ts";`
 <br>
+
 ## 1.2
 - *added* pipe method
 - *added* 'data' eventEmitter for pipe method
@@ -24,11 +25,13 @@
 - *changed* constructer. Now it is one object like with the 
 following options `ffmpegDir`, `niceness`(not used on windows), `fatalError`(on by default) and `source` which is the inputfileYou don't need to specify all these, but you can
 <br>
+
 ## 1.1.1
 - *added* url input's
 <br><br>
 - *changed* variable **sumshit** => to **progressOBJ**
 <br>
+
 ## 1.1
 - *added* noAudio() method
 - *added* noVideo() method
@@ -46,5 +49,6 @@ following options `ffmpegDir`, `niceness`(not used on windows), `fatalError`(on 
 - *removed* deprecated code
 - *updated* external libs
 <br>
+
 ## 1.0
 -  Added buggy ffmpeg wrapper
