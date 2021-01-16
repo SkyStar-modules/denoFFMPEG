@@ -29,7 +29,7 @@ export class FfmpegClass extends Processing {
                         if (Deno.build.os !== "windows") this.niceness = j[1];
                         break;
                     case "input":
-                        if (j[1].includes("http")) this.inputIsURL = true;
+                        if (j[1].includes("http") && this.input.length === 0) this.firstInputIsURL = true;
                         this.input.push(j[1]);
                         break;
                     default:
@@ -63,7 +63,7 @@ export class FfmpegClass extends Processing {
     public addInput(input: string): this {
         if (input) {
             this.input.push(input);
-            if (input.includes("http")) this.inputIsURL = true;
+            if (input.includes("http") && this.input.length === 0) this.firstInputIsURL = true;
         }
         return this;
     }
@@ -155,11 +155,19 @@ export class FfmpegClass extends Processing {
      */
     public videoFilters(...Filters: Filters[]): this {
         Filters.forEach(x => {
-            let temp: string = x.filterName + '="';
-            Object.entries(x.options).forEach((j, i) => {
-                if (i > 0) {temp += `: ${j[0]}=${j[1]}`} else {temp += `${j[0]}=${j[1]}`}
-            });
-            this.videoFilter.push(temp);
+            if (x.complex) {
+                let temp: string = x.filterName + '=';
+                Object.entries(x.options).forEach((j, i) => {
+                    if (i > 0) {temp += `: ${j[0]}=${j[1]}`} else {temp += `${j[0]}=${j[1]}`}
+                });
+                this.cvideoFilter.push(temp);
+            } else {
+                let temp: string = x.filterName + '=';
+                Object.entries(x.options).forEach((j, i) => {
+                    if (i > 0) {temp += `: ${j[0]}=${j[1]}`} else {temp += `${j[0]}=${j[1]}`}
+                });
+                this.videoFilter.push(temp);
+            }
         });
         return this;
     }

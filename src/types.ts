@@ -1,4 +1,5 @@
 export interface Filters {
+    complex?: boolean;
     filterName: string;
     options: Record<string, unknown>;
 }

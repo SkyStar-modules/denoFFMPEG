@@ -13,6 +13,7 @@ export class Processing {
     protected vbitrate:       string[] =       [];
     protected abitrate:       string[] =       [];
     protected videoFilter:    string[] =       [];
+    protected cvideoFilter:   string[] =       [];
     protected vidCodec:       string[] =       [];
     protected audCodec:       string[] =       [];
     protected stderr:         string[] =       [];
@@ -21,7 +22,7 @@ export class Processing {
     protected noaudio                  =    false;
     protected novideo                  =    false;
     protected outputPipe               =    false;
-    protected inputIsURL               =    false;
+    protected firstInputIsURL          =    false;
     protected Process!: Deno.Process;
 
     /**
@@ -42,20 +43,23 @@ export class Processing {
         let stdFPS = 0;
         for await (const line of readLines(this.Process.stderr!)) {
             if (line.includes('encoder')) encFound++;
+            
             if (stderrStart === true) {
+
                 this.stderr.push(line);
-                if ((i == 7 && !this.inputIsURL) || (i == 6 && this.inputIsURL)) {
+
+                if ((i == 7 && !this.firstInputIsURL) || (i == 6 && this.firstInputIsURL)) {
                     const dur: string = line.trim().replaceAll("Duration: ", "");
                     const timeArr: string[] = dur.substr(0, dur.indexOf(",")).split(":");
                     timeS = ((Number.parseFloat(timeArr[0]) * 60 + parseFloat(timeArr[1])) * 60 + parseFloat(timeArr[2]));
                 }
 
-                if ((i == 8 && !this.inputIsURL) || (i == 7 && this.inputIsURL)) {
+                if ((i == 8 && !this.firstInputIsURL) || (i == 7 && this.firstInputIsURL)) {
                     const string: string = line.trim();
                     totalFrames = timeS * Number.parseFloat(string.substr(string.indexOf('kb/s,'), string.indexOf('fps') - string.indexOf('kb/s,')).replaceAll("kb/s,", "").trim());
                 }
 
-                if (line.includes("encoder") && (encFound > 3 || (this.inputIsURL === true && encFound > 2)) || i >= 49) {
+                if (line.includes("encoder") && (encFound > 3 || (this.firstInputIsURL === true && encFound > 2)) || i >= 49) {
                     i = 0;
                     stderrStart = false;
                 }
@@ -72,7 +76,7 @@ export class Processing {
                         ETA: new Date(Date.now() + (totalFrames - stdFrame) / stdFPS * 1000),
                         percentage: Number.parseFloat((stdFrame / totalFrames * 100).toFixed(2))
                     }
-                    if (!Number.isNaN(stdFPS) && !Number.isNaN(stdFrame) && !Number.isNaN(stdFPS) && stdFPS !== 0) yield progressOBJ;
+                    if (!Number.isNaN(totalFrames) && !Number.isNaN(stdFrame) && !Number.isNaN(stdFPS) && stdFPS !== 0) yield progressOBJ;
                     i = 0;
                 }
             }
@@ -156,6 +160,7 @@ export class Processing {
         if (this.audCodec.length > 0) temp.concat(this.audCodec);
         if (this.vidCodec.length > 0) temp.concat(this.vidCodec);
         if (this.videoFilter.length > 0) temp.push("-vf", this.videoFilter.join(","));
+        if (this.cvideoFilter.length > 0) temp.push("-filter_complex", this.cvideoFilter.join(","));
         if (this.abitrate.length > 0) temp.concat(this.abitrate);
         if (this.vbitrate.length > 0) temp.concat(this.vbitrate);
         temp.push("-progress", "pipe:2", this.outputFile);
@@ -174,6 +179,8 @@ export class Processing {
         if (this.input.length === 0) {errors.push("No input specified!")}
         if ((!this.outputFile || this.outputFile == "") && !this.outputPipe) {errors.push("No output specified!")}
         if (!this.ffmpegDir || this.ffmpegDir == "") {errors.push("No ffmpeg directory specified!")}
+        if (this.videoFilter.length > 0 && this.cvideoFilter.length > 0) {errors.push("simple & complex filters cannot be used at the same time")}
+        if (this.videoFilter.length > 0 && this.cvideoFilter.join("").includes("undefined")) {errors.push("Filters were selected, but the field is incorrect or empty")}
         if (this.videoFilter.length > 0 && this.videoFilter.join("").includes("undefined")) {errors.push("Filters were selected, but the field is incorrect or empty")}
         if (errors.length > 0) {
             const errorList: string = errors.join("\n");
