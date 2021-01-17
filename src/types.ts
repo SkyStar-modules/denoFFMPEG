@@ -1,7 +1,7 @@
 export interface Filters {
     complex?: boolean;
     filterName: string;
-    options: Record<string, unknown>;
+    options: Record<string, string|number>;
 }
 export interface Spawn {
     ffmpegDir?: string;

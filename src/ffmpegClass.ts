@@ -1,6 +1,6 @@
 import { Processing } from "./processorClass.ts";
 import { Spawn, Progress, Filters } from "./types.ts";
-import { warning } from "./logger.ts";
+import * as log from "./logger.ts";
 /**
  * Public Class for ffmpeg rendering
  */
@@ -25,15 +25,23 @@ export class FfmpegClass extends Processing {
                         this.ffmpegDir = j[1];
                         break;
                     case "niceness":
-                        if (Deno.build.os === "windows") warning("Niceness is set while using windows\nPlease remove it because it isn't needed")
-                        if (Deno.build.os !== "windows") this.niceness = j[1];
+                        if (Deno.build.os === "windows") {
+                            log.warning("Niceness is set while using windows\nPlease remove it because it isn't needed");
+                        }
+
+                        if (Deno.build.os !== "windows") {
+                            this.niceness = j[1];
+                        }
                         break;
                     case "input":
-                        if (j[1].includes("http") && this.input.length === 0) this.firstInputIsURL = true;
+                        if (j[1].includes("http") && this.input.length == 0) {
+                            this.firstInputIsURL = true;
+                        }
+
                         this.input.push(j[1]);
                         break;
                     default:
-                        warning("option '" + j[0] + "' not found! Please remove it");
+                        log.warning("option '" + j[0] + "' not found! Please remove it");
                 }
             })
         }
@@ -48,7 +56,9 @@ export class FfmpegClass extends Processing {
      */
     public setFfmpegPath(ffmpegPath: string): this {
         if (ffmpegPath) {
-            if (this.ffmpegDir.length > 0 && this.ffmpegDir !== "ffmpeg") warning("changing ffmpeg path from " + this.ffmpegDir + " to " + ffmpegPath);
+            if (this.ffmpegDir.length > 0 && this.ffmpegDir !== "ffmpeg") {
+                log.warning("changing ffmpeg path from " + this.ffmpegDir + " to " + ffmpegPath);
+            }
             this.ffmpegDir = ffmpegPath;
         }
         return this;
@@ -62,8 +72,10 @@ export class FfmpegClass extends Processing {
      */
     public addInput(input: string): this {
         if (input) {
+            if (input.includes("http") && this.input.length == 0) {
+                this.firstInputIsURL = true;
+            }
             this.input.push(input);
-            if (input.includes("http") && this.input.length === 0) this.firstInputIsURL = true;
         }
         return this;
     }
@@ -95,8 +107,14 @@ export class FfmpegClass extends Processing {
      */
     public audioCodec(codec: string, options?: Record<string, string>): this {
         this.audCodec = ["-c:a", codec];
-        if (codec == "" || codec == "null" || codec == "undefined") this.audCodec = ["-c:a", "undefined"];
-        if (options) Object.entries(options).forEach(x => this.audCodec.push("-" + x[0], x[1]));
+        if (codec == "" || codec == "null" || codec == "undefined") {
+            this.audCodec = ["-c:a", "undefined"];
+        }
+        if (options) {
+            Object.entries(options).forEach(x => {
+                this.audCodec.push("-" + x[0], x[1]);
+            });
+        }
         return this;
     }
 
@@ -109,8 +127,12 @@ export class FfmpegClass extends Processing {
      */
     public videoCodec(codec: string, options?: Record<string, number|string>): this {
         this.vidCodec = ["-c:v", codec];
-        if (codec == "" || codec == "null" || codec == "undefined") this.vidCodec = ["-c:v", "undefined"];
-        if (options) Object.entries(options).forEach(x => this.vidCodec.push("-" + x[0], String(x[1])));
+        if (codec == "" || codec == "null" || codec == "undefined") {
+            this.vidCodec = ["-c:v", "undefined"];
+        }
+        if (options) Object.entries(options).forEach(x => {
+            this.vidCodec.push("-" + x[0], String(x[1]));
+        });
         return this;
     }
 
@@ -140,9 +162,27 @@ export class FfmpegClass extends Processing {
         if (lastChar !== "m" && lastChar !== "k") {
             lastChar = "k";
         }
-        this.vbitrate = ['-maxrate', brString, '-minrate', brString, "-b:v", brString, '-bufsize', '3M'];
+        this.vbitrate = [
+            '-maxrate',
+            brString,
+            '-minrate',
+            brString,
+            "-b:v",
+            brString,
+            '-bufsize',
+            '3M'
+        ];
         if (cbr == false) {
-            this.vbitrate = ['-maxrate', String(Number.parseFloat(brString) * 2 + lastChar), '-minrate', String(Number.parseFloat(brString) / 3), "-b:v", String(brString), '-bufsize', String(Number.parseFloat(brString) * 4)];
+            this.vbitrate = [
+                '-maxrate',
+                String(Number.parseFloat(brString) * 2 + lastChar),
+                '-minrate',
+                String(Number.parseFloat(brString) / 3),
+                "-b:v",
+                String(brString),
+                '-bufsize',
+                String(Number.parseFloat(brString) * 4)
+            ];
         }
         return this;
     }
@@ -157,14 +197,22 @@ export class FfmpegClass extends Processing {
         Filters.forEach(x => {
             if (x.complex) {
                 let temp: string = x.filterName + '=';
-                Object.entries(x.options).forEach((j, i) => {
-                    if (i > 0) {temp += `: ${j[0]}=${j[1]}`} else {temp += `${j[0]}=${j[1]}`}
+                Object.entries(x.options).forEach((j:Array<string|number>, i:number) => {
+                    if (i > 0) {
+                        temp += `: ${j[0]}=${j[1]}`;
+                    } else {
+                        temp += `${j[0]}=${j[1]}`;
+                    }
                 });
                 this.cvideoFilter.push(temp);
             } else {
                 let temp: string = x.filterName + '=';
                 Object.entries(x.options).forEach((j, i) => {
-                    if (i > 0) {temp += `: ${j[0]}=${j[1]}`} else {temp += `${j[0]}=${j[1]}`}
+                    if (i > 0) {
+                        temp += `:${j[0]}=${j[1]}`;
+                    } else {
+                        temp += `${j[0]}=${j[1]}`;
+                    }
                 });
                 this.videoFilter.push(temp);
             }
@@ -180,7 +228,7 @@ export class FfmpegClass extends Processing {
      * returns: void
      * 
      */
-    public save(output:string): Promise<void> {
+    public save(output: string): Promise<void> {
         this.outputFile = output;
         return this.__run();
     }
@@ -193,7 +241,7 @@ export class FfmpegClass extends Processing {
      * returns: Promise<AsyncGenerator<Progress>>
      * 
      */
-    public saveWithProgress(output:string): AsyncGenerator<Progress,void,void> {
+    public saveWithProgress(output: string): AsyncGenerator<Progress> {
         this.outputFile = output;
         return this.__runWithProgress();
     }

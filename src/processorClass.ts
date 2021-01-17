@@ -1,6 +1,6 @@
 import { Progress } from "./types.ts";
 import { readLines } from "../deps.ts"
-import { warning, formatError, ffmpegError, internalError } from "./logger.ts";
+import * as log from "./logger.ts";
 
 /**
  * Private Class for ffmpeg rendering
@@ -19,6 +19,7 @@ export class Processing {
     protected stderr:         string[] =       [];
     protected aBR                      =        0;
     protected vBR                      =        0;
+    protected debug                    =    true;
     protected noaudio                  =    false;
     protected novideo                  =    false;
     protected outputPipe               =    false;
@@ -33,17 +34,16 @@ export class Processing {
      * percentage: Number
      * }
      */
-    protected async* __getProgress(): AsyncGenerator<Progress,void,void> {
+    protected async* __getProgress(): AsyncGenerator<Progress> {
         let i = 1;
         let stderrStart = true;
         let timeS = 0;
         let totalFrames = 0;
         let encFound = 0;
-        let stdFrame = 0;
-        let stdFPS = 0;
+        let currentFrame = 0;
+        let currentFPS = 0;
         for await (const line of readLines(this.Process.stderr!)) {
             if (line.includes('encoder')) encFound++;
-            
             if (stderrStart === true) {
 
                 this.stderr.push(line);
@@ -56,27 +56,31 @@ export class Processing {
 
                 if ((i == 8 && !this.firstInputIsURL) || (i == 7 && this.firstInputIsURL)) {
                     const string: string = line.trim();
-                    totalFrames = timeS * Number.parseFloat(string.substr(string.indexOf('kb/s,'), string.indexOf('fps') - string.indexOf('kb/s,')).replaceAll("kb/s,", "").trim());
+                    totalFrames = Math.floor(timeS * Number.parseFloat(string.substr(string.indexOf('kb/s,'), string.indexOf('fps') - string.indexOf('kb/s,')).replaceAll("kb/s,", "").trim()));
                 }
 
-                if (line.includes("encoder") && (encFound > 3 || (this.firstInputIsURL === true && encFound > 2)) || i >= 49) {
+                if (line.includes("encoder") && encFound > 2) {
                     i = 0;
                     stderrStart = false;
                 }
             } else {
                 if (line === "progress=end") break;
                 if (line.includes("frame=")) {
-                    stdFrame = Number.parseInt(line.replaceAll("frame=", "").trim())
+                    currentFrame = Number.parseInt(line.replaceAll("frame=", "").trim())
                 }
                 if (line.includes("fps=")) {
-                    stdFPS = Number.parseFloat(line.replaceAll("fps=", "").trim())
+                    currentFPS = Number.parseFloat(line.replaceAll("fps=", "").trim())
                 }
                 if (i == 12) {
                     const progressOBJ: Progress = {
-                        ETA: new Date(Date.now() + (totalFrames - stdFrame) / stdFPS * 1000),
-                        percentage: Number.parseFloat((stdFrame / totalFrames * 100).toFixed(2))
+                        ETA: new Date(Date.now() + (totalFrames - currentFrame) / currentFPS * 1000),
+                        percentage: Number.parseFloat((currentFrame / totalFrames * 100).toFixed(2))
                     }
-                    if (!Number.isNaN(totalFrames) && !Number.isNaN(stdFrame) && !Number.isNaN(stdFPS) && stdFPS !== 0) yield progressOBJ;
+                    if (!Number.isNaN(totalFrames) && !Number.isNaN(currentFrame) && !Number.isNaN(currentFPS) && currentFPS !== 0) {
+                        yield progressOBJ;
+                    } else if (currentFPS !== 0 && this.debug && totalFrames > currentFrame) {
+                        log.internalWarning(`progress yield is invalid because one of the following values is NaN\ntotalFrames:${totalFrames}\ncurrentFrame:${currentFrame}\ncurrentFPS:${currentFPS}`)
+                    }
                     i = 0;
                 }
             }
@@ -98,11 +102,11 @@ export class Processing {
             case "audio":
 
                 if (this.aBR !== 0) {
-                    warning("video bitrate was selected while no audio mode was selected!\nPlease remove video bitrate");
+                    log.warning("video bitrate was selected while no audio mode was selected!\nPlease remove video bitrate");
                 }
 
                 if (this.audCodec.length > 0) {
-                    warning("video codec was selected while no audio mode was selected!\nPlease remove video codec");
+                    log.warning("video codec was selected while no audio mode was selected!\nPlease remove video codec");
                 }
 
                 this.audCodec = [];
@@ -113,15 +117,15 @@ export class Processing {
             case "video":
 
                 if (this.videoFilter.length > 0) {
-                    warning("video Filters was selected while no video mode was selected!\nPlease remove video filters");
+                    log.warning("video Filters was selected while no video mode was selected!\nPlease remove video filters");
                 }
 
                 if (this.vBR !== 0) {
-                    warning("video bitrate was selected while no video mode was selected!\nPlease remove video bitrate");
+                    log.warning("video bitrate was selected while no video mode was selected!\nPlease remove video bitrate");
                 }
 
                 if (this.vidCodec.length > 0) {
-                    warning("video codec was selected while no video mode was selected!\nPlease remove video codec");
+                    log.warning("video codec was selected while no video mode was selected!\nPlease remove video codec");
                 }
 
                 this.vidCodec = [];
@@ -131,7 +135,7 @@ export class Processing {
                 break;
 
             default:
-                internalError("tried to clear input. But invalid was specified!");
+                log.internalError("tried to clear input. But invalid input was specified!");
         }
         return;
     }
@@ -150,8 +154,8 @@ export class Processing {
         if (this.noaudio) {
             temp.push("-an");
             this.__clear("audio");
-
         }
+
         if (this.novideo) {
             temp.push("-vn");
             this.__clear("video");
@@ -159,10 +163,13 @@ export class Processing {
 
         if (this.audCodec.length > 0) temp.concat(this.audCodec);
         if (this.vidCodec.length > 0) temp.concat(this.vidCodec);
+
         if (this.videoFilter.length > 0) temp.push("-vf", this.videoFilter.join(","));
         if (this.cvideoFilter.length > 0) temp.push("-filter_complex", this.cvideoFilter.join(","));
+
         if (this.abitrate.length > 0) temp.concat(this.abitrate);
         if (this.vbitrate.length > 0) temp.concat(this.vbitrate);
+
         temp.push("-progress", "pipe:2", this.outputFile);
         return temp;
     }
@@ -172,19 +179,49 @@ export class Processing {
      */
     private __errorCheck(): void {
         const errors: string[] = [];
-        if (this.audCodec.length > 0 && (this.audCodec.join("").includes("undefined") || this.audCodec.includes("null"))) {errors.push("one or more audio codec options are undefined")}
-        if (this.vidCodec.length > 0 && (this.vidCodec.join("").includes("undefined") || this.vidCodec.includes("null"))) {errors.push("one or more video codec options are undefined")}
-        if (this.vbitrate.length > 0 && (this.vBR == 0 || Number.isNaN(this.vBR) == true)) {errors.push("video Bitrate is NaN")}
-        if (this.abitrate.length > 0 && (this.aBR == 0 || Number.isNaN(this.aBR) == true)) {errors.push("audio Bitrate is NaN")}
-        if (this.input.length === 0) {errors.push("No input specified!")}
-        if ((!this.outputFile || this.outputFile == "") && !this.outputPipe) {errors.push("No output specified!")}
-        if (!this.ffmpegDir || this.ffmpegDir == "") {errors.push("No ffmpeg directory specified!")}
-        if (this.videoFilter.length > 0 && this.cvideoFilter.length > 0) {errors.push("simple & complex filters cannot be used at the same time")}
-        if (this.videoFilter.length > 0 && this.cvideoFilter.join("").includes("undefined")) {errors.push("Filters were selected, but the field is incorrect or empty")}
-        if (this.videoFilter.length > 0 && this.videoFilter.join("").includes("undefined")) {errors.push("Filters were selected, but the field is incorrect or empty")}
+        if (this.audCodec.length > 0 && (this.audCodec.join("").includes("undefined") || this.audCodec.includes("null"))) {
+            errors.push("one or more audio codec options are undefined");
+        }
+
+        if (this.vidCodec.length > 0 && (this.vidCodec.join("").includes("undefined") || this.vidCodec.includes("null"))) {
+            errors.push("one or more video codec options are undefined");
+        }
+
+        if (this.vbitrate.length > 0 && (this.vBR == 0 || Number.isNaN(this.vBR) == true)) {
+            errors.push("video Bitrate is NaN");
+        }
+
+        if (this.abitrate.length > 0 && (this.aBR == 0 || Number.isNaN(this.aBR) == true)) {
+            errors.push("audio Bitrate is NaN");
+        }
+        
+        if (this.input.length === 0) {
+            errors.push("No input specified!");
+        }
+        
+        if ((!this.outputFile || this.outputFile == "") && !this.outputPipe) {
+            errors.push("No output specified!");
+        }
+        
+        if (!this.ffmpegDir || this.ffmpegDir == "") {
+            errors.push("No ffmpeg directory specified!");
+        }
+        
+        if (this.videoFilter.length > 0 && this.cvideoFilter.length > 0) {
+            errors.push("simple & complex filters cannot be used at the same time");
+        }
+        
+        if (this.videoFilter.length > 0 && this.cvideoFilter.join("").includes("undefined")) {
+            errors.push("Filters were selected, but the field is incorrect or empty");
+        }
+        
+        if (this.videoFilter.length > 0 && this.videoFilter.join("").includes("undefined")) {
+            errors.push("Filters were selected, but the field is incorrect or empty");
+        }
+        
         if (errors.length > 0) {
             const errorList: string = errors.join("\n");
-            formatError(errorList);
+            log.formatError(errorList);
         }
         return;
     }
@@ -192,21 +229,19 @@ export class Processing {
     /**
      * Wait method for run
      */
-    private async __closeProcess(progress:boolean): Promise<void> {
+    private async __closeProcess(hasProgress:boolean): Promise<void> {
         let stderr = this.stderr.join("");
-        if (!progress) {
+        if (!hasProgress) {
             stderr = new TextDecoder().decode(await this.Process.stderrOutput());
+        } else {
+            this.Process.stderr!.close()
         }
 
         const status = await this.Process.status();
         this.Process.close();
 
-        if (progress) {
-            this.Process.stderr!.close();
-        }
-
         if (status.success === false) {
-            ffmpegError(stderr);
+            log.ffmpegError(stderr);
         }
         return;
     }
@@ -231,7 +266,7 @@ export class Processing {
     /**
      * run method with progress data
      */
-    protected __runWithProgress(): AsyncGenerator<Progress,void,void> {
+    protected __runWithProgress(): AsyncGenerator<Progress> {
         this.__errorCheck();
         this.Process = Deno.run({
             cmd: this.__formatting(),
