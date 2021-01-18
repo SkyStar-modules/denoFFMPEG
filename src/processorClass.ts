@@ -6,24 +6,24 @@ import * as log from "./logger.ts";
  * Private Class for ffmpeg rendering
  */
 export class Processing {
-    protected ffmpegDir                = "ffmpeg";
-    protected outputFile               =       "";
-    protected niceness                 =       "";
-    protected input:          string[] =       [];
-    protected vbitrate:       string[] =       [];
-    protected abitrate:       string[] =       [];
-    protected videoFilter:    string[] =       [];
-    protected cvideoFilter:   string[] =       [];
-    protected vidCodec:       string[] =       [];
-    protected audCodec:       string[] =       [];
-    protected stderr:         string[] =       [];
-    protected aBR                      =        0;
-    protected vBR                      =        0;
-    protected debug                    =    true;
-    protected noaudio                  =    false;
-    protected novideo                  =    false;
-    protected outputPipe               =    false;
-    protected firstInputIsURL          =    false;
+    protected ffmpegDir                    = "ffmpeg";
+    protected outputFile                   =       "";
+    protected niceness                     =       "";
+    protected input:              string[] =       [];
+    protected vbitrate:           string[] =       [];
+    protected abitrate:           string[] =       [];
+    protected simpleVideoFilter:  string[] =       [];
+    protected complexVideoFilter: string[] =       [];
+    protected vidCodec:           string[] =       [];
+    protected audCodec:           string[] =       [];
+    protected stderr:             string[] =       [];
+    protected aBR                          =        0;
+    protected vBR                          =        0;
+    protected debug                        =     true;
+    protected noaudio                      =    false;
+    protected novideo                      =    false;
+    protected outputPipe                   =    false;
+    protected firstInputIsURL              =    false;
     protected Process!: Deno.Process;
 
     /**
@@ -100,7 +100,6 @@ export class Processing {
     private __clear(input: string): void {
         switch (input.toLowerCase()) {
             case "audio":
-
                 if (this.aBR !== 0) {
                     log.warning("video bitrate was selected while no audio mode was selected!\nPlease remove video bitrate");
                 }
@@ -115,8 +114,7 @@ export class Processing {
                 break;
 
             case "video":
-
-                if (this.videoFilter.length > 0) {
+                if (this.complexVideoFilter.length > 0 || this.simpleVideoFilter.length > 0) {
                     log.warning("video Filters was selected while no video mode was selected!\nPlease remove video filters");
                 }
 
@@ -131,7 +129,8 @@ export class Processing {
                 this.vidCodec = [];
                 this.vBR = 0;
                 this.vbitrate = [];
-                this.videoFilter = [];
+                this.simpleVideoFilter = [];
+                this.complexVideoFilter = [];
                 break;
 
             default:
@@ -164,8 +163,8 @@ export class Processing {
         if (this.audCodec.length > 0) temp.concat(this.audCodec);
         if (this.vidCodec.length > 0) temp.concat(this.vidCodec);
 
-        if (this.videoFilter.length > 0) temp.push("-vf", this.videoFilter.join(","));
-        if (this.cvideoFilter.length > 0) temp.push("-filter_complex", this.cvideoFilter.join(","));
+        if (this.simpleVideoFilter.length > 0) temp.push("-vf", this.simpleVideoFilter.join(","));
+        if (this.complexVideoFilter.length > 0) temp.push("-filter_complex", this.complexVideoFilter.join(","));
 
         if (this.abitrate.length > 0) temp.concat(this.abitrate);
         if (this.vbitrate.length > 0) temp.concat(this.vbitrate);
@@ -187,11 +186,11 @@ export class Processing {
             errors.push("one or more video codec options are undefined");
         }
 
-        if (this.vbitrate.length > 0 && (this.vBR == 0 || Number.isNaN(this.vBR) == true)) {
+        if (this.vbitrate.length > 0 && (this.vBR === 0 || Number.isNaN(this.vBR))) {
             errors.push("video Bitrate is NaN");
         }
 
-        if (this.abitrate.length > 0 && (this.aBR == 0 || Number.isNaN(this.aBR) == true)) {
+        if (this.abitrate.length > 0 && (this.aBR === 0 || Number.isNaN(this.aBR))) {
             errors.push("audio Bitrate is NaN");
         }
         
@@ -207,15 +206,15 @@ export class Processing {
             errors.push("No ffmpeg directory specified!");
         }
         
-        if (this.videoFilter.length > 0 && this.cvideoFilter.length > 0) {
+        if (this.simpleVideoFilter.length > 0 && this.complexVideoFilter.length > 0) {
             errors.push("simple & complex filters cannot be used at the same time");
         }
         
-        if (this.videoFilter.length > 0 && this.cvideoFilter.join("").includes("undefined")) {
+        if (this.complexVideoFilter.length > 0 && this.complexVideoFilter.join("").includes("undefined")) {
             errors.push("Filters were selected, but the field is incorrect or empty");
         }
         
-        if (this.videoFilter.length > 0 && this.videoFilter.join("").includes("undefined")) {
+        if (this.simpleVideoFilter.length > 0 && this.simpleVideoFilter.join("").includes("undefined")) {
             errors.push("Filters were selected, but the field is incorrect or empty");
         }
         
@@ -240,7 +239,7 @@ export class Processing {
         const status = await this.Process.status();
         this.Process.close();
 
-        if (status.success === false) {
+        if (!status.success) {
             log.ffmpegError(stderr);
         }
         return;

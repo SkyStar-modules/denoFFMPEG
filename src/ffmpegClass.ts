@@ -72,7 +72,7 @@ export class FfmpegClass extends Processing {
      */
     public addInput(input: string): this {
         if (input) {
-            if (input.includes("http") && this.input.length == 0) {
+            if (input.includes("http") && this.input.length === 0) {
                 this.firstInputIsURL = true;
             }
             this.input.push(input);
@@ -172,7 +172,7 @@ export class FfmpegClass extends Processing {
             '-bufsize',
             '3M'
         ];
-        if (cbr == false) {
+        if (!cbr) {
             this.vbitrate = [
                 '-maxrate',
                 String(Number.parseFloat(brString) * 2 + lastChar),
@@ -204,17 +204,17 @@ export class FfmpegClass extends Processing {
                         temp += `${j[0]}=${j[1]}`;
                     }
                 });
-                this.cvideoFilter.push(temp);
+                this.complexVideoFilter.push(temp);
             } else {
                 let temp: string = x.filterName + '=';
-                Object.entries(x.options).forEach((j, i) => {
+                Object.entries(x.options).forEach((j:Array<string|number>, i:number) => {
                     if (i > 0) {
                         temp += `:${j[0]}=${j[1]}`;
                     } else {
                         temp += `${j[0]}=${j[1]}`;
                     }
                 });
-                this.videoFilter.push(temp);
+                this.simpleVideoFilter.push(temp);
             }
         });
         return this;
