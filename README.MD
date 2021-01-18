@@ -1,7 +1,11 @@
 # Deno FFMPEG
-### FFmpeg is really nice to use and quite handy for alot of applications.
-### But we didn't have any easy wrapper for it in Deno!<br>So now we do :D
+
+## FFmpeg is really nice to use and quite handy for alot of applications
+
+## But we didn't have any easy wrapper for it in Deno! So now we do :D
+
 ---
+
 ## List of features
 
 - Video bitrate(VBR and CBR)
@@ -11,20 +15,32 @@
 - Frequently updated and maintained by me
 
 ---
+
 ## V2 information
+
 denoFFMPEG v2 is alot different from v1  
-it breaks alot of stuff that used to work, please read the doc's below to see what changed
+it breaks alot of stuff that used to work.
+
+please read the doc's below to see what changed
+
 ## Basic example
-`save()` is used to start the render process. you should always use `save()` or `saveWithProgress()` as last option
+
+`save()` is used to start the render process.
+
+you should always use `save()` or `saveWithProgress()` as last option
+
 ```js
 import { ffmpeg } from "./mod.ts";
 let videoRender = ffmpeg({ input: './dev/video0', ffmpegDir: './dev/ffmpeg' })
 await videoRender.videoBitrate(1000).save('./output.mp4');
 ```
---- 
+
+---
+
 # Documentation
 
 ## Creating a new instance of ffmpeg
+
 The denoFFMPEG module returns a constructor that you can use to instanciate FFmpeg commands.
 
 ```js
@@ -35,7 +51,9 @@ let render = ffmpeg();
 import { FfmpegClass } from "./mod.ts";
 let render = new FfmpegClass();
 ```
+
 ## save(outputPath: string)
+
 `save()` returns a Promise that get's voided once ffmpeg is done rendering
 
 ```js
@@ -49,9 +67,12 @@ await render;
 ```
 
 ## saveWithProgress(outputPath: String)
-`saveWithProgress()` returns an asyncGenerator with an object with 2 keys in it.  
+
+`saveWithProgress()` returns an asyncGenerator with an object with 2 keys in it.
+
 ETA: which is the estimated time the render is done  
-percentage: The percentage of how far the render is  
+percentage: The percentage of how far the render is
+
 ```js
 import { ffmpeg } from "./mod.ts";
 
@@ -62,7 +83,9 @@ for await (const obj of render) {
     console.log(obj);
 }
 ```
+
 ## setFfmpegPath(path: string)
+
 `setFfmpegPath()` will set the ffmpeg path if this is not set in the constructor
 
 ```js
@@ -72,7 +95,9 @@ await render.save("video.mp4");
 ```
 
 ## addInput(path: string)
-`addInput()` will add an input to the list of input's (you need to map them yourself)  
+
+`addInput()` will add an input to the list of input's (you need to map them yourself)
+
 this means that the first input is input 0 so on and so on  
 path can be a url aswell
 
@@ -81,6 +106,7 @@ import { ffmpeg } from "./mod.ts";
 let render = ffmpeg().addInput("./path/to/file");
 await render.save("video.mp4");
 ```
+
 ```js
 import { ffmpeg } from "./mod.ts";
 let render = ffmpeg().addInput("./path/to/file"); // this is input 0
@@ -89,7 +115,9 @@ await render.save("video.mp4");
 ```
 
 ## noVideo()
+
 `noVideo()` will just disable video and remove all video settings
+
 ```js
 import { ffmpeg } from "./mod.ts";
 let render = ffmpeg().noVideo();
@@ -97,7 +125,9 @@ await render.save("video.mp4");
 ```
 
 ## noAudio()
+
 `noAudio()` will just disable audio and remove all audio settings
+
 ```js
 import { ffmpeg } from "./mod.ts";
 let render = ffmpeg().noAudio();
@@ -105,8 +135,10 @@ await render.save("video.mp4");
 ```
 
 ## audioCodec(codec: string, options?: Object)
+
 `audioCodec()` let's you specify which audio codec & options to use  
 options should only be used if you know what you are doing
+
 ```js
 import { ffmpeg } from "./mod.ts";
 let render = ffmpeg().audioCodec("lib3lame");
@@ -114,8 +146,10 @@ await render.save("video.mp4");
 ```
 
 ## videoCodec(codec: string, options?: Object)
+
 `videoCodec()` let's you specify which video codec & options to use  
 options should only be used if you know what you are doing
+
 ```js
 import { ffmpeg } from "./mod.ts";
 let render = ffmpeg().videoCodec("libx264");
@@ -123,7 +157,9 @@ await render.save("video.mp4");
 ```
 
 ## audioBitrate(bitrate: number)
+
 `audioBitrate()` let's you specify the audio bitrate in kbps
+
 ```js
 import { ffmpeg } from "./mod.ts";
 let render = ffmpeg().audioBitrate(128);
@@ -131,12 +167,16 @@ await render.save("video.mp4");
 ```
 
 ## videoBitrate(bitrate: string|number, constantBitrate: boolean)
-`videoBitrate()` let's you specify the video bitrate(default is kbps) and if this should be cbr(default) or vbr
+
+`videoBitrate()` let's you specify the video bitrate(default is kbps)
+and if this should be cbr(default) or vbr
+
 ```js
 import { ffmpeg } from "./mod.ts";
 let render = ffmpeg().videoBitrate(1050);
 await render.save("video.mp4");
 ```
+
 ```js
 import { ffmpeg } from "./mod.ts";
 
@@ -146,7 +186,9 @@ await render.save("video.mp4");
 ```
 
 ## videoFilters(...Filters: Filters[])
-`videoFilters()` let's you use the -vf video filters.
+
+`videoFilters()` let's you use the videofilters
+
 ```ts
 const filters = {
     filterName: "drawtext", //the filtername you want to use
@@ -155,9 +197,11 @@ const filters = {
     }
 }
 ```
-`drawtext="text=cool guy: fontsize: 60"` will be like this
-```
-{
+
+`drawtext=text=cool guy:fontsize:60` will be like this
+
+```ts
+const filters = {
     filterName: "drawtext",
     options: {
         text: "cool guy",
@@ -165,6 +209,19 @@ const filters = {
     }
 }
 ```
+
+or if you want to use complex filter `-filter_complex`
+
+```ts
+const overlay = {
+    complex: true,
+    filterName: "overlay",
+    options: {
+        x: '150'
+    }
+}
+```
+
 ```js
 import { ffmpeg } from "./mod.ts";
 
@@ -185,12 +242,25 @@ let render = ffmpeg().videoFilters(
 await render.save("video.mp4");
 ```
 
----
-## Authors or Acknowledgments
-- Skyler "MierenMans" van Boheemen - Author
 <br>
 
-<h1>License</h1>
+# Releases
+
+Currently I have 2 branches.  
+Dev which will get all the latest pushes and commit's after v2.1  
+and I have main which will be all official releases like v2.1 and v2.2 etc.  
+The dev branch might be unstable or broken but it will have the latest features.  
+These features may not be documented yet!
+<br><br>
+
+# Authors or Acknowledgments
+
+- Skyler "MierenMans" van Boheemen - Author
+
+<br>
+
+# License
+
 Copyright 2021 Skyler "MierenMans" van Boheemen
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
