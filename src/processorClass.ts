@@ -96,7 +96,7 @@ export class Processing {
             percentage: 100
         };
     }
-
+    
     /**
      * Clear all filters and everything for audio or video
      */
@@ -133,7 +133,7 @@ export class Processing {
             this.simpleVideoFilter = [];
             this.complexVideoFilter = [];
             this.fps = 0;
-            
+
         } else {
             log.internalError("tried to clear input. But invalid input was specified!");
         }

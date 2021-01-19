@@ -1,6 +1,8 @@
 import { Processing } from "./processorClass.ts";
 import { Spawn, Progress, Filters } from "./types.ts";
-import * as log from "./logger.ts";
+import * as logger from "./logger.ts";
+import * as formatter from "./formatter.ts";
+
 /**
  * Public Class for ffmpeg rendering
  */
@@ -26,7 +28,7 @@ export class FfmpegClass extends Processing {
                         break;
                     case "niceness":
                         if (Deno.build.os === "windows") {
-                            log.warning("Niceness is set while using windows\nPlease remove it because it isn't needed");
+                            logger.warning("Niceness is set while using windows\nPlease remove it because it isn't needed");
                         }
 
                         if (Deno.build.os !== "windows") {
@@ -41,7 +43,7 @@ export class FfmpegClass extends Processing {
                         this.input.push(j[1]);
                         break;
                     default:
-                        log.warning("option '" + j[0] + "' not found! Please remove it");
+                        logger.warning("option '" + j[0] + "' not found! Please remove it");
                 }
             })
         }
@@ -57,7 +59,7 @@ export class FfmpegClass extends Processing {
     public setFfmpegPath(ffmpegPath: string): this {
         if (ffmpegPath) {
             if (this.ffmpegDir.length > 0 && this.ffmpegDir !== "ffmpeg") {
-                log.warning("changing ffmpeg path from " + this.ffmpegDir + " to " + ffmpegPath);
+                logger.warning("changing ffmpeg path from " + this.ffmpegDir + " to " + ffmpegPath);
             }
             this.ffmpegDir = ffmpegPath;
         }
@@ -103,16 +105,8 @@ export class FfmpegClass extends Processing {
      * Parameter 2: options options object for codec supported options
      *
      */
-    public audioCodec(codec: string, options?: Record<string, string>): this {
-        this.audCodec = ["-c:a", codec];
-        if (codec == "" || codec == "null" || codec == "undefined") {
-            this.audCodec = ["-c:a", "undefined"];
-        }
-        if (options) {
-            Object.entries(options).forEach(x => {
-                this.audCodec.push("-" + x[0], x[1]);
-            });
-        }
+    public audioCodec(codec: string, options?: Record<string, string|number>): this {
+        this.audCodec = formatter.codecFormatter("-c:a", codec, options);
         return this;
     }
 
@@ -123,14 +117,8 @@ export class FfmpegClass extends Processing {
      * Parameter 2: options Options object for codec supported options
      *
      */
-    public videoCodec(codec: string, options?: Record<string, number|string>): this {
-        this.vidCodec = ["-c:v", codec];
-        if (codec == "" || codec == "null" || codec == "undefined") {
-            this.vidCodec = ["-c:v", "undefined"];
-        }
-        if (options) Object.entries(options).forEach(x => {
-            this.vidCodec.push("-" + x[0], String(x[1]));
-        });
+    public videoCodec(codec: string, options?: Record<string, string>): this {
+        this.vidCodec = formatter.codecFormatter("-c:v", codec, options);
         return this;
     }
 
@@ -191,30 +179,29 @@ export class FfmpegClass extends Processing {
      * Parameter 1: Filters Array of filter Objects you want to use for processing
      * 
      */
+    public audioFilters(...Filters: Filters[]): this {
+        this.simpleVideoFilter = formatter.filterFormatter(...Filters)
+        return this;
+    }
+    /**
+     * Set video filters
+     * 
+     * Parameter 1: Filters Array of filter Objects you want to use for processing
+     * 
+     */
+    public complexFilters(...Filters: Filters[]): this {
+        this.complexVideoFilter = formatter.filterFormatter(...Filters)
+        return this;
+    }
+
+    /**
+     * Set video filters
+     * 
+     * Parameter 1: Filters Array of filter Objects you want to use for processing
+     * 
+     */
     public videoFilters(...Filters: Filters[]): this {
-        Filters.forEach(x => {
-            if (x.complex) {
-                let temp: string = x.filterName + '=';
-                Object.entries(x.options).forEach((j:Array<string|number>, i:number) => {
-                    if (i > 0) {
-                        temp += `: ${j[0]}=${j[1]}`;
-                    } else {
-                        temp += `${j[0]}=${j[1]}`;
-                    }
-                });
-                this.complexVideoFilter.push(temp);
-            } else {
-                let temp: string = x.filterName + '=';
-                Object.entries(x.options).forEach((j:Array<string|number>, i:number) => {
-                    if (i > 0) {
-                        temp += `:${j[0]}=${j[1]}`;
-                    } else {
-                        temp += `${j[0]}=${j[1]}`;
-                    }
-                });
-                this.simpleVideoFilter.push(temp);
-            }
-        });
+        this.simpleVideoFilter = formatter.filterFormatter(...Filters)
         return this;
     }
     /**
