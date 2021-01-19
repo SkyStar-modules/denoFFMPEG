@@ -219,7 +219,11 @@ export class FfmpegClass extends Processing {
         });
         return this;
     }
-
+    public withOutputFPS = (fps:number): this => this.outputFPS(fps);
+    public outputFPS(fps: number): this {
+        this.fps = fps;
+        return this;
+    }
     /**
      * set output path and encode
      * 

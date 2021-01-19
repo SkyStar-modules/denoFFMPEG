@@ -17,6 +17,7 @@ export class Processing {
     protected vidCodec:           string[] =       [];
     protected audCodec:           string[] =       [];
     protected stderr:             string[] =       [];
+    protected fps                          =        0;
     protected aBR                          =        0;
     protected vBR                          =        0;
     protected debug                        =     true;
@@ -53,11 +54,13 @@ export class Processing {
                     const timeArr: string[] = dur.substr(0, dur.indexOf(",")).split(":");
                     timeS = ((Number.parseFloat(timeArr[0]) * 60 + parseFloat(timeArr[1])) * 60 + parseFloat(timeArr[2]));
                 }
-
-                if ((i == 8 && !this.firstInputIsURL) || (i == 7 && this.firstInputIsURL)) {
+                if (this.fps > 0) {
+                    totalFrames = Math.floor(timeS * this.fps)
+                } else if ((i == 8 && !this.firstInputIsURL) || (i == 7 && this.firstInputIsURL)) {
                     const string: string = line.trim();
                     totalFrames = Math.floor(timeS * Number.parseFloat(string.substr(string.indexOf('kb/s,'), string.indexOf('fps') - string.indexOf('kb/s,')).replaceAll("kb/s,", "").trim()));
                 }
+                
 
                 if (line.includes("encoder") && encFound > 2) {
                     i = 0;
@@ -76,9 +79,9 @@ export class Processing {
                         ETA: new Date(Date.now() + (totalFrames - currentFrame) / currentFPS * 1000),
                         percentage: Number.parseFloat((currentFrame / totalFrames * 100).toFixed(2))
                     }
-                    if (!Number.isNaN(totalFrames) && !Number.isNaN(currentFrame) && !Number.isNaN(currentFPS) && currentFPS !== 0) {
+                    if (!Number.isNaN(totalFrames) && !Number.isNaN(currentFrame) && !Number.isNaN(currentFPS) && currentFPS !== 0 && progressOBJ.percentage < 100) {
                         yield progressOBJ;
-                    } else if (currentFPS !== 0 && this.debug && totalFrames > currentFrame) {
+                    } else if (currentFPS !== 0 && this.debug && totalFrames > currentFrame && progressOBJ.percentage < 100) {
                         log.internalWarning(`progress yield is invalid because one of the following values is NaN\ntotalFrames:${totalFrames}\ncurrentFrame:${currentFrame}\ncurrentFPS:${currentFPS}`)
                     }
                     i = 0;
@@ -131,6 +134,7 @@ export class Processing {
                 this.vbitrate = [];
                 this.simpleVideoFilter = [];
                 this.complexVideoFilter = [];
+                this.fps = 0;
                 break;
 
             default:
@@ -168,7 +172,7 @@ export class Processing {
 
         if (this.abitrate.length > 0) temp.concat(this.abitrate);
         if (this.vbitrate.length > 0) temp.concat(this.vbitrate);
-
+        if (this.fps > 0) temp.push("-r", this.fps.toString());
         temp.push("-progress", "pipe:2", this.outputFile);
         return temp;
     }
@@ -178,6 +182,9 @@ export class Processing {
      */
     private __errorCheck(): void {
         const errors: string[] = [];
+        if (this.fps > 0 && Number.isNaN(this.fps)) {
+            errors.push("FPS is NaN");
+        }
         if (this.audCodec.length > 0 && (this.audCodec.join("").includes("undefined") || this.audCodec.includes("null"))) {
             errors.push("one or more audio codec options are undefined");
         }
