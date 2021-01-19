@@ -99,6 +99,22 @@ export class FfmpegClass extends Processing {
     }
 
     /**
+     * Set height of the video
+     */
+    public setHeight(h:number): this {
+        this.height = h;
+        return this;
+    }
+
+    /**
+     * Set width of the video
+     */
+    public setWidth(w:number): this {
+        this.width = w;
+        return this;
+    }
+    
+    /**
      * Set audio codec
      * 
      * Parameter 1: codec Audio Codec name  

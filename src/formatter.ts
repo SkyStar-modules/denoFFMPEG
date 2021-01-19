@@ -1,4 +1,4 @@
-import {Filters} from "./types.ts";
+import { Filters } from "./types.ts";
 export function codecFormatter(codecType: string, codec: string, options?: Record<string, string|number>): string[] {
     let codecArr: string[] = [codecType, codec];
     if (codec == "" || codec == "null" || codec == "undefined") {

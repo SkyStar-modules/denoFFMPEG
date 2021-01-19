@@ -20,6 +20,8 @@ export class Processing {
     protected fps                          =        0;
     protected aBR                          =        0;
     protected vBR                          =        0;
+    protected width                        =       -1;
+    protected height                       =       -1;
     protected debug                        =     true;
     protected noaudio                      =    false;
     protected novideo                      =    false;
@@ -163,7 +165,7 @@ export class Processing {
 
         if (this.audCodec.length > 0) temp.concat(this.audCodec);
         if (this.vidCodec.length > 0) temp.concat(this.vidCodec);
-
+        if (this.height !== -1 || this.width !== -1) this.simpleVideoFilter.push(`scale=${this.width}:${this.height}`)
         if (this.simpleVideoFilter.length > 0) temp.push("-vf", this.simpleVideoFilter.join(","));
         if (this.complexVideoFilter.length > 0) temp.push("-filter_complex", this.complexVideoFilter.join(","));
 
@@ -214,7 +216,12 @@ export class Processing {
         if (this.simpleVideoFilter.length > 0 && this.complexVideoFilter.length > 0) {
             errors.push("simple & complex filters cannot be used at the same time");
         }
-        
+        if (this.width % 2 !== 0 && this.width !== -1) {
+            errors.push("Width is not divisible by 2");
+        }
+        if (this.height % 2 !== 0 && this.height !== -1) {
+            errors.push("height is not divisible by 2");
+        }
         if (this.complexVideoFilter.length > 0 && this.complexVideoFilter.join("").includes("undefined")) {
             errors.push("Filters were selected, but the field is incorrect or empty");
         }
