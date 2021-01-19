@@ -34,6 +34,7 @@ export class Processing {
      * ETA: Date,
      * percentage: Number
      * }
+     * 
      */
     protected async* __getProgress(): AsyncGenerator<Progress> {
         let i = 1;
@@ -98,47 +99,43 @@ export class Processing {
 
     /**
      * Clear all filters and everything for audio or video
-     * 
      */
     private __clear(input: string): void {
-        switch (input.toLowerCase()) {
-            case "audio":
-                if (this.aBR !== 0) {
-                    log.warning("video bitrate was selected while no audio mode was selected!\nPlease remove video bitrate");
-                }
+        if (input.toLowerCase() === "audio") {
+            if (this.aBR !== 0) {
+                log.warning("video bitrate was selected while no audio mode was selected!\nPlease remove video bitrate");
+            }
 
-                if (this.audCodec.length > 0) {
-                    log.warning("video codec was selected while no audio mode was selected!\nPlease remove video codec");
-                }
+            if (this.audCodec.length > 0) {
+                log.warning("video codec was selected while no audio mode was selected!\nPlease remove video codec");
+            }
 
-                this.audCodec = [];
-                this.aBR = 0;
-                this.abitrate = [];
-                break;
+            this.audCodec = [];
+            this.aBR = 0;
+            this.abitrate = [];
 
-            case "video":
-                if (this.complexVideoFilter.length > 0 || this.simpleVideoFilter.length > 0) {
-                    log.warning("video Filters was selected while no video mode was selected!\nPlease remove video filters");
-                }
+        } else if (input.toLowerCase() === "video") {
+            if (this.complexVideoFilter.length > 0 || this.simpleVideoFilter.length > 0) {
+                log.warning("video Filters was selected while no video mode was selected!\nPlease remove video filters");
+            }
 
-                if (this.vBR !== 0) {
-                    log.warning("video bitrate was selected while no video mode was selected!\nPlease remove video bitrate");
-                }
+            if (this.vBR !== 0) {
+                log.warning("video bitrate was selected while no video mode was selected!\nPlease remove video bitrate");
+            }
 
-                if (this.vidCodec.length > 0) {
-                    log.warning("video codec was selected while no video mode was selected!\nPlease remove video codec");
-                }
+            if (this.vidCodec.length > 0) {
+                log.warning("video codec was selected while no video mode was selected!\nPlease remove video codec");
+            }
 
-                this.vidCodec = [];
-                this.vBR = 0;
-                this.vbitrate = [];
-                this.simpleVideoFilter = [];
-                this.complexVideoFilter = [];
-                this.fps = 0;
-                break;
-
-            default:
-                log.internalError("tried to clear input. But invalid input was specified!");
+            this.vidCodec = [];
+            this.vBR = 0;
+            this.vbitrate = [];
+            this.simpleVideoFilter = [];
+            this.complexVideoFilter = [];
+            this.fps = 0;
+            
+        } else {
+            log.internalError("tried to clear input. But invalid input was specified!");
         }
         return;
     }
@@ -173,6 +170,7 @@ export class Processing {
         if (this.abitrate.length > 0) temp.concat(this.abitrate);
         if (this.vbitrate.length > 0) temp.concat(this.vbitrate);
         if (this.fps > 0) temp.push("-r", this.fps.toString());
+
         temp.push("-progress", "pipe:2", this.outputFile);
         return temp;
     }
@@ -251,10 +249,6 @@ export class Processing {
         }
         return;
     }
-
-    /**
-     * close method for runWithProgress
-     */
 
     /**
      * run method without progress data

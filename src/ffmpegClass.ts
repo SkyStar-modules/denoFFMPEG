@@ -82,7 +82,6 @@ export class FfmpegClass extends Processing {
 
     /**
      * Disable Audio and remove all audio settings
-     * 
      */
     public noAudio(): this {
         this.noaudio = true;
@@ -91,7 +90,6 @@ export class FfmpegClass extends Processing {
 
     /**
      * Disable video and remove all video settings
-     * 
      */
     public noVideo(): this {
         this.novideo = true;
@@ -219,7 +217,12 @@ export class FfmpegClass extends Processing {
         });
         return this;
     }
-    public withOutputFPS = (fps:number): this => this.outputFPS(fps);
+    /**
+     * Set output fps
+     * 
+     * parameter 1: set output fps
+     * 
+     */
     public outputFPS(fps: number): this {
         this.fps = fps;
         return this;
@@ -227,7 +230,7 @@ export class FfmpegClass extends Processing {
     /**
      * set output path and encode
      * 
-     * parameter 1: output set output path
+     * parameter 1: set output path
      * 
      * returns: void
      * 
