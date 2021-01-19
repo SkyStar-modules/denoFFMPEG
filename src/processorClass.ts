@@ -13,7 +13,8 @@ export class Processing {
     protected vbitrate:           string[] =       [];
     protected abitrate:           string[] =       [];
     protected simpleVideoFilter:  string[] =       [];
-    protected complexVideoFilter: string[] =       [];
+    protected complexFilter:      string[] =       [];
+    protected audioFilter:        string[] =       [];
     protected vidCodec:           string[] =       [];
     protected audCodec:           string[] =       [];
     protected stderr:             string[] =       [];
@@ -115,9 +116,9 @@ export class Processing {
             this.audCodec = [];
             this.aBR = 0;
             this.abitrate = [];
-
+            this.audioFilter = [];
         } else if (input.toLowerCase() === "video") {
-            if (this.complexVideoFilter.length > 0 || this.simpleVideoFilter.length > 0) {
+            if (this.simpleVideoFilter.length > 0) {
                 log.warning("video Filters was selected while no video mode was selected!\nPlease remove video filters");
             }
 
@@ -133,7 +134,8 @@ export class Processing {
             this.vBR = 0;
             this.vbitrate = [];
             this.simpleVideoFilter = [];
-            this.complexVideoFilter = [];
+            this.height = -1;
+            this.width = -1;
             this.fps = 0;
 
         } else {
@@ -165,9 +167,12 @@ export class Processing {
 
         if (this.audCodec.length > 0) temp.concat(this.audCodec);
         if (this.vidCodec.length > 0) temp.concat(this.vidCodec);
-        if (this.height !== -1 || this.width !== -1) this.simpleVideoFilter.push(`scale=${this.width}:${this.height}`)
+
+        if (this.height !== -1 || this.width !== -1) this.simpleVideoFilter.push(`scale=${this.width}:${this.height}`);
+
+        if (this.audioFilter.length > 0) temp.push("-af", this.audioFilter.join(","));
         if (this.simpleVideoFilter.length > 0) temp.push("-vf", this.simpleVideoFilter.join(","));
-        if (this.complexVideoFilter.length > 0) temp.push("-filter_complex", this.complexVideoFilter.join(","));
+        if (this.complexFilter.length > 0) temp.push("-filter_complex", this.complexFilter.join(","));
 
         if (this.abitrate.length > 0) temp.concat(this.abitrate);
         if (this.vbitrate.length > 0) temp.concat(this.vbitrate);
@@ -213,8 +218,8 @@ export class Processing {
             errors.push("No ffmpeg directory specified!");
         }
         
-        if (this.simpleVideoFilter.length > 0 && this.complexVideoFilter.length > 0) {
-            errors.push("simple & complex filters cannot be used at the same time");
+        if (this.simpleVideoFilter.length > 0 && this.complexFilter.length > 0) {
+            errors.push("Simple & Complex filters cannot be used at the same time");
         }
         if (this.width % 2 !== 0 && this.width !== -1) {
             errors.push("Width is not divisible by 2");
@@ -222,14 +227,18 @@ export class Processing {
         if (this.height % 2 !== 0 && this.height !== -1) {
             errors.push("height is not divisible by 2");
         }
-        if (this.complexVideoFilter.length > 0 && this.complexVideoFilter.join("").includes("undefined")) {
-            errors.push("Filters were selected, but the field is incorrect or empty");
+        if (this.complexFilter.length > 0 && this.complexFilter.join("").includes("undefined")) {
+            errors.push("Complex Filter(s) were selected, but the field is incorrect or empty");
         }
         
         if (this.simpleVideoFilter.length > 0 && this.simpleVideoFilter.join("").includes("undefined")) {
-            errors.push("Filters were selected, but the field is incorrect or empty");
+            errors.push("Simple video Filter(s) were selected, but the field is incorrect or empty");
         }
-        
+
+        if (this.audioFilter.length > 0 && this.audioFilter.join("").includes("undefined")) {
+            errors.push("Audio Filter(s) were selected, but the field is incorrect or empty");
+        }
+
         if (errors.length > 0) {
             const errorList: string = errors.join("\n");
             log.formatError(errorList);

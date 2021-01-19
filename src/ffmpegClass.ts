@@ -113,7 +113,7 @@ export class FfmpegClass extends Processing {
         this.width = w;
         return this;
     }
-    
+
     /**
      * Set audio codec
      * 
@@ -196,7 +196,7 @@ export class FfmpegClass extends Processing {
      * 
      */
     public audioFilters(...Filters: Filters[]): this {
-        this.simpleVideoFilter = formatter.filterFormatter(...Filters)
+        this.audioFilter = formatter.filterFormatter(...Filters)
         return this;
     }
     /**
@@ -206,7 +206,7 @@ export class FfmpegClass extends Processing {
      * 
      */
     public complexFilters(...Filters: Filters[]): this {
-        this.complexVideoFilter = formatter.filterFormatter(...Filters)
+        this.complexFilter = formatter.filterFormatter(...Filters)
         return this;
     }
 
