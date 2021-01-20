@@ -23,7 +23,7 @@ export class FfmpegClass extends Processing {
         if (options) {
             Object.entries(options).forEach((j: Array<string|number>) => {
                 const option = j[0].toString().toLowerCase();
-                const value = j[1].toString()
+                const value = j[1].toString();
                 switch (option) {
                     case "threads":
                         this.threadCount = parseInt(value);

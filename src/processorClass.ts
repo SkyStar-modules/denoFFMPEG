@@ -2,6 +2,7 @@ import { Progress, Globals } from "./types.ts";
 import { readLines } from "../deps.ts"
 import * as log from "./logger.ts";
 import { globalOptionsFormatter } from "./formatter.ts";
+
 /**
  * Private Class for ffmpeg rendering
  */

@@ -1,4 +1,5 @@
 import { Filters, Globals } from "./types.ts";
+
 export function codecFormatter(codecType: string, codec: string, options?: Record<string, string|number>): string[] {
     codec = (codec == "" || codec == "null" || codec == "undefined") ? "undefined" : codec;
     const codecArr: string[] = [codecType, codec];
@@ -31,11 +32,7 @@ export function filterFormatter(...filters: Filters[]): string[] {
     filters.forEach(x => {
             let temp: string = x.filterName + '=';
             Object.entries(x.options).forEach((j, i) => {
-                if (i > 0) {
-                    temp += `: ${j[0]}=${j[1]}`;
-                } else {
-                    temp += `${j[0]}=${j[1]}`;
-                }
+                temp += (i > 0) ? `: ${j[0]}=${j[1]}` : `${j[0]}=${j[1]}`;
             });
 
         filterArr.push(temp);
