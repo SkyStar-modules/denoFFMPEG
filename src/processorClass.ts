@@ -78,13 +78,16 @@ export class Processing {
                     currentFrame = Number.parseInt(line.replaceAll("frame=", "").trim())
                 }
                 if (line.includes("fps=")) {
+                    console.log(line);
                     currentFPS = Number.parseFloat(line.replaceAll("fps=", "").trim())
+                    if (currentFPS === 0) currentFPS = currentFrame;
                 }
                 if (i == 12) {
                     const progressOBJ: Progress = {
                         ETA: new Date(Date.now() + (totalFrames - currentFrame) / currentFPS * 1000),
                         percentage: Number.parseFloat((currentFrame / totalFrames * 100).toFixed(2))
                     }
+                    
                     if (!Number.isNaN(totalFrames) && !Number.isNaN(currentFrame) && !Number.isNaN(currentFPS) && currentFPS !== 0 && progressOBJ.percentage < 100) {
                         yield progressOBJ;
                     } else if (currentFPS !== 0 && this.debug && totalFrames > currentFrame && progressOBJ.percentage < 100) {
