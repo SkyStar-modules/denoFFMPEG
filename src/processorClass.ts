@@ -6,30 +6,30 @@ import { globalOptionsFormatter } from "./formatter.ts";
  * Private Class for ffmpeg rendering
  */
 export class Processing {
-    protected ffmpegDir                    = "ffmpeg";
-    protected outputFile                   =       "";
-    protected input:              string[] =       [];
-    protected vbitrate:           string[] =       [];
-    protected abitrate:           string[] =       [];
-    protected simpleVideoFilter:  string[] =       [];
-    protected complexFilter:      string[] =       [];
-    protected audioFilter:        string[] =       [];
-    protected vidCodec:           string[] =       [];
-    protected audCodec:           string[] =       [];
-    protected stderr:             string[] =       [];
-    protected globals:            string[] =       [];
-    protected niceness                     =       -1;
-    protected threadCount                  =        0;
-    protected fps                          =        0;
-    protected aBR                          =        0;
-    protected vBR                          =        0;
-    protected width                        =       -1;
-    protected height                       =       -1;
-    protected debug                        =     true;
-    protected noaudio                      =    false;
-    protected novideo                      =    false;
-    protected outputPipe                   =    false;
-    protected firstInputIsURL              =    false;
+    protected ffmpegDir                    =    "";
+    protected outputFile                   =    "";
+    protected input:              string[] =    [];
+    protected vbitrate:           string[] =    [];
+    protected abitrate:           string[] =    [];
+    protected simpleVideoFilter:  string[] =    [];
+    protected complexFilter:      string[] =    [];
+    protected audioFilter:        string[] =    [];
+    protected vidCodec:           string[] =    [];
+    protected audCodec:           string[] =    [];
+    protected stderr:             string[] =    [];
+    protected globals:            string[] =    [];
+    protected niceness                     =    -1;
+    protected threadCount                  =     0;
+    protected fps                          =     0;
+    protected aBR                          =     0;
+    protected vBR                          =     0;
+    protected width                        =    -1;
+    protected height                       =    -1;
+    protected debug                        =  true;
+    protected noaudio                      = false;
+    protected novideo                      = false;
+    protected outputPipe                   = false;
+    protected firstInputIsURL              = false;
     protected Process!: Deno.Process;
 
     /**
