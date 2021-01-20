@@ -12,14 +12,14 @@ export function codecFormatter(codecType: string, codec: string, options?: Recor
 }
 
 export function globalOptionsFormatter(globals: Globals): string[] {
-    const temp: string[] = ["ffmpeg","-hide_banner", "-nostats","-y"];
-        temp[0] = (globals.ffmpegdir == "" || !globals.ffmpegdir) ? "ffmpeg" : globals.ffmpegdir;
+    const temp: string[] = ["","-hide_banner", "-nostats","-y"];
+        temp[0] = !(globals.ffmpegdir == "" || !globals.ffmpegdir) ? globals.ffmpegdir : "ffmpeg";
 
-    if (globals.niceness && globals.niceness > 0) {
+    if (globals.niceness > 0) {
         temp.push("-n", globals.niceness.toString());
     }
 
-    if (globals.threads && globals.threads > 0) {
+    if (globals.threads > 0) {
         temp.push("-threads", globals.threads.toString());
     }
 

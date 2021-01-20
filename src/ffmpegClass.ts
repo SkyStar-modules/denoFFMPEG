@@ -228,6 +228,7 @@ export class FfmpegClass extends Processing {
         this.simpleVideoFilter = formatter.filterFormatter(...Filters);
         return this;
     }
+
     /**
      * Set output fps
      * 
@@ -238,6 +239,7 @@ export class FfmpegClass extends Processing {
         this.fps = fps;
         return this;
     }
+    
     /**
      * set output path and encode
      * 

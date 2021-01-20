@@ -15,6 +15,6 @@ export interface Progress {
 }
 export interface Globals {
     ffmpegdir: string;
-    niceness?: string|number;
-    threads?: string|number;
+    niceness: string|number;
+    threads: string|number;
 }
