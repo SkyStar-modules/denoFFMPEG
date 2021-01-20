@@ -1,4 +1,4 @@
-import { Filters } from "./types.ts";
+import { Filters, Globals } from "./types.ts";
 export function codecFormatter(codecType: string, codec: string, options?: Record<string, string|number>): string[] {
     let codecArr: string[] = [codecType, codec];
     if (codec == "" || codec == "null" || codec == "undefined") {
@@ -10,6 +10,21 @@ export function codecFormatter(codecType: string, codec: string, options?: Recor
         });
     }
     return codecArr;
+}
+
+export function globalOptionsFormatter(globals: Globals): string[] {
+    const temp: string[] = ["","-hide_banner", "-nostats","-y"];
+
+    if (globals.ffmpegdir) {
+        temp[0] = globals.ffmpegdir;
+    }
+    if (globals.niceness && globals.niceness > 0) {
+        temp.push("-n", globals.niceness.toString());
+    }
+    if (globals.threads && globals.threads > 0) {
+        temp.push("-threads", globals.threads.toString());
+    }
+    return temp;
 }
 
 export function filterFormatter(...filters: Filters[]): string[] {

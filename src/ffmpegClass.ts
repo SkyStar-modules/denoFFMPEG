@@ -21,26 +21,29 @@ export class FfmpegClass extends Processing {
     public constructor(options?:Spawn) {
         super();
         if (options) {
-            Object.entries(options).forEach((j: string[]) => {
-                switch (j[0].toLowerCase()) {
+            Object.entries(options).forEach((j: Array<string|number>) => {
+                const option = j[0].toString().toLowerCase();
+                const value = j[1].toString()
+                switch (option) {
+                    case "threads":
+                        this.threadCount = Number.parseInt(value);
+                        break;
                     case "ffmpegdir":
-                        this.ffmpegDir = j[1];
+                        this.ffmpegDir = value;
                         break;
                     case "niceness":
                         if (Deno.build.os === "windows") {
-                            logger.warning("Niceness is set while using windows\nPlease remove it because it isn't needed");
-                        }
-
-                        if (Deno.build.os !== "windows") {
-                            this.niceness = j[1];
+                            logger.warning("Niceness is set while using windows\nPlease remove it because it is ignored");
+                        } else {
+                            this.niceness = Number.parseInt(value);
                         }
                         break;
                     case "input":
-                        if (j[1].includes("http") && this.input.length == 0) {
+                        if (value.includes("http") && this.input.length == 0) {
                             this.firstInputIsURL = true;
                         }
 
-                        this.input.push(j[1]);
+                        this.input.push(value);
                         break;
                     default:
                         logger.warning("option '" + j[0] + "' not found! Please remove it");
@@ -63,6 +66,11 @@ export class FfmpegClass extends Processing {
             }
             this.ffmpegDir = ffmpegPath;
         }
+        return this;
+    }
+    
+    public threads(amount: number): this {
+        this.threadCount = amount;
         return this;
     }
 

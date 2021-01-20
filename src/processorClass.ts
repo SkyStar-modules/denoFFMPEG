@@ -1,14 +1,13 @@
-import { Progress } from "./types.ts";
+import { Progress, Globals } from "./types.ts";
 import { readLines } from "../deps.ts"
 import * as log from "./logger.ts";
-
+import { globalOptionsFormatter } from "./formatter.ts";
 /**
  * Private Class for ffmpeg rendering
  */
 export class Processing {
     protected ffmpegDir                    = "ffmpeg";
     protected outputFile                   =       "";
-    protected niceness                     =       "";
     protected input:              string[] =       [];
     protected vbitrate:           string[] =       [];
     protected abitrate:           string[] =       [];
@@ -18,6 +17,9 @@ export class Processing {
     protected vidCodec:           string[] =       [];
     protected audCodec:           string[] =       [];
     protected stderr:             string[] =       [];
+    protected globals:            string[] =       [];
+    protected niceness                     =       -1;
+    protected threadCount                  =        0;
     protected fps                          =        0;
     protected aBR                          =        0;
     protected vBR                          =        0;
@@ -148,10 +150,14 @@ export class Processing {
      * Format & process all data to run ffmpeg
      */
     private __formatting(): string[] {
-        const temp = [this.ffmpegDir];
-        if (this.niceness !== "") temp.push("-n", this.niceness);
+        const thing:Globals = {
+            ffmpegdir: this.ffmpegDir,
+            niceness: this.niceness,
+            threads: this.threadCount
+            
+        }
+        const temp = globalOptionsFormatter(thing);
 
-        temp.push("-hide_banner", "-nostats","-y");
         for (let i = 0; i < this.input.length; i++) {
             temp.push("-i", this.input[i]);
         }
@@ -190,6 +196,11 @@ export class Processing {
         if (this.fps > 0 && Number.isNaN(this.fps)) {
             errors.push("FPS is NaN");
         }
+
+        if (this.threadCount > 0 && Number.isNaN(this.threadCount)) {
+            errors.push("amount of threads is NaN");
+        }
+
         if (this.audCodec.length > 0 && (this.audCodec.join("").includes("undefined") || this.audCodec.includes("null"))) {
             errors.push("one or more audio codec options are undefined");
         }
