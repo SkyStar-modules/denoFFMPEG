@@ -58,13 +58,13 @@ export class Processing {
                 if ((i == 7 && !this.firstInputIsURL) || (i == 6 && this.firstInputIsURL)) {
                     const dur: string = line.trim().replaceAll("Duration: ", "");
                     const timeArr: string[] = dur.substr(0, dur.indexOf(",")).split(":");
-                    timeS = ((Number.parseFloat(timeArr[0]) * 60 + parseFloat(timeArr[1])) * 60 + parseFloat(timeArr[2]));
+                    timeS = ((parseFloat(timeArr[0]) * 60 + parseFloat(timeArr[1])) * 60 + parseFloat(timeArr[2]));
                 }
                 if (this.fps > 0) {
                     totalFrames = Math.floor(timeS * this.fps)
                 } else if ((i == 8 && !this.firstInputIsURL) || (i == 7 && this.firstInputIsURL)) {
                     const string: string = line.trim();
-                    totalFrames = Math.floor(timeS * Number.parseFloat(string.substr(string.indexOf('kb/s,'), string.indexOf('fps') - string.indexOf('kb/s,')).replaceAll("kb/s,", "").trim()));
+                    totalFrames = Math.floor(timeS * parseFloat(string.substr(string.indexOf('kb/s,'), string.indexOf('fps') - string.indexOf('kb/s,')).replaceAll("kb/s,", "").trim()));
                 }
                 
 
@@ -75,19 +75,19 @@ export class Processing {
             } else {
                 if (line === "progress=end") break;
                 if (line.includes("frame=")) {
-                    currentFrame = Number.parseInt(line.replaceAll("frame=", "").trim())
+                    currentFrame = parseInt(line.replaceAll("frame=", "").trim())
                 }
                 if (line.includes("fps=")) {
-                    currentFPS = Number.parseFloat(line.replaceAll("fps=", "").trim())
+                    currentFPS = parseFloat(line.replaceAll("fps=", "").trim())
                     if (currentFPS === 0) currentFPS = currentFrame;
                 }
                 if (i == 12) {
                     const progressOBJ: Progress = {
                         ETA: new Date(Date.now() + (totalFrames - currentFrame) / currentFPS * 1000),
-                        percentage: Number.parseFloat((currentFrame / totalFrames * 100).toFixed(2))
+                        percentage: parseFloat((currentFrame / totalFrames * 100).toFixed(2))
                     }
 
-                    if (!Number.isNaN(totalFrames) && !Number.isNaN(currentFrame) && !Number.isNaN(currentFPS) && currentFPS !== 0 && progressOBJ.percentage < 100) {
+                    if (!isNaN(totalFrames) && !isNaN(currentFrame) && !isNaN(currentFPS) && currentFPS !== 0 && progressOBJ.percentage < 100) {
                         yield progressOBJ;
                     } else if (currentFPS !== 0 && this.debug && totalFrames > currentFrame && progressOBJ.percentage < 100) {
                         log.internalWarning(`progress yield is invalid because one of the following values is NaN\ntotalFrames:${totalFrames}\ncurrentFrame:${currentFrame}\ncurrentFPS:${currentFPS}`)
@@ -195,11 +195,11 @@ export class Processing {
      */
     private __errorCheck(): void {
         const errors: string[] = [];
-        if (this.fps > 0 && Number.isNaN(this.fps)) {
+        if (this.fps > 0 && isNaN(this.fps)) {
             errors.push("FPS is NaN");
         }
 
-        if (this.threadCount > 0 && Number.isNaN(this.threadCount)) {
+        if (this.threadCount > 0 && isNaN(this.threadCount)) {
             errors.push("amount of threads is NaN");
         }
 
@@ -211,11 +211,11 @@ export class Processing {
             errors.push("one or more video codec options are undefined");
         }
 
-        if (this.vbitrate.length > 0 && (this.vBR === 0 || Number.isNaN(this.vBR))) {
+        if (this.vbitrate.length > 0 && (this.vBR === 0 || isNaN(this.vBR))) {
             errors.push("video Bitrate is NaN");
         }
 
-        if (this.abitrate.length > 0 && (this.aBR === 0 || Number.isNaN(this.aBR))) {
+        if (this.abitrate.length > 0 && (this.aBR === 0 || isNaN(this.aBR))) {
             errors.push("audio Bitrate is NaN");
         }
         

@@ -26,7 +26,7 @@ export class FfmpegClass extends Processing {
                 const value = j[1].toString()
                 switch (option) {
                     case "threads":
-                        this.threadCount = Number.parseInt(value);
+                        this.threadCount = parseInt(value);
                         break;
                     case "ffmpegdir":
                         this.ffmpegDir = value;
@@ -35,7 +35,7 @@ export class FfmpegClass extends Processing {
                         if (Deno.build.os === "windows") {
                             logger.warning("Niceness is set while using windows\nPlease remove it because it is ignored");
                         } else {
-                            this.niceness = Number.parseInt(value);
+                            this.niceness = parseInt(value);
                         }
                         break;
                     case "input":
@@ -185,13 +185,13 @@ export class FfmpegClass extends Processing {
         if (!cbr) {
             this.vbitrate = [
                 '-maxrate',
-                String(Number.parseFloat(brString) * 2 + lastChar),
+                (parseFloat(brString) * 2 + lastChar).toString(),
                 '-minrate',
-                String(Number.parseFloat(brString) / 3),
+                (parseFloat(brString) / 3).toString(),
                 "-b:v",
-                String(brString),
+                brString.toString(),
                 '-bufsize',
-                String(Number.parseFloat(brString) * 4)
+                (parseFloat(brString) * 4).toString()
             ];
         }
         return this;
@@ -204,7 +204,7 @@ export class FfmpegClass extends Processing {
      * 
      */
     public audioFilters(...Filters: Filters[]): this {
-        this.audioFilter = formatter.filterFormatter(...Filters)
+        this.audioFilter = formatter.filterFormatter(...Filters);
         return this;
     }
     /**
@@ -214,7 +214,7 @@ export class FfmpegClass extends Processing {
      * 
      */
     public complexFilters(...Filters: Filters[]): this {
-        this.complexFilter = formatter.filterFormatter(...Filters)
+        this.complexFilter = formatter.filterFormatter(...Filters);
         return this;
     }
 
@@ -225,7 +225,7 @@ export class FfmpegClass extends Processing {
      * 
      */
     public videoFilters(...Filters: Filters[]): this {
-        this.simpleVideoFilter = formatter.filterFormatter(...Filters)
+        this.simpleVideoFilter = formatter.filterFormatter(...Filters);
         return this;
     }
     /**
