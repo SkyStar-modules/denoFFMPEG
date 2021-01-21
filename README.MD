@@ -1,8 +1,8 @@
 # Deno FFMPEG
 
-## FFmpeg is really nice to use and quite handy for alot of applications
+## FFmpeg is really nice to use and quite handy for alot of applications But we didn't have any easy wrapper for it in Deno
 
-## But we didn't have any easy wrapper for it in Deno! So now we do :D
+## So now we do :D
 
 ---
 
@@ -54,6 +54,8 @@ import { FfmpegClass } from "./mod.ts";
 let render = new FfmpegClass();
 ```
 
+# Global Methods
+
 ## save(outputPath: string)
 
 `save()` returns a Promise that get's voided once ffmpeg is done rendering
@@ -96,7 +98,7 @@ let render = ffmpeg().setFfmpegPath("./path/to/binary");
 await render.save("video.mp4");
 ```
 
-## threads()
+## threads(threadcount: number)
 
 `threads()` let's you set a custom number of threads to use for encoding
 
@@ -128,7 +130,7 @@ render.addInput("./path/to/file"); // this is input 1
 await render.save("video.mp4");
 ```
 
-## setWidth()
+## setWidth(w: number)
 
 `setWidth()` let's you adjust video width
 
@@ -138,7 +140,7 @@ let render = ffmpeg().setWidth(1920);
 await render.save("video.mp4");
 ```
 
-## setHeight()
+## setHeight(h: number)
 
 `setHeight()` let's you adjust video height
 
@@ -148,7 +150,7 @@ let render = ffmpeg().setHeight(1080);
 await render.save("video.mp4");
 ```
 
-## outputFPS()
+## outputFPS(fps: number)
 
 `outputFPS()` let's you adjust the framerate of the video
 
@@ -233,7 +235,7 @@ await render.save("video.mp4");
 
 # Filters
 
-## videoFilters()
+## videoFilters(...Filter: Filters[])
 
 `videoFilters()` let's you use the videofilters  
 `-vf drawtext=text=cool guy:fontsize:60` will be like this
@@ -268,7 +270,7 @@ let render = ffmpeg().videoFilters(
 await render.save("video.mp4");
 ```
 
-## audioFilters()
+## audioFilters(...Filter: Filters[])
 
 `audioFilters()` let's you use the audio filters  
 this is a audio counterpart of `videoFilters()`  
@@ -302,7 +304,7 @@ let render = ffmpeg().audioFilters(
 await render.save("video.mp4");
 ```
 
-## complexFilters()
+## complexFilters(...Filter: Filters[])
 
 `complex()` let's you use complex video and or audio filters  
 `-filter_complex overlay=x=10:y=60` will be like this
