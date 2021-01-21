@@ -2,8 +2,6 @@
 
 ## FFmpeg is really nice to use and quite handy for alot of applications But we didn't have any easy wrapper for it in Deno, so now we do :D
 
----
-
 ## List of features
 
 - Video bitrate(VBR and CBR)
@@ -255,14 +253,8 @@ let render = ffmpeg().videoFilters(
     {
     filterName: "drawtext",
     options: {
-        text: "cool thing",
-        fontsize: "60",
-        x: (856 / 2 - 30 * "cool thing".length / 2),
-        y: "H-240",
-        fontcolor: "white",
-        shadowcolor: "black",
-        shadowx: "2",
-        shadowy: "2",
+        text: "cool guy",
+        fontsize: 60
     }
 })
 await render.save("video.mp4");
@@ -311,7 +303,7 @@ await render.save("video.mp4");
 const filters = {
     filterName: "overlay",
     options: {
-        x: 10
+        x: 10,
         y: 60
     }
 }
@@ -324,14 +316,12 @@ let render = ffmpeg().complexFilters(
     {
     filterName: "overlay",
     options: {
-        x: 10
+        x: 10,
         y: 60
     }
 })
 await render.save("video.mp4");
 ```
-
-<br>
 
 # Releases
 
@@ -345,8 +335,6 @@ These features may not be documented yet!
 # Authors or Acknowledgments
 
 - Skyler "MierenMans" van Boheemen - Author
-
-<br>
 
 # License
 
