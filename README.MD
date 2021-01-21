@@ -27,7 +27,8 @@ please read the doc's below to see what changed
 
 `save()` is used to start the render process.
 
-you should always use `save()` or `saveWithProgress()` as last option
+you should always use `save()` or `saveWithProgress()` as last option  
+you should always specify the ffmpegDir in the constructor or via the `setFfmpegPath()` method!
 
 ```js
 import { ffmpeg } from "./mod.ts";
@@ -42,6 +43,7 @@ await videoRender.videoBitrate(1000).save('./output.mp4');
 ## Creating a new instance of ffmpeg
 
 The denoFFMPEG module returns a constructor that you can use to instanciate FFmpeg commands.
+you should always specify the ffmpegDir in the constructor or via the `setFfmpegPath()` method!
 
 ```js
 import { ffmpeg } from "./mod.ts";
@@ -94,6 +96,18 @@ let render = ffmpeg().setFfmpegPath("./path/to/binary");
 await render.save("video.mp4");
 ```
 
+## threads()
+
+`threads()` let's you set a custom number of threads to use for encoding
+
+```js
+import { ffmpeg } from "./mod.ts";
+let render = ffmpeg().threads(5);
+await render.save("video.mp4");
+```
+
+# Video Methods
+
 ## addInput(path: string)
 
 `addInput()` will add an input to the list of input's (you need to map them yourself)
@@ -114,6 +128,36 @@ render.addInput("./path/to/file"); // this is input 1
 await render.save("video.mp4");
 ```
 
+## setWidth()
+
+`setWidth()` let's you adjust video width
+
+```js
+import { ffmpeg } from "./mod.ts";
+let render = ffmpeg().setWidth(1920);
+await render.save("video.mp4");
+```
+
+## setHeight()
+
+`setHeight()` let's you adjust video height
+
+```js
+import { ffmpeg } from "./mod.ts";
+let render = ffmpeg().setHeight(1080);
+await render.save("video.mp4");
+```
+
+## outputFPS()
+
+`outputFPS()` let's you adjust the framerate of the video
+
+```js
+import { ffmpeg } from "./mod.ts";
+let render = ffmpeg().outputFPS(24);
+await render.save("video.mp4");
+```
+
 ## noVideo()
 
 `noVideo()` will just disable video and remove all video settings
@@ -121,27 +165,6 @@ await render.save("video.mp4");
 ```js
 import { ffmpeg } from "./mod.ts";
 let render = ffmpeg().noVideo();
-await render.save("video.mp4");
-```
-
-## noAudio()
-
-`noAudio()` will just disable audio and remove all audio settings
-
-```js
-import { ffmpeg } from "./mod.ts";
-let render = ffmpeg().noAudio();
-await render.save("video.mp4");
-```
-
-## audioCodec(codec: string, options?: Object)
-
-`audioCodec()` let's you specify which audio codec & options to use  
-options should only be used if you know what you are doing
-
-```js
-import { ffmpeg } from "./mod.ts";
-let render = ffmpeg().audioCodec("lib3lame");
 await render.save("video.mp4");
 ```
 
@@ -153,16 +176,6 @@ options should only be used if you know what you are doing
 ```js
 import { ffmpeg } from "./mod.ts";
 let render = ffmpeg().videoCodec("libx264");
-await render.save("video.mp4");
-```
-
-## audioBitrate(bitrate: number)
-
-`audioBitrate()` let's you specify the audio bitrate in kbps
-
-```js
-import { ffmpeg } from "./mod.ts";
-let render = ffmpeg().audioBitrate(128);
 await render.save("video.mp4");
 ```
 
@@ -185,20 +198,45 @@ let render = ffmpeg().videoBitrate("1050k", false);
 await render.save("video.mp4");
 ```
 
-## videoFilters(...Filters: Filters[])
+# Audio Methods
 
-`videoFilters()` let's you use the videofilters
+## noAudio()
 
-```ts
-const filters = {
-    filterName: "drawtext", //the filtername you want to use
-    options: {
-        //here you should have all options
-    }
-}
+`noAudio()` will just disable audio and remove all audio settings
+
+```js
+import { ffmpeg } from "./mod.ts";
+let render = ffmpeg().noAudio();
+await render.save("video.mp4");
 ```
 
-`drawtext=text=cool guy:fontsize:60` will be like this
+## audioCodec(codec: string, options?: Object)
+
+`audioCodec()` let's you specify which audio codec & options to use  
+options should only be used if you know what you are doing
+
+```js
+import { ffmpeg } from "./mod.ts";
+let render = ffmpeg().audioCodec("lib3lame");
+await render.save("video.mp4");
+```
+
+## audioBitrate(bitrate: number)
+
+`audioBitrate()` let's you specify the audio bitrate in kbps
+
+```js
+import { ffmpeg } from "./mod.ts";
+let render = ffmpeg().audioBitrate(128);
+await render.save("video.mp4");
+```
+
+# Filters
+
+## videoFilters()
+
+`videoFilters()` let's you use the videofilters  
+`-vf drawtext=text=cool guy:fontsize:60` will be like this
 
 ```ts
 const filters = {
@@ -206,18 +244,6 @@ const filters = {
     options: {
         text: "cool guy",
         fontsize: 60
-    }
-}
-```
-
-or if you want to use complex filter `-filter_complex`
-
-```ts
-const overlay = {
-    complex: true,
-    filterName: "overlay",
-    options: {
-        x: '150'
     }
 }
 ```
@@ -237,6 +263,69 @@ let render = ffmpeg().videoFilters(
         shadowcolor: "black",
         shadowx: "2",
         shadowy: "2",
+    }
+})
+await render.save("video.mp4");
+```
+
+## audioFilters()
+
+`audioFilters()` let's you use the audio filters  
+this is a audio counterpart of `videoFilters()`  
+it works the same way but for audio filters  
+
+`-vf afade=type=in: duration=10: curve=log` will be like this
+
+```ts
+const filters = {
+    filterName: "afade",
+    options: {
+        type: "in",
+        duration: 10,
+        curve: "log"
+    }
+}
+```
+
+```js
+import { ffmpeg } from "./mod.ts";
+
+let render = ffmpeg().audioFilters(
+    {
+    filterName: "afade",
+    options: {
+        type: "in",
+        duration: 10,
+        curve: "log"
+    }
+})
+await render.save("video.mp4");
+```
+
+## complexFilters()
+
+`complex()` let's you use complex video and or audio filters  
+`-filter_complex overlay=x=10:y=60` will be like this
+
+```ts
+const filters = {
+    filterName: "overlay",
+    options: {
+        x: 10
+        y: 60
+    }
+}
+```
+
+```js
+import { ffmpeg } from "./mod.ts";
+
+let render = ffmpeg().complexFilters(
+    {
+    filterName: "overlay",
+    options: {
+        x: 10
+        y: 60
     }
 })
 await render.save("video.mp4");
