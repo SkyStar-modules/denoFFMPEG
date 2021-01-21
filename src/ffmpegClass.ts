@@ -1,6 +1,8 @@
 import { Processing } from "./processorClass.ts";
 import { Spawn, Progress, Filters } from "./types.ts";
-import * as log from "./logger.ts";
+import * as logger from "./logger.ts";
+import * as formatter from "./formatter.ts";
+
 /**
  * Public Class for ffmpeg rendering
  */
@@ -19,29 +21,32 @@ export class FfmpegClass extends Processing {
     public constructor(options?:Spawn) {
         super();
         if (options) {
-            Object.entries(options).forEach((j: string[]) => {
-                switch (j[0].toLowerCase()) {
+            Object.entries(options).forEach((j: Array<string|number>) => {
+                const option = j[0].toString().toLowerCase();
+                const value = j[1].toString();
+                switch (option) {
+                    case "threads":
+                        this.threadCount = parseInt(value);
+                        break;
                     case "ffmpegdir":
-                        this.ffmpegDir = j[1];
+                        this.ffmpegDir = value;
                         break;
                     case "niceness":
                         if (Deno.build.os === "windows") {
-                            log.warning("Niceness is set while using windows\nPlease remove it because it isn't needed");
-                        }
-
-                        if (Deno.build.os !== "windows") {
-                            this.niceness = j[1];
+                            logger.warning("Niceness is set while using windows\nPlease remove it because it is ignored");
+                        } else {
+                            this.niceness = parseInt(value);
                         }
                         break;
                     case "input":
-                        if (j[1].includes("http") && this.input.length == 0) {
+                        if (value.includes("http") && this.input.length == 0) {
                             this.firstInputIsURL = true;
                         }
 
-                        this.input.push(j[1]);
+                        this.input.push(value);
                         break;
                     default:
-                        log.warning("option '" + j[0] + "' not found! Please remove it");
+                        logger.warning("option '" + j[0] + "' not found! Please remove it");
                 }
             })
         }
@@ -57,10 +62,15 @@ export class FfmpegClass extends Processing {
     public setFfmpegPath(ffmpegPath: string): this {
         if (ffmpegPath) {
             if (this.ffmpegDir.length > 0 && this.ffmpegDir !== "ffmpeg") {
-                log.warning("changing ffmpeg path from " + this.ffmpegDir + " to " + ffmpegPath);
+                logger.warning("changing ffmpeg path from " + this.ffmpegDir + " to " + ffmpegPath);
             }
             this.ffmpegDir = ffmpegPath;
         }
+        return this;
+    }
+    
+    public threads(amount: number): this {
+        this.threadCount = amount;
         return this;
     }
 
@@ -82,7 +92,6 @@ export class FfmpegClass extends Processing {
 
     /**
      * Disable Audio and remove all audio settings
-     * 
      */
     public noAudio(): this {
         this.noaudio = true;
@@ -91,10 +100,25 @@ export class FfmpegClass extends Processing {
 
     /**
      * Disable video and remove all video settings
-     * 
      */
     public noVideo(): this {
         this.novideo = true;
+        return this;
+    }
+
+    /**
+     * Set height of the video
+     */
+    public setHeight(h:number): this {
+        this.height = h;
+        return this;
+    }
+
+    /**
+     * Set width of the video
+     */
+    public setWidth(w:number): this {
+        this.width = w;
         return this;
     }
 
@@ -105,16 +129,8 @@ export class FfmpegClass extends Processing {
      * Parameter 2: options options object for codec supported options
      *
      */
-    public audioCodec(codec: string, options?: Record<string, string>): this {
-        this.audCodec = ["-c:a", codec];
-        if (codec == "" || codec == "null" || codec == "undefined") {
-            this.audCodec = ["-c:a", "undefined"];
-        }
-        if (options) {
-            Object.entries(options).forEach(x => {
-                this.audCodec.push("-" + x[0], x[1]);
-            });
-        }
+    public audioCodec(codec: string, options?: Record<string, string|number>): this {
+        this.audCodec = formatter.codecFormatter("-c:a", codec, options);
         return this;
     }
 
@@ -125,14 +141,8 @@ export class FfmpegClass extends Processing {
      * Parameter 2: options Options object for codec supported options
      *
      */
-    public videoCodec(codec: string, options?: Record<string, number|string>): this {
-        this.vidCodec = ["-c:v", codec];
-        if (codec == "" || codec == "null" || codec == "undefined") {
-            this.vidCodec = ["-c:v", "undefined"];
-        }
-        if (options) Object.entries(options).forEach(x => {
-            this.vidCodec.push("-" + x[0], String(x[1]));
-        });
+    public videoCodec(codec: string, options?: Record<string, string>): this {
+        this.vidCodec = formatter.codecFormatter("-c:v", codec, options);
         return this;
     }
 
@@ -175,13 +185,13 @@ export class FfmpegClass extends Processing {
         if (!cbr) {
             this.vbitrate = [
                 '-maxrate',
-                String(Number.parseFloat(brString) * 2 + lastChar),
+                (parseFloat(brString) * 2 + lastChar).toString(),
                 '-minrate',
-                String(Number.parseFloat(brString) / 3),
+                (parseFloat(brString) / 3).toString(),
                 "-b:v",
-                String(brString),
+                brString.toString(),
                 '-bufsize',
-                String(Number.parseFloat(brString) * 4)
+                (parseFloat(brString) * 4).toString()
             ];
         }
         return this;
@@ -193,37 +203,47 @@ export class FfmpegClass extends Processing {
      * Parameter 1: Filters Array of filter Objects you want to use for processing
      * 
      */
-    public videoFilters(...Filters: Filters[]): this {
-        Filters.forEach(x => {
-            if (x.complex) {
-                let temp: string = x.filterName + '=';
-                Object.entries(x.options).forEach((j:Array<string|number>, i:number) => {
-                    if (i > 0) {
-                        temp += `: ${j[0]}=${j[1]}`;
-                    } else {
-                        temp += `${j[0]}=${j[1]}`;
-                    }
-                });
-                this.complexVideoFilter.push(temp);
-            } else {
-                let temp: string = x.filterName + '=';
-                Object.entries(x.options).forEach((j:Array<string|number>, i:number) => {
-                    if (i > 0) {
-                        temp += `:${j[0]}=${j[1]}`;
-                    } else {
-                        temp += `${j[0]}=${j[1]}`;
-                    }
-                });
-                this.simpleVideoFilter.push(temp);
-            }
-        });
+    public audioFilters(...Filters: Filters[]): this {
+        this.audioFilter = formatter.filterFormatter(...Filters);
+        return this;
+    }
+    /**
+     * Set video filters
+     * 
+     * Parameter 1: Filters Array of filter Objects you want to use for processing
+     * 
+     */
+    public complexFilters(...Filters: Filters[]): this {
+        this.complexFilter = formatter.filterFormatter(...Filters);
         return this;
     }
 
     /**
+     * Set video filters
+     * 
+     * Parameter 1: Filters Array of filter Objects you want to use for processing
+     * 
+     */
+    public videoFilters(...Filters: Filters[]): this {
+        this.simpleVideoFilter = formatter.filterFormatter(...Filters);
+        return this;
+    }
+
+    /**
+     * Set output fps
+     * 
+     * parameter 1: set output fps
+     * 
+     */
+    public outputFPS(fps: number): this {
+        this.fps = fps;
+        return this;
+    }
+    
+    /**
      * set output path and encode
      * 
-     * parameter 1: output set output path
+     * parameter 1: set output path
      * 
      * returns: void
      * 

@@ -1,9 +1,9 @@
 export function warning(str: string): void {
-    console.warn("\x1b[0;33;40mWARNING:\x1b[39m " + str);
+    return console.warn("\x1b[0;33;40mWARNING:\x1b[39m " + str);
 }
 
 export function internalWarning(str: string): void {
-    console.warn("\x1b[0;33;40mINTERNAL ERROR WARNING:\x1b[39m " + str);
+    return console.warn("\x1b[0;33;40mINTERNAL WARNING:\x1b[39m " + str);
 }
 
 export function internalError(str: string): void {
