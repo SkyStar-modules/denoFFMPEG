@@ -1,8 +1,6 @@
 # Deno FFMPEG
 
-## FFmpeg is really nice to use and quite handy for alot of applications But we didn't have any easy wrapper for it in Deno
-
-## So now we do :D
+## FFmpeg is really nice to use and quite handy for alot of applications But we didn't have any easy wrapper for it in Deno, so now we do :D
 
 ---
 
