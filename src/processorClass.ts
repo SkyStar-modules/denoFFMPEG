@@ -53,21 +53,21 @@ export class Processing {
         for await (const line of readLines(this.Process.stderr!)) {
             if (line.includes('encoder')) encFound++;
             if (stderrStart === true) {
-
                 this.stderr.push(line);
                 if (line.includes("Duration: ")) {
                     const dur: string = line.trim().replaceAll("Duration: ", "");
                     const timeArr: string[] = dur.substr(0, dur.indexOf(",")).split(":");
                     timeS = ((parseFloat(timeArr[0]) * 60 + parseFloat(timeArr[1])) * 60 + parseFloat(timeArr[2]));
-                
                 }
                 if (this.fps > 0) {
-                    totalFrames = Math.floor(timeS * this.fps)
-                } else if ((i == 8 && !this.firstInputIsURL) || (i == 7 && this.firstInputIsURL)) {
+                    totalFrames = Math.floor(timeS * this.fps);
+                } else if (line.includes("SAR") && line.includes("fps") && line.includes("tbr") && line.includes("tbn")) {
                     const string: string = line.trim();
                     totalFrames = Math.floor(timeS * parseFloat(string.substr(string.indexOf('kb/s,'), string.indexOf('fps') - string.indexOf('kb/s,')).replaceAll("kb/s,", "").trim()));
+                    if (isNaN(totalFrames)) {
+                        totalFrames = Math.floor(timeS * parseFloat(string.substr(string.indexOf('],'), string.indexOf('fps') - string.indexOf('],')).replaceAll("],", "").trim()));
+                    }   
                 }
-                
 
                 if (line.includes("encoder") && encFound > 2) {
                     i = 0;
