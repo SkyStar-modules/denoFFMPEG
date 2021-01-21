@@ -55,11 +55,11 @@ export class Processing {
             if (stderrStart === true) {
 
                 this.stderr.push(line);
-
-                if ((i == 7 && !this.firstInputIsURL) || (i == 6 && this.firstInputIsURL)) {
+                if (line.includes("Duration: ")) {
                     const dur: string = line.trim().replaceAll("Duration: ", "");
                     const timeArr: string[] = dur.substr(0, dur.indexOf(",")).split(":");
                     timeS = ((parseFloat(timeArr[0]) * 60 + parseFloat(timeArr[1])) * 60 + parseFloat(timeArr[2]));
+                
                 }
                 if (this.fps > 0) {
                     totalFrames = Math.floor(timeS * this.fps)
@@ -98,11 +98,12 @@ export class Processing {
             }
             i++
         }
-        await this.__closeProcess(true);
         yield {
             ETA: new Date(),
             percentage: 100
         };
+        await this.__closeProcess(true);
+        return;
     }
     
     /**
