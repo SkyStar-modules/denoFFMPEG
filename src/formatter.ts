@@ -5,7 +5,7 @@ export function codecFormatter(codecType: string, codec: string, options?: Recor
     const codecArr: string[] = [codecType, codec];
 
     if (options) {
-        Object.entries(options).forEach(x => {
+        Object.entries(options).forEach((x: Array<string|number>) => {
             codecArr.push("-" + x[0], x[1].toString());
         });
     }
@@ -29,9 +29,9 @@ export function globalOptionsFormatter(globals: Globals): string[] {
 
 export function filterFormatter(...filters: Filters[]): string[] {
     const filterArr: string[] = [];
-    filters.forEach(x => {
+    filters.forEach((x: Filters) => {
             let temp: string = x.filterName + '=';
-            Object.entries(x.options).forEach((j, i) => {
+            Object.entries(x.options).forEach((j: Array<string|number>, i: number) => {
                 temp += (i > 0) ? `: ${j[0]}=${j[1]}` : `${j[0]}=${j[1]}`;
             });
 

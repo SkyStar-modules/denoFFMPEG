@@ -4,7 +4,7 @@ export interface Filters {
     options: Record<string, string|number>;
 }
 export interface Spawn {
-    threads?: number
+    threads?: number;
     ffmpegDir?: string;
     niceness?: number;
     input?: string;
