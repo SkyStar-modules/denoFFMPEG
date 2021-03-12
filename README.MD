@@ -332,7 +332,7 @@ The dev branch might be unstable or broken but it will have the latest features.
 These features may not be documented yet!
 <br><br>
 
-# Authors or Acknowledgments
+# Authors & Acknowledgments
 
 - Skyler "MierenMans" van Boheemen - Author
 
