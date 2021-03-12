@@ -1,12 +1,19 @@
 # Changelog
 
+## 2.2
+
+- *added* propper tsdoc's
+<br>
+
+- *updated* Dependencies
+
 ## 2.1
 
 - *added* `threads()` method to set a custom amount of cpu threads used for processing
 - *added* `outputFPS()` method to set a different output fps
 - *added* `setWidth()` method to set a custom width
 - *added* `setHeight()` method to set a custom height
-- *added* `audioFilters()` method. it's almost like videoFilters but for audio
+- *added* `audioFilters()` method. It's almost like videoFilters but for audio
 - *added* `complexFilters()` method. It allow's or complex video/audio filters  
 **Complex filters and simple filters are not compatible!**
 <br>
@@ -18,7 +25,7 @@
 
 - *changed* video & audio codec to use less code
 - *changed* all filter methods to use less code
-- *changed* Filters now allow numbers & strings instead of only strings
+- *changed* filters now allow numbers & strings instead of only strings
 - *updated* dependencies
 
 ## 2.0
