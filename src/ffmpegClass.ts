@@ -37,7 +37,6 @@ export class FfmpegClass extends Processing {
             if (value.includes("http") && this.input.length == 0) {
               this.firstInputIsURL = true;
             }
-
             this.input.push(value);
             break;
           default:
@@ -50,9 +49,7 @@ export class FfmpegClass extends Processing {
 
   /**
   * Set path to the ffmpeg binary file
-  * 
-  * Parameter 1: ffmpegDir path to the ffmpeg binary
-  * 
+  @param { string } ffmpegPath
   */
   public setFfmpegPath(ffmpegPath: string): this {
     if (ffmpegPath) {
@@ -66,6 +63,10 @@ export class FfmpegClass extends Processing {
     return this;
   }
 
+  /**
+   * Set amount of threads
+   * @param { number } amount - Amount of threads to use
+   */
   public threads(amount: number): this {
     this.threadCount = amount;
     return this;
@@ -94,36 +95,36 @@ export class FfmpegClass extends Processing {
   }
 
   /**
-     * Disable video and remove all video settings
-     */
+  * Disable video and remove all video settings
+  */
   public noVideo(): this {
     this.novideo = true;
     return this;
   }
 
   /**
-     * Set height of the video
-     */
-  public setHeight(h: number): this {
-    this.height = h;
+  * Set height of the video
+  @param { number } height - height of the output
+  */
+  public setHeight(height: number): this {
+    this.height = height;
     return this;
   }
 
   /**
-     * Set width of the video
-     */
-  public setWidth(w: number): this {
-    this.width = w;
+  * Set width of the video
+  @param { number } width - width of the output
+  */
+  public setWidth(width: number): this {
+    this.width = width;
     return this;
   }
 
   /**
-     * Set audio codec
-     * 
-     * Parameter 1: codec Audio Codec name  
-     * Parameter 2: options options object for codec supported options
-     *
-     */
+  * Set audio codec
+  @param { string } codec - codec to use for encoding audio
+  @param { Record<string, string | number> } options - options to use with codec (usually not used)
+  */
   public audioCodec(
     codec: string,
     options?: Record<string, string | number>,
@@ -133,23 +134,19 @@ export class FfmpegClass extends Processing {
   }
 
   /**
-     * Set video codec
-     * 
-     * Parameter 1: codec video Codec name  
-     * Parameter 2: options Options object for codec supported options
-     *
-     */
+  * Set video codec
+  @param { string } codec - codec to use for encoding video
+  @param { Record<string, string> } options - options to use with codec (usually not used)
+  */
   public videoCodec(codec: string, options?: Record<string, string>): this {
     this.vidCodec = formatter.codecFormatter("-c:v", codec, options);
     return this;
   }
 
   /**
-     * Set audio bitrate in kbps
-     * 
-     * Parameter 1: bitrate use bitrate you want in kbps
-     * 
-     */
+  * Set audio bitrate in kbps
+  @param { number } bitrate - audio bitrate to use
+  */
   public audioBitrate(bitrate: number): this {
     this.aBR = bitrate * 1024;
     this.abitrate = ["-b:a", String(bitrate * 1024)];
@@ -157,12 +154,10 @@ export class FfmpegClass extends Processing {
   }
 
   /**
-     * Set video bitrate in mbps or kbps
-     * 
-     * Parameter 1: bitrate use bitrate you want in mbps(15m) or kbps(15000k)  
-     * Parameter 2: cbr enable constant bitrate (default = true)
-     * 
-     */
+  * Set video bitrate in mbps or kbps
+  @param { number | string } bitrate - bitrate use bitrate you want in mbps(15m) or kbps(15000k)
+  @param cbr - enable constant bitrate (default = true)
+  */
   public videoBitrate(bitrate: number | string, cbr = true): this {
     const brString = String(bitrate);
     this.vBR = parseInt(brString);
@@ -196,69 +191,55 @@ export class FfmpegClass extends Processing {
   }
 
   /**
-     * Set video filters
-     * 
-     * Parameter 1: Filters Array of filter Objects you want to use for processing
-     * 
-     */
+  * Set audio filters
+  @param { Filters[] } Filters - Filters Array of filter Objects you want to use for processing
+  */
   public audioFilters(...Filters: Filters[]): this {
     this.audioFilter = formatter.filterFormatter(...Filters);
     return this;
   }
+
   /**
-     * Set video filters
-     * 
-     * Parameter 1: Filters Array of filter Objects you want to use for processing
-     * 
-     */
+  * Set video filters
+  @param { Filters[] } Filters - Filters Array of filter Objects you want to use for processing
+  */
   public complexFilters(...Filters: Filters[]): this {
     this.complexFilter = formatter.filterFormatter(...Filters);
     return this;
   }
 
   /**
-     * Set video filters
-     * 
-     * Parameter 1: Filters Array of filter Objects you want to use for processing
-     * 
-     */
+  * Set video filters
+  @param { Filters[] } Filters - Filters Array of filter Objects you want to use for processing
+  */
   public videoFilters(...Filters: Filters[]): this {
     this.simpleVideoFilter = formatter.filterFormatter(...Filters);
     return this;
   }
 
   /**
-     * Set output fps
-     * 
-     * parameter 1: set output fps
-     * 
-     */
+  * Set output fps
+  @param { number } fps - framerate you want to use
+  */
   public outputFPS(fps: number): this {
     this.fps = fps;
     return this;
   }
 
   /**
-     * set output path and encode
-     * 
-     * parameter 1: set output path
-     * 
-     * returns: void
-     * 
-     */
+  * set output path and encode input. will return once the render is finished
+  @param { string } output - output path
+  */
   public save(output: string): Promise<void> {
     this.outputFile = output;
     return this.__run();
   }
 
   /**
-     * set output path and encode
-     * 
-     * parameter 1: output set output path
-     * 
-     * returns: Promise<AsyncGenerator<Progress>>
-     * 
-     */
+   * set output path and encode input
+   @param { string } output - output path
+   @returns { AsyncGenerator<Progress> } - Returns async iterable
+   */
   public saveWithProgress(output: string): AsyncGenerator<Progress> {
     this.outputFile = output;
     return this.__runWithProgress();

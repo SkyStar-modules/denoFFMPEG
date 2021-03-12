@@ -34,14 +34,9 @@ export class Processing {
   protected Process!: Deno.Process;
 
   /**
-     * Get the progress of the ffmpeg instancegenerator
-     * 
-     * Yields: {
-     * ETA: Date,
-     * percentage: Number
-     * }
-     * 
-     */
+  * Get the progress of the ffmpeg instancegenerator
+  @returns { AsyncGenerator<Progress> } - Returns async iterable
+  */
   protected async *__getProgress(): AsyncGenerator<Progress> {
     let i = 1;
     let stderrStart = true;
@@ -57,9 +52,8 @@ export class Processing {
         if (line.includes("Duration: ")) {
           const dur: string = line.trim().replaceAll("Duration: ", "");
           const timeArr: string[] = dur.substr(0, dur.indexOf(",")).split(":");
-          timeS =
-            ((parseFloat(timeArr[0]) * 60 + parseFloat(timeArr[1])) * 60 +
-              parseFloat(timeArr[2]));
+          timeS = ((parseFloat(timeArr[0]) * 60 + parseFloat(timeArr[1])) * 60 +
+            parseFloat(timeArr[2]));
         }
         if (this.fps > 0) {
           totalFrames = Math.floor(timeS * this.fps);
@@ -140,8 +134,8 @@ export class Processing {
   }
 
   /**
-     * Clear all filters and everything for audio or video
-     */
+  * Clear all filters and everything for audio or video
+  */
   private __clear(input: string): void {
     if (input.toLowerCase() === "audio") {
       if (this.aBR !== 0) {
@@ -195,8 +189,8 @@ export class Processing {
   }
 
   /**
-     * Format & process all data to run ffmpeg
-     */
+  * Format & process all data to run ffmpeg
+  */
   private __formatting(): string[] {
     const thing: Globals = {
       ffmpegdir: this.ffmpegDir,
@@ -244,8 +238,8 @@ export class Processing {
   }
 
   /**
-     * Check's for common error's made by the user
-     */
+  * Check's for common error's made by the user
+  */
   private __errorCheck(): void {
     const errors: string[] = [];
     if (this.fps > 0 && isNaN(this.fps)) {
@@ -336,8 +330,8 @@ export class Processing {
   }
 
   /**
-     * Wait method for run
-     */
+  * Wait method for run
+  */
   private async __closeProcess(hasProgress: boolean): Promise<void> {
     let stderr = this.stderr.join("");
     if (!hasProgress) {
@@ -356,8 +350,8 @@ export class Processing {
   }
 
   /**
-     * run method without progress data
-     */
+  * run method without progress data
+  */
   protected __run(): Promise<void> {
     this.__errorCheck();
     this.Process = Deno.run({
@@ -369,8 +363,8 @@ export class Processing {
   }
 
   /**
-     * run method with progress data
-     */
+  * run method with progress data
+  */
   protected __runWithProgress(): AsyncGenerator<Progress> {
     this.__errorCheck();
     this.Process = Deno.run({
