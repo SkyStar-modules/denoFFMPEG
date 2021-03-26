@@ -4,8 +4,8 @@ Deno.test({
   fn: async () => {
     await new FfmpegClass({
       ffmpegDir: "ffmpeg",
-      input: "./input.mp4",
-    }).videoBitrate(1300, true).save("./ree.mp4");
+      input: "./tests/videos/input.mp4",
+    }).videoBitrate(1300, true).save("./tests/videos/output.mp4");
   },
   sanitizeOps: true,
   sanitizeResources: true,
@@ -15,8 +15,8 @@ Deno.test({
   fn: async () => {
     await new FfmpegClass({
       ffmpegDir: "ffmpeg",
-      input: "./input.mp4",
-    }).videoBitrate(1300, false).save("./ree.mp4");
+      input: "./tests/videos/input.mp4",
+    }).videoBitrate(1300, false).save("./tests/videos/output.mp4");
   },
   sanitizeOps: true,
   sanitizeResources: true,
@@ -26,8 +26,8 @@ Deno.test({
   fn: async () => {
     await new FfmpegClass({
       ffmpegDir: "ffmpeg",
-      input: "./input.mp4",
-    }).videoBitrate(1300, true).save("./ree.mp4");
+      input: "./tests/videos/input.mp4",
+    }).videoBitrate(1300, true).save("./tests/videos/output.mp4");
   },
   sanitizeOps: true,
   sanitizeResources: true,
@@ -37,8 +37,8 @@ Deno.test({
   fn: async () => {
     const progress = new FfmpegClass({
       ffmpegDir: "ffmpeg",
-      input: "./input.mp4",
-    }).videoBitrate(1300, true).saveWithProgress("./ree.mp4");
+      input: "./tests/videos/input.mp4",
+    }).videoBitrate(1300, true).saveWithProgress("./tests/videos/output.mp4");
     for await (const obj of progress) {
       console.log(obj);
     }
@@ -51,8 +51,8 @@ Deno.test({
   fn: async () => {
     const progress = new FfmpegClass({
       ffmpegDir: "ffmpeg",
-      input: "./input.mp4",
-    }).videoBitrate(1300, false).saveWithProgress("./ree.mp4");
+      input: "./tests/videos/input.mp4",
+    }).videoBitrate(1300, false).saveWithProgress("./tests/videos/output.mp4");
     for await (const obj of progress) {
       console.log(obj);
     }
@@ -65,8 +65,8 @@ Deno.test({
   fn: async () => {
     const progress = new FfmpegClass({
       ffmpegDir: "ffmpeg",
-      input: "./input.mp4",
-    }).videoBitrate(1300, true).saveWithProgress("./ree.mp4");
+      input: "./tests/videos/input.mp4",
+    }).videoBitrate(1300, true).saveWithProgress("./tests/videos/output.mp4");
     for await (const obj of progress) {
       console.log(obj);
     }

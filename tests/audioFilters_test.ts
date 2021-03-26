@@ -11,9 +11,9 @@ Deno.test({
   name: "audioFilters feature with progress",
   fn: async () => {
     const thing = new FfmpegClass({
-      input: "./input.mp4",
+      input: "./tests/videos/input.mp4",
     }).setFfmpegPath("ffmpeg").audioFilters(filter)
-      .saveWithProgress("./ree.mp4");
+      .saveWithProgress("./tests/videos/output.mp4");
     for await (const progress of thing) {
       console.log(progress);
     }
@@ -25,9 +25,9 @@ Deno.test({
   name: "audioFilters feature",
   fn: async () => {
     await new FfmpegClass({
-      input: "./input.mp4",
+      input: "./tests/videos/input.mp4",
     }).setFfmpegPath("ffmpeg").audioFilters(filter).save(
-      "./ree.mp4",
+      "./tests/videos/output.mp4",
     );
   },
   sanitizeOps: true,

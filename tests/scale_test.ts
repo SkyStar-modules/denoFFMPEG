@@ -3,9 +3,9 @@ Deno.test({
   name: "setHeight feature with progress",
   fn: async () => {
     const thing = new FfmpegClass({
-      input: "./input.mp4",
+      input: "./tests/videos/input.mp4",
     }).setFfmpegPath("ffmpeg").setHeight(710).saveWithProgress(
-      "./ree.mp4",
+      "./tests/videos/output.mp4",
     );
     for await (const progress of thing) {
       console.log(progress);
@@ -18,8 +18,8 @@ Deno.test({
   name: "setHeight feature",
   fn: async () => {
     await new FfmpegClass({
-      input: "./input.mp4",
-    }).setFfmpegPath("ffmpeg").setHeight(710).save("./ree.mp4");
+      input: "./tests/videos/input.mp4",
+    }).setFfmpegPath("ffmpeg").setHeight(710).save("./tests/videos/output.mp4");
   },
   sanitizeOps: true,
   sanitizeResources: true,
@@ -28,9 +28,9 @@ Deno.test({
   name: "setWidth feature with progress",
   fn: async () => {
     const thing = new FfmpegClass({
-      input: "./input.mp4",
+      input: "./tests/videos/input.mp4",
     }).setFfmpegPath("ffmpeg").setWidth(1280).saveWithProgress(
-      "./ree.mp4",
+      "./tests/videos/output.mp4",
     );
     for await (const progress of thing) {
       console.log(progress);
@@ -43,8 +43,8 @@ Deno.test({
   name: "setWidth feature",
   fn: async () => {
     await new FfmpegClass({
-      input: "./input.mp4",
-    }).setFfmpegPath("ffmpeg").setWidth(1280).save("./ree.mp4");
+      input: "./tests/videos/input.mp4",
+    }).setFfmpegPath("ffmpeg").setWidth(1280).save("./tests/videos/output.mp4");
   },
   sanitizeOps: true,
   sanitizeResources: true,
@@ -53,9 +53,9 @@ Deno.test({
   name: "setHeight+setWidth feature with progress",
   fn: async () => {
     const thing = new FfmpegClass({
-      input: "./input.mp4",
+      input: "./tests/videos/input.mp4",
     }).setFfmpegPath("ffmpeg").setWidth(1280).setHeight(720)
-      .saveWithProgress("./ree.mp4");
+      .saveWithProgress("./tests/videos/output.mp4");
     for await (const progress of thing) {
       console.log(progress);
     }
@@ -67,9 +67,9 @@ Deno.test({
   name: "setHeight+setWidth feature",
   fn: async () => {
     await new FfmpegClass({
-      input: "./input.mp4",
+      input: "./tests/videos/input.mp4",
     }).setFfmpegPath("ffmpeg").setWidth(1280).setHeight(720).save(
-      "./ree.mp4",
+      "./tests/videos/output.mp4",
     );
   },
   sanitizeOps: true,
