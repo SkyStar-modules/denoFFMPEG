@@ -197,7 +197,7 @@ export class Processing {
       niceness: this.niceness,
       threads: this.threadCount,
     };
-    const temp = globalOptionsFormatter(thing);
+    let temp = globalOptionsFormatter(thing);
 
     for (let i = 0; i < this.input.length; i++) {
       temp.push("-i", this.input[i]);
@@ -212,8 +212,8 @@ export class Processing {
       this.__clear("video");
     }
 
-    if (this.audCodec.length > 0) temp.concat(this.audCodec);
-    if (this.vidCodec.length > 0) temp.concat(this.vidCodec);
+    if (this.audCodec.length > 0) temp = temp.concat(this.audCodec);
+    if (this.vidCodec.length > 0) temp = temp.concat(this.vidCodec);
 
     if (this.height !== -1 || this.width !== -1) {
       this.simpleVideoFilter.push(`scale=${this.width}:${this.height}`);
@@ -229,10 +229,9 @@ export class Processing {
       temp.push("-filter_complex", this.complexFilter.join(","));
     }
 
-    if (this.abitrate.length > 0) temp.concat(this.abitrate);
-    if (this.vbitrate.length > 0) temp.concat(this.vbitrate);
+    if (this.abitrate.length > 0) temp = temp.concat(this.abitrate);
+    if (this.vbitrate.length > 0) temp = temp.concat(this.vbitrate);
     if (this.fps > 0) temp.push("-r", this.fps.toString());
-
     temp.push("-progress", "pipe:2", this.outputFile);
     return temp;
   }
