@@ -1,8 +1,8 @@
 # Changelog
 
-## 2.2
+## 2.1.1
 
-- _added_ propper tsdoc's
+- _fixed_ Small bug
   <br>
 
 - _updated_ Dependencies
