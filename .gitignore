@@ -1,3 +1,4 @@
 ffmpeg
 /tests/template.ts
 .vscode
+/tests/videos/output.mp4
