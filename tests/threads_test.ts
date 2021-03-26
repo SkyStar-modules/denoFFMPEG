@@ -3,7 +3,7 @@ Deno.test({
   name: "threads feature",
   fn: async () => {
     await new FfmpegClass({
-      ffmpegDir: "./ffmpeg/ffmpeg.exe",
+      ffmpegDir: "ffmpeg",
       input: "./input.mp4",
     }).threads(8).save("./ree.mp4");
   },
@@ -14,7 +14,7 @@ Deno.test({
   name: "threads feature with progress",
   fn: async () => {
     const thing = new FfmpegClass({
-      ffmpegDir: "./ffmpeg/ffmpeg.exe",
+      ffmpegDir: "ffmpeg",
       input: "./input.mp4",
     }).threads(8).saveWithProgress("./ree.mp4");
     for await (const progress of thing) {
@@ -28,7 +28,7 @@ Deno.test({
   name: "threads constructor feature",
   fn: async () => {
     await new FfmpegClass({
-      ffmpegDir: "./ffmpeg/ffmpeg.exe",
+      ffmpegDir: "ffmpeg",
       input: "./input.mp4",
       threads: 8,
     }).save("./ree.mp4");
@@ -40,7 +40,7 @@ Deno.test({
   name: "threads constructor feature with progress",
   fn: async () => {
     const thing = new FfmpegClass({
-      ffmpegDir: "./ffmpeg/ffmpeg.exe",
+      ffmpegDir: "ffmpeg",
       input: "./input.mp4",
       threads: 8,
     }).saveWithProgress("./ree.mp4");

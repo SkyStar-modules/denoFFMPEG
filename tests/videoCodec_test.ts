@@ -7,7 +7,7 @@ Deno.test({
   name: "videoCodec feature",
   fn: async () => {
     await new FfmpegClass({
-      ffmpegDir: "./ffmpeg/ffmpeg.exe",
+      ffmpegDir: "ffmpeg",
       input: "./input.mp4",
     }).videoCodec("libx264", options).save("./ree.mp4");
   },
@@ -18,7 +18,7 @@ Deno.test({
   name: "videoCodec feature with progress",
   fn: async () => {
     const thing = new FfmpegClass({
-      ffmpegDir: "./ffmpeg/ffmpeg.exe",
+      ffmpegDir: "ffmpeg",
       input: "./input.mp4",
     }).videoCodec("libx264", options).saveWithProgress("./ree.mp4");
     for await (const progress of thing) {

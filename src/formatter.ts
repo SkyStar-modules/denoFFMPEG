@@ -19,10 +19,7 @@ export function codecFormatter(
 }
 
 export function globalOptionsFormatter(globals: Globals): string[] {
-  const temp: string[] = ["", "-hide_banner", "-nostats", "-y"];
-  temp[0] = !(globals.ffmpegdir == "" || !globals.ffmpegdir)
-    ? globals.ffmpegdir
-    : "ffmpeg";
+  const temp: string[] = [globals.ffmpegdir, "-hide_banner", "-nostats", "-y"];
 
   if (globals.niceness > 0) {
     temp.push("-n", globals.niceness.toString());

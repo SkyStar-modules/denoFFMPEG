@@ -3,7 +3,7 @@ Deno.test({
   name: "noAudio feature",
   fn: async () => {
     await new FfmpegClass({
-      ffmpegDir: "./ffmpeg/ffmpeg.exe",
+      ffmpegDir: "ffmpeg",
       input: "./input.mp4",
     }).noAudio().save("./ree.mp4");
   },
@@ -14,7 +14,7 @@ Deno.test({
   name: "noAudio feature with progress",
   fn: async () => {
     const thing = new FfmpegClass({
-      ffmpegDir: "./ffmpeg/ffmpeg.exe",
+      ffmpegDir: "ffmpeg",
       input: "./input.mp4",
     }).noAudio().saveWithProgress("./ree.mp4");
     for await (const progress of thing) {
@@ -28,7 +28,7 @@ Deno.test({
   name: "noVideo feature",
   fn: async () => {
     await new FfmpegClass({
-      ffmpegDir: "./ffmpeg/ffmpeg.exe",
+      ffmpegDir: "ffmpeg",
       input: "./input.mp4",
     }).noVideo().save("./ree.mp4");
   },
@@ -39,7 +39,7 @@ Deno.test({
   name: "noVideo feature with progress",
   fn: async () => {
     const thing = new FfmpegClass({
-      ffmpegDir: "./ffmpeg/ffmpeg.exe",
+      ffmpegDir: "ffmpeg",
       input: "./input.mp4",
     }).noVideo().saveWithProgress("./ree.mp4");
     for await (const progress of thing) {

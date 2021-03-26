@@ -12,7 +12,7 @@ Deno.test({
   fn: async () => {
     const thing = new FfmpegClass({
       input: "./input.mp4",
-    }).setFfmpegPath("./ffmpeg/ffmpeg.exe").audioFilters(filter)
+    }).setFfmpegPath("ffmpeg").audioFilters(filter)
       .saveWithProgress("./ree.mp4");
     for await (const progress of thing) {
       console.log(progress);
@@ -26,7 +26,7 @@ Deno.test({
   fn: async () => {
     await new FfmpegClass({
       input: "./input.mp4",
-    }).setFfmpegPath("./ffmpeg/ffmpeg.exe").audioFilters(filter).save(
+    }).setFfmpegPath("ffmpeg").audioFilters(filter).save(
       "./ree.mp4",
     );
   },

@@ -17,7 +17,7 @@ Deno.test({
   name: "simple videoFilter feature",
   fn: async () => {
     await new FfmpegClass({
-      ffmpegDir: "./ffmpeg/ffmpeg.exe",
+      ffmpegDir: "ffmpeg",
       input: "./input.mp4",
     }).videoFilters(text).save("./ree.mp4");
   },
@@ -28,7 +28,7 @@ Deno.test({
   name: "simple videoFilter feature with progress",
   fn: async () => {
     const thing = new FfmpegClass({
-      ffmpegDir: "./ffmpeg/ffmpeg.exe",
+      ffmpegDir: "ffmpeg",
       input: "./input.mp4",
     }).videoFilters(text).saveWithProgress("./ree.mp4");
     for await (const progress of thing) {

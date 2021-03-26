@@ -4,8 +4,8 @@ import * as logger from "./logger.ts";
 import * as formatter from "./formatter.ts";
 
 /**
- * Public Class for ffmpeg rendering
- */
+* Public Class for ffmpeg rendering
+*/
 export class FfmpegClass extends Processing {
   /**
   * Make new ffmpeg instance.
@@ -64,9 +64,9 @@ export class FfmpegClass extends Processing {
   }
 
   /**
-   * Set amount of threads
-   * @param { number } amount - Amount of threads to use
-   */
+  * Set amount of threads
+  @param { number } amount - Amount of threads to use
+  */
   public threads(amount: number): this {
     this.threadCount = amount;
     return this;
@@ -236,10 +236,10 @@ export class FfmpegClass extends Processing {
   }
 
   /**
-   * set output path and encode input
-   @param { string } output - output path
-   @returns { AsyncGenerator<Progress> } - Returns async iterable
-   */
+  * set output path and encode input
+  @param { string } output - output path
+  @returns { AsyncGenerator<Progress> } - Returns async iterable
+  */
   public saveWithProgress(output: string): AsyncGenerator<Progress> {
     this.outputFile = output;
     return this.__runWithProgress();

@@ -5,7 +5,7 @@ Deno.test({
   name: "http constructor feature",
   fn: async () => {
     await new FfmpegClass({
-      ffmpegDir: "./ffmpeg/ffmpeg.exe",
+      ffmpegDir: "ffmpeg",
       input: link,
     }).save("./ree.mp4");
   },
@@ -16,7 +16,7 @@ Deno.test({
   name: "http constructor feature with progress",
   fn: async () => {
     const thing = new FfmpegClass({
-      ffmpegDir: "./ffmpeg/ffmpeg.exe",
+      ffmpegDir: "ffmpeg",
       input: link,
     }).saveWithProgress("./ree.mp4");
     for await (const progress of thing) {
@@ -30,7 +30,7 @@ Deno.test({
   name: "http inputFile feature",
   fn: async () => {
     await new FfmpegClass({
-      ffmpegDir: "./ffmpeg/ffmpeg.exe",
+      ffmpegDir: "ffmpeg",
     }).addInput(link).save("./ree.mp4");
   },
   sanitizeOps: true,
@@ -40,7 +40,7 @@ Deno.test({
   name: "http inputFile feature with progress",
   fn: async () => {
     const thing = new FfmpegClass({
-      ffmpegDir: "./ffmpeg/ffmpeg.exe",
+      ffmpegDir: "ffmpeg",
     }).addInput(link).saveWithProgress("./ree.mp4");
     for await (const progress of thing) {
       console.log(progress);

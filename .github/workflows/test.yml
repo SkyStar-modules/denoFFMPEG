@@ -1,0 +1,34 @@
+name: github test
+
+on: 
+  push:
+    branches:
+      - main
+      - dev
+  pull_request:
+    branches:
+      - main
+      - dev
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        deno: ['v1.x', 'nightly']
+
+    steps:
+      - name: Setup repo
+        uses: actions/checkout@v2
+
+      - name: Setup Deno
+        uses: denolib/setup-deno@v2.3.0
+        with:
+          deno-version: ${{ matrix.deno }}
+
+      - name: Setup ffmpeg
+      - uses: FedericoCarboni/setup-ffmpeg@v1
+
+      - name: Run tests
+        run: deno test -A --unstable tests

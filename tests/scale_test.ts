@@ -4,7 +4,7 @@ Deno.test({
   fn: async () => {
     const thing = new FfmpegClass({
       input: "./input.mp4",
-    }).setFfmpegPath("./ffmpeg/ffmpeg.exe").setHeight(710).saveWithProgress(
+    }).setFfmpegPath("ffmpeg").setHeight(710).saveWithProgress(
       "./ree.mp4",
     );
     for await (const progress of thing) {
@@ -19,7 +19,7 @@ Deno.test({
   fn: async () => {
     await new FfmpegClass({
       input: "./input.mp4",
-    }).setFfmpegPath("./ffmpeg/ffmpeg.exe").setHeight(710).save("./ree.mp4");
+    }).setFfmpegPath("ffmpeg").setHeight(710).save("./ree.mp4");
   },
   sanitizeOps: true,
   sanitizeResources: true,
@@ -29,7 +29,7 @@ Deno.test({
   fn: async () => {
     const thing = new FfmpegClass({
       input: "./input.mp4",
-    }).setFfmpegPath("./ffmpeg/ffmpeg.exe").setWidth(1280).saveWithProgress(
+    }).setFfmpegPath("ffmpeg").setWidth(1280).saveWithProgress(
       "./ree.mp4",
     );
     for await (const progress of thing) {
@@ -44,7 +44,7 @@ Deno.test({
   fn: async () => {
     await new FfmpegClass({
       input: "./input.mp4",
-    }).setFfmpegPath("./ffmpeg/ffmpeg.exe").setWidth(1280).save("./ree.mp4");
+    }).setFfmpegPath("ffmpeg").setWidth(1280).save("./ree.mp4");
   },
   sanitizeOps: true,
   sanitizeResources: true,
@@ -54,7 +54,7 @@ Deno.test({
   fn: async () => {
     const thing = new FfmpegClass({
       input: "./input.mp4",
-    }).setFfmpegPath("./ffmpeg/ffmpeg.exe").setWidth(1280).setHeight(720)
+    }).setFfmpegPath("ffmpeg").setWidth(1280).setHeight(720)
       .saveWithProgress("./ree.mp4");
     for await (const progress of thing) {
       console.log(progress);
@@ -68,7 +68,7 @@ Deno.test({
   fn: async () => {
     await new FfmpegClass({
       input: "./input.mp4",
-    }).setFfmpegPath("./ffmpeg/ffmpeg.exe").setWidth(1280).setHeight(720).save(
+    }).setFfmpegPath("ffmpeg").setWidth(1280).setHeight(720).save(
       "./ree.mp4",
     );
   },
