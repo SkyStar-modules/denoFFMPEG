@@ -24,4 +24,4 @@ jobs:
           deno-version: v1.x
       
       - name: Run lint
-        run: deno lint --unstable src
+        run: deno lint --unstable
