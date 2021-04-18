@@ -31,4 +31,4 @@ jobs:
         uses: FedericoCarboni/setup-ffmpeg@v1
 
       - name: Run tests
-        run: deno test -A --unstable tests
+        run: deno test -A --fail-fast tests
