@@ -77,12 +77,13 @@ export class FfmpegClass extends Processing {
   * Set path to the inputfile
   @param { string } input - input file
   */
-  public addInput(input: string): this {
+  public addInput(input: string, options: Record<string, string> = {}): this {
     if (input) {
       if (input.includes("http") && this.input.length === 0) {
         this.firstInputIsURL = true;
       }
       this.input.push(input);
+      this.inputOptions.push(options);
     }
     return this;
   }

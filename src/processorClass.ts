@@ -11,6 +11,7 @@ export class Processing {
   protected outputFile = "";
   protected outputformat = "";
   protected input: string[] = [];
+  protected inputOptions: Record<string, string>[] = [];
   protected vbitrate: string[] = [];
   protected abitrate: string[] = [];
   protected simpleVideoFilter: string[] = [];
@@ -19,7 +20,7 @@ export class Processing {
   protected vidCodec: string[] = [];
   protected audCodec: string[] = [];
   protected stderr: string[] = [];
-  protected globals: string[] = [];
+  protected globals: Record<string, string> = {};
   protected niceness = -1;
   protected threadCount = 0;
   protected fps = 0;
@@ -171,7 +172,6 @@ export class Processing {
           "video codec was selected while no video mode was selected!\nPlease remove video codec",
         );
       }
-
       this.vidCodec = [];
       this.vBR = 0;
       this.vbitrate = [];
@@ -195,10 +195,16 @@ export class Processing {
       ffmpegdir: this.ffmpegDir,
       niceness: this.niceness,
       threads: this.threadCount,
+      ...this.globals,
     };
     let temp = globalOptionsFormatter(thing);
 
     for (let i = 0; i < this.input.length; i++) {
+      if (this.inputOptions[i]) {
+        Object.entries(this.inputOptions[i]).forEach(([key, value]) => {
+          temp.push("-" + key, value);
+        });
+      }
       temp.push("-i", this.input[i]);
     }
     if (this.noaudio) {
