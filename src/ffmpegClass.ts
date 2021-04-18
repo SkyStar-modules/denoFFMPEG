@@ -1,4 +1,5 @@
 import { Processing } from "./processorClass.ts";
+// deno-lint-ignore no-unused-vars
 import { Filters, Progress, Spawn } from "./types.ts";
 import * as logger from "./logger.ts";
 import * as formatter from "./formatter.ts";
