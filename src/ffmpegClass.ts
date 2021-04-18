@@ -228,6 +228,13 @@ export class FfmpegClass extends Processing {
   }
 
   /**
+  @param { string } format - format to use if no extention is provided
+  */
+  public outputFormat(format: string): this {
+    this.outputformat = format;
+    return this;
+  }
+  /**
   * set output path and encode input. will return once the render is finished
   @param { string } output - output path
   */

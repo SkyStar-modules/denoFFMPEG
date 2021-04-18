@@ -9,6 +9,7 @@ import { globalOptionsFormatter } from "./formatter.ts";
 export class Processing {
   protected ffmpegDir = "";
   protected outputFile = "";
+  protected outputformat = "";
   protected input: string[] = [];
   protected vbitrate: string[] = [];
   protected abitrate: string[] = [];
@@ -26,10 +27,8 @@ export class Processing {
   protected vBR = 0;
   protected width = -1;
   protected height = -1;
-  protected debug = true;
   protected noaudio = false;
   protected novideo = false;
-  protected outputPipe = false;
   protected firstInputIsURL = false;
   protected Process!: Deno.Process;
 
@@ -113,7 +112,7 @@ export class Processing {
           ) {
             yield progressOBJ;
           } else if (
-            currentFPS !== 0 && this.debug && totalFrames > currentFrame &&
+            currentFPS !== 0 && totalFrames > currentFrame &&
             progressOBJ.percentage < 100
           ) {
             log.internalWarning(
@@ -232,6 +231,7 @@ export class Processing {
     if (this.abitrate.length > 0) temp = temp.concat(this.abitrate);
     if (this.vbitrate.length > 0) temp = temp.concat(this.vbitrate);
     if (this.fps > 0) temp.push("-r", this.fps.toString());
+    if (this.outputformat !== "") temp.push("-f", this.outputformat);
     temp.push("-progress", "pipe:2", this.outputFile);
     return temp;
   }
@@ -277,7 +277,7 @@ export class Processing {
       errors.push("No input specified!");
     }
 
-    if ((!this.outputFile || this.outputFile == "") && !this.outputPipe) {
+    if ((!this.outputFile || this.outputFile == "")) {
       errors.push("No output specified!");
     }
 
