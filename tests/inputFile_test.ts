@@ -59,7 +59,7 @@ Deno.test({
 });
 
 Deno.test({
-  name: "input & output options feature",
+  name: "input options feature",
   fn: async () => {
     await new FfmpegClass({
       ffmpegDir: "ffmpeg",
@@ -72,7 +72,7 @@ Deno.test({
 });
 
 Deno.test({
-  name: "input & output options feature with progress",
+  name: "input options feature with progress",
   fn: async () => {
     const thing = new FfmpegClass({
       ffmpegDir: "ffmpeg",
