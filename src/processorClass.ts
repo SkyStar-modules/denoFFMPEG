@@ -17,7 +17,7 @@ export class Processing {
   protected outputFile = "";
   protected input: string[] = [];
   protected outputOptions: string[] = [];
-  protected inputOptions: Record<string, string>[] = [];
+  protected inputOptions: Record<string, string | undefined>[] = [];
   protected vbitrate: string[] = [];
   protected abitrate: string[] = [];
   protected simpleVideoFilter: string[] = [];

@@ -1,12 +1,13 @@
 import { Filters, Globals } from "./types.ts";
 export function optionsFormatter(
   mutArray: string[],
-  options: Record<string, string | number>,
+  options: Record<string, string | number | undefined>,
 ): void {
   const optArray = Object.entries(options);
 
   optArray.forEach(([key, value]) => {
-    mutArray.push("-" + key, value.toString());
+    mutArray.push("-" + key);
+    if (value) mutArray.push(value.toString());
   });
   return;
 }

@@ -39,6 +39,7 @@ export class FfmpegClass extends Processing {
               this.firstInputIsURL = true;
             }
             this.input.push(value);
+            this.inputOptions.push({});
             break;
           default:
             warning("option '" + j[0] + "' not found! Please remove it");
@@ -76,8 +77,12 @@ export class FfmpegClass extends Processing {
   /**
   Set path to the inputfile
   @param { string } input - input file
+  @param { Record<string, string | undefined> } options - Options for input
   */
-  public addInput(input: string, options: Record<string, string> = {}): this {
+  public addInput(
+    input: string,
+    options: Record<string, string | undefined> = {},
+  ): this {
     if (input) {
       if (input.includes("http") && this.input.length === 0) {
         this.firstInputIsURL = true;
@@ -125,11 +130,11 @@ export class FfmpegClass extends Processing {
   /**
   Set audio codec
   @param { string } codec - codec to use for encoding audio
-  @param { Record<string, string | number> } options - options to use with codec (usually not used)
+  @param { Record<string, string | number | undefined> } options - options to use with codec (usually not used)
   */
   public audioCodec(
     codec: string,
-    options: Record<string, string | number> = {},
+    options: Record<string, string | number | undefined> = {},
   ): this {
     this.audCodec = ["-c:a", codec];
     formatter.optionsFormatter(this.audCodec, options);
@@ -139,9 +144,12 @@ export class FfmpegClass extends Processing {
   /**
   Set video codec
   @param { string } codec - codec to use for encoding video
-  @param { Record<string, string> } options - options to use with codec (usually not used)
+  @param { Record<string, string | undefined> } options - options to use with codec (usually not used)
   */
-  public videoCodec(codec: string, options: Record<string, string> = {}): this {
+  public videoCodec(
+    codec: string,
+    options: Record<string, string | undefined> = {},
+  ): this {
     this.vidCodec = ["-c:v", codec];
     formatter.optionsFormatter(this.vidCodec, options);
     return this;
@@ -236,7 +244,7 @@ export class FfmpegClass extends Processing {
   */
   public save(
     output: string,
-    options: Record<string, string> = {},
+    options: Record<string, string | undefined> = {},
   ): Promise<void> {
     this.outputFile = output;
     formatter.optionsFormatter(
@@ -253,7 +261,7 @@ export class FfmpegClass extends Processing {
   */
   public saveWithProgress(
     output: string,
-    options: Record<string, string> = {},
+    options: Record<string, string | undefined> = {},
   ): AsyncGenerator<Progress> {
     this.outputFile = output;
     formatter.optionsFormatter(
