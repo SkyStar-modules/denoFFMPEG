@@ -1,6 +1,12 @@
 import { Globals, Progress } from "./types.ts";
 import { readLines } from "../deps.ts";
-import * as log from "./logger.ts";
+import {
+  FfmpegError,
+  FormatError,
+  InternalError,
+  internalWarning,
+  warning,
+} from "./error.ts";
 import { globalOptionsFormatter, optionsFormatter } from "./formatter.ts";
 
 /**
@@ -117,7 +123,7 @@ export class Processing {
             currentFPS !== 0 && totalFrames > currentFrame &&
             progressOBJ.percentage < 100
           ) {
-            log.internalWarning(
+            internalWarning(
               `progress yield is invalid because one of the following values is NaN\ntotalFrames:${totalFrames}\ncurrentFrame:${currentFrame}\ncurrentFPS:${currentFPS}`,
             );
           }
@@ -140,13 +146,13 @@ export class Processing {
   private __clear(input: string): void {
     if (input.toLowerCase() === "audio") {
       if (this.aBR !== 0) {
-        log.warning(
+        warning(
           "video bitrate was selected while no audio mode was selected!\nPlease remove video bitrate",
         );
       }
 
       if (this.audCodec.length > 0) {
-        log.warning(
+        warning(
           "video codec was selected while no audio mode was selected!\nPlease remove video codec",
         );
       }
@@ -157,19 +163,19 @@ export class Processing {
       this.audioFilter = [];
     } else if (input.toLowerCase() === "video") {
       if (this.simpleVideoFilter.length > 0) {
-        log.warning(
+        warning(
           "video Filters was selected while no video mode was selected!\nPlease remove video filters",
         );
       }
 
       if (this.vBR !== 0) {
-        log.warning(
+        warning(
           "video bitrate was selected while no video mode was selected!\nPlease remove video bitrate",
         );
       }
 
       if (this.vidCodec.length > 0) {
-        log.warning(
+        warning(
           "video codec was selected while no video mode was selected!\nPlease remove video codec",
         );
       }
@@ -181,7 +187,7 @@ export class Processing {
       this.width = -1;
       this.fps = 0;
     } else {
-      log.internalError(
+      throw new InternalError(
         "tried to clear input. But invalid input was specified!",
       );
     }
@@ -328,7 +334,7 @@ export class Processing {
 
     if (errors.length > 0) {
       const errorList: string = errors.join("\n");
-      log.formatError(errorList);
+      throw new FormatError(errorList);
     }
     return;
   }
@@ -348,7 +354,7 @@ export class Processing {
     this.Process.close();
 
     if (!status.success) {
-      log.ffmpegError(
+      throw new FfmpegError(
         stderr + "\nCLI: " + this.__formatting().join(" ") + "\n",
       );
     }
