@@ -83,7 +83,7 @@ export class FfmpegClass extends Processing {
         this.firstInputIsURL = true;
       }
       this.input.push(input);
-      this.inputOptions.push(options)
+      this.inputOptions.push(options);
     }
     return this;
   }
@@ -245,11 +245,11 @@ export class FfmpegClass extends Processing {
     output: string,
     options: Record<string, string> = {},
   ): Promise<void> {
+    this.outputFile = output;
     formatter.optionsFormatter(
       this.outputOptions,
       options,
     );
-    this.outputFile = output;
     return this.__run();
   }
 
@@ -258,8 +258,15 @@ export class FfmpegClass extends Processing {
   @param { string } output - output path
   @returns { AsyncGenerator<Progress> } - Returns async iterable
   */
-  public saveWithProgress(output: string): AsyncGenerator<Progress> {
+  public saveWithProgress(
+    output: string,
+    options: Record<string, string> = {},
+  ): AsyncGenerator<Progress> {
     this.outputFile = output;
+    formatter.optionsFormatter(
+      this.outputOptions,
+      options,
+    );
     return this.__runWithProgress();
   }
 }

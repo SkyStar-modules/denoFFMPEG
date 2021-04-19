@@ -348,7 +348,9 @@ export class Processing {
     this.Process.close();
 
     if (!status.success) {
-      log.ffmpegError(stderr + "\nCLI: " + this.__formatting().join(" ") + "\n");
+      log.ffmpegError(
+        stderr + "\nCLI: " + this.__formatting().join(" ") + "\n",
+      );
     }
     return;
   }
