@@ -47,7 +47,7 @@ Deno.test({
       "./tests/videos/output.mp4",
     );
     for await (const progress of thing) {
-      console.log(progress);
+      console.log(progress.percentage);
     }
   },
   sanitizeOps: true,
@@ -75,7 +75,7 @@ Deno.test({
     }).setFfmpegPath("ffmpeg").setWidth(1280).setHeight(720)
       .saveWithProgress("./tests/videos/output.mp4");
     for await (const progress of thing) {
-      console.log(progress);
+      console.log(progress.percentage);
     }
   },
   sanitizeOps: true,
