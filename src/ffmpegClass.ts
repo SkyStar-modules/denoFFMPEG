@@ -1,7 +1,7 @@
 import { Processing } from "./processorClass.ts";
 // deno-lint-ignore no-unused-vars
 import { Filters, Progress, Spawn } from "./types.ts";
-import * as logger from "./logger.ts";
+import { warning } from "./error.ts";
 import * as formatter from "./formatter.ts";
 
 /**
@@ -27,7 +27,7 @@ export class FfmpegClass extends Processing {
             break;
           case "niceness":
             if (Deno.build.os === "windows") {
-              logger.warning(
+              warning(
                 "Niceness is set while using windows\nPlease remove it because it is ignored",
               );
             } else {
@@ -41,7 +41,7 @@ export class FfmpegClass extends Processing {
             this.input.push(value);
             break;
           default:
-            logger.warning("option '" + j[0] + "' not found! Please remove it");
+            warning("option '" + j[0] + "' not found! Please remove it");
         }
       });
     }
@@ -55,7 +55,7 @@ export class FfmpegClass extends Processing {
   public setFfmpegPath(ffmpegPath: string): this {
     if (ffmpegPath) {
       if (this.ffmpegDir.length > 0 && this.ffmpegDir !== "ffmpeg") {
-        logger.warning(
+        warning(
           "changing ffmpeg path from " + this.ffmpegDir + " to " + ffmpegPath,
         );
       }
