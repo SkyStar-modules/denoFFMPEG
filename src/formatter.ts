@@ -1,21 +1,14 @@
 import { Filters, Globals } from "./types.ts";
+export function optionsFormatter(
+  mutArray: string[],
+  options: Record<string, string | number>,
+): void {
+  const optArray = Object.entries(options);
 
-export function codecFormatter(
-  codecType: string,
-  codec: string,
-  options?: Record<string, string | number>,
-): string[] {
-  codec = (codec == "" || codec == "null" || codec == "undefined")
-    ? "undefined"
-    : codec;
-  const codecArr: string[] = [codecType, codec];
-
-  if (options) {
-    Object.entries(options).forEach((x: Array<string | number>) => {
-      codecArr.push("-" + x[0], x[1].toString());
-    });
-  }
-  return codecArr;
+  optArray.forEach(([key, value]) => {
+    mutArray.push("-" + key, value.toString());
+  });
+  return;
 }
 
 export function globalOptionsFormatter(globals: Globals): string[] {
@@ -37,8 +30,8 @@ export function filterFormatter(...filters: Filters[]): string[] {
   filters.forEach((x: Filters) => {
     let temp: string = x.filterName + "=";
     Object.entries(x.options).forEach(
-      (j: Array<string | number>, i: number) => {
-        temp += (i > 0) ? `: ${j[0]}=${j[1]}` : `${j[0]}=${j[1]}`;
+      ([key, value], i: number) => {
+        temp += (i > 0) ? `: ${key}=${value}` : `${key}=${value}`;
       },
     );
 
