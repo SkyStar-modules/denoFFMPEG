@@ -7,13 +7,13 @@ export function internalWarning(str: string): void {
 }
 
 export function internalError(str: string): void {
-  throw "\x1b[0;31;40mINTERNAL ERROR:\x1b[39m " + str;
+  throw new Error("\x1b[0;31;40mINTERNAL ERROR:\x1b[39m " + str);
 }
 
 export function ffmpegError(str: string): void {
-  throw "\x1b[0;31;40mRENDER DIDN'T FINISH:\x1b[39m " + str;
+  throw new Error("\x1b[0;31;40mRENDER DIDN'T FINISH:\x1b[39m " + str);
 }
 
 export function formatError(str: string): void {
-  throw "\x1b[0;31;40mFormatting Error:\x1b[39m " + str;
+  throw new Error("\x1b[0;31;40mFormatting Error:\x1b[39m " + str);
 }
