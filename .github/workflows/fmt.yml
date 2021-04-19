@@ -1,4 +1,4 @@
-name: github fmt
+name: Formatting
 
 on: 
   push:
@@ -6,9 +6,6 @@ on:
       - main
       - dev
   pull_request:
-    branches:
-      - main
-      - dev
 
 jobs:
   fmt:
