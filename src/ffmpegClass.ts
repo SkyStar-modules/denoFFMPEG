@@ -8,8 +8,9 @@ import * as formatter from "./formatter.ts";
 * Public Class for ffmpeg rendering
 */
 export class FfmpegClass extends Processing {
+  
   /**
-  * Make new ffmpeg instance.
+  Make new ffmpeg instance.
   @param { Spawn } options - Spawn options
   */
   public constructor(options?: Spawn) {
@@ -49,7 +50,7 @@ export class FfmpegClass extends Processing {
   }
 
   /**
-  * Set path to the ffmpeg binary file
+  Set path to the ffmpeg binary file
   @param { string } ffmpegPath
   */
   public setFfmpegPath(ffmpegPath: string): this {
@@ -65,7 +66,7 @@ export class FfmpegClass extends Processing {
   }
 
   /**
-  * Set amount of threads
+  Set amount of threads
   @param { number } amount - Amount of threads to use
   */
   public threads(amount: number): this {
@@ -74,7 +75,7 @@ export class FfmpegClass extends Processing {
   }
 
   /**
-  * Set path to the inputfile
+  Set path to the inputfile
   @param { string } input - input file
   */
   public addInput(input: string, options: Record<string, string> = {}): this {
@@ -89,7 +90,7 @@ export class FfmpegClass extends Processing {
   }
 
   /**
-  * Disable Audio and remove all audio settings
+  Disable Audio and remove all audio settings
   */
   public noAudio(): this {
     this.noaudio = true;
@@ -97,7 +98,7 @@ export class FfmpegClass extends Processing {
   }
 
   /**
-  * Disable video and remove all video settings
+  Disable video and remove all video settings
   */
   public noVideo(): this {
     this.novideo = true;
@@ -105,7 +106,7 @@ export class FfmpegClass extends Processing {
   }
 
   /**
-  * Set height of the video
+  Set height of the video
   @param { number } height - height of the output
   */
   public setHeight(height: number): this {
@@ -114,7 +115,7 @@ export class FfmpegClass extends Processing {
   }
 
   /**
-  * Set width of the video
+  Set width of the video
   @param { number } width - width of the output
   */
   public setWidth(width: number): this {
@@ -123,7 +124,7 @@ export class FfmpegClass extends Processing {
   }
 
   /**
-  * Set audio codec
+  Set audio codec
   @param { string } codec - codec to use for encoding audio
   @param { Record<string, string | number> } options - options to use with codec (usually not used)
   */
@@ -137,7 +138,7 @@ export class FfmpegClass extends Processing {
   }
 
   /**
-  * Set video codec
+  Set video codec
   @param { string } codec - codec to use for encoding video
   @param { Record<string, string> } options - options to use with codec (usually not used)
   */
@@ -148,7 +149,7 @@ export class FfmpegClass extends Processing {
   }
 
   /**
-  * Set audio bitrate in kbps
+  Set audio bitrate in kbps
   @param { number } bitrate - audio bitrate to use
   */
   public audioBitrate(bitrate: number): this {
@@ -158,7 +159,7 @@ export class FfmpegClass extends Processing {
   }
 
   /**
-  * Set video bitrate in mbps or kbps
+  Set video bitrate in mbps or kbps
   @param { number | string } bitrate - bitrate use bitrate you want in mbps(15m) or kbps(15000k)
   @param cbr - enable constant bitrate (default = true)
   */
@@ -195,7 +196,7 @@ export class FfmpegClass extends Processing {
   }
 
   /**
-  * Set audio filters
+  Set audio filters
   @param { Filters[] } Filters - Filters Array of filter Objects you want to use for processing
   */
   public audioFilters(...Filters: Filters[]): this {
@@ -204,7 +205,7 @@ export class FfmpegClass extends Processing {
   }
 
   /**
-  * Set video filters
+  Set video filters
   @param { Filters[] } Filters - Filters Array of filter Objects you want to use for processing
   */
   public complexFilters(...Filters: Filters[]): this {
@@ -213,7 +214,7 @@ export class FfmpegClass extends Processing {
   }
 
   /**
-  * Set video filters
+  Set video filters
   @param { Filters[] } Filters - Filters Array of filter Objects you want to use for processing
   */
   public videoFilters(...Filters: Filters[]): this {
@@ -222,7 +223,8 @@ export class FfmpegClass extends Processing {
   }
 
   /**
-  * Set output fps
+  Set output fps
+  @deprecated
   @param { number } fps - framerate you want to use
   */
   public outputFPS(fps: number): this {
@@ -231,6 +233,8 @@ export class FfmpegClass extends Processing {
   }
 
   /**
+  Set output format
+  @deprecated
   @param { string } format - format to use if no extention is provided
   */
   public outputFormat(format: string): this {
@@ -238,7 +242,7 @@ export class FfmpegClass extends Processing {
     return this;
   }
   /**
-  * set output path and encode input. will return once the render is finished
+  Set output path and encode input. will return once the render is finished
   @param { string } output - output path
   */
   public save(

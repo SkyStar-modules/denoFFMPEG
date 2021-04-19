@@ -4,8 +4,8 @@ import * as log from "./logger.ts";
 import { globalOptionsFormatter, optionsFormatter } from "./formatter.ts";
 
 /**
- * Private Class for ffmpeg rendering
- */
+Private Class for ffmpeg rendering
+*/
 export class Processing {
   protected ffmpegDir = "";
   protected outputFile = "";
@@ -35,7 +35,7 @@ export class Processing {
   protected Process!: Deno.Process;
 
   /**
-  * Get the progress of the ffmpeg instancegenerator
+  Get the progress of the ffmpeg instancegenerator
   @returns { AsyncGenerator<Progress> } - Returns async iterable
   */
   protected async *__getProgress(): AsyncGenerator<Progress> {
@@ -135,7 +135,7 @@ export class Processing {
   }
 
   /**
-  * Clear all filters and everything for audio or video
+  Clear all filters and everything for audio or video
   */
   private __clear(input: string): void {
     if (input.toLowerCase() === "audio") {
@@ -189,7 +189,7 @@ export class Processing {
   }
 
   /**
-  * Format & process all data to run ffmpeg
+  Format & process all data to run ffmpeg
   */
   private __formatting(): string[] {
     const thing: Globals = {
@@ -242,7 +242,7 @@ export class Processing {
   }
 
   /**
-  * Check's for common error's made by the user
+  Check's for common error's made by the user
   */
   private __errorCheck(): void {
     const errors: string[] = [];
@@ -334,7 +334,7 @@ export class Processing {
   }
 
   /**
-  * Wait method for run
+  Wait method for run
   */
   private async __closeProcess(hasProgress: boolean): Promise<void> {
     let stderr = this.stderr.join("");
@@ -356,7 +356,7 @@ export class Processing {
   }
 
   /**
-  * run method without progress data
+  Run method without progress data
   */
   protected __run(): Promise<void> {
     this.__errorCheck();
@@ -369,7 +369,7 @@ export class Processing {
   }
 
   /**
-  * run method with progress data
+  Run method with progress data
   */
   protected __runWithProgress(): AsyncGenerator<Progress> {
     this.__errorCheck();
