@@ -8,7 +8,6 @@ import * as formatter from "./formatter.ts";
 * Public Class for ffmpeg rendering
 */
 export class FfmpegClass extends Processing {
-  
   /**
   Make new ffmpeg instance.
   @param { Spawn } options - Spawn options
