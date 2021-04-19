@@ -1,4 +1,5 @@
 import { FfmpegClass } from "../mod.ts";
+
 Deno.test({
   name: "inputFile feature",
   fn: async () => {
@@ -9,6 +10,7 @@ Deno.test({
   sanitizeOps: true,
   sanitizeResources: true,
 });
+
 Deno.test({
   name: "inputFile feature with progress",
   fn: async () => {
@@ -24,6 +26,7 @@ Deno.test({
   sanitizeOps: true,
   sanitizeResources: true,
 });
+
 Deno.test({
   name: "double input feature",
   fn: async () => {
@@ -36,6 +39,7 @@ Deno.test({
   sanitizeOps: true,
   sanitizeResources: true,
 });
+
 Deno.test({
   name: "double input feature with progress",
   fn: async () => {
@@ -53,6 +57,7 @@ Deno.test({
   sanitizeOps: true,
   sanitizeResources: true,
 });
+
 Deno.test({
   name: "input & output options feature",
   fn: async () => {
@@ -65,6 +70,7 @@ Deno.test({
   sanitizeOps: true,
   sanitizeResources: true,
 });
+
 Deno.test({
   name: "input & output options feature with progress",
   fn: async () => {
@@ -74,7 +80,7 @@ Deno.test({
       "./tests/videos/output.mp4",
     );
     for await (const progress of thing) {
-      console.log(progress);
+      console.log(progress.percentage);
     }
   },
   sanitizeOps: true,

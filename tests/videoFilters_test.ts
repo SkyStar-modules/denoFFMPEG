@@ -1,5 +1,7 @@
 import { FfmpegClass, Filters } from "../mod.ts";
+
 const sentence = "I love deno :D";
+
 const text: Filters = {
   filterName: "drawtext",
   options: {
@@ -13,6 +15,7 @@ const text: Filters = {
     shadowy: "2",
   },
 };
+
 Deno.test({
   name: "simple videoFilter feature",
   fn: async () => {
@@ -24,6 +27,7 @@ Deno.test({
   sanitizeOps: true,
   sanitizeResources: true,
 });
+
 Deno.test({
   name: "simple videoFilter feature with progress",
   fn: async () => {
@@ -32,7 +36,7 @@ Deno.test({
       input: "./tests/videos/input.mp4",
     }).videoFilters(text).saveWithProgress("./tests/videos/output.mp4");
     for await (const progress of thing) {
-      console.log(progress);
+      console.log(progress.percentage);
     }
   },
   sanitizeOps: true,

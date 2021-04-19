@@ -1,4 +1,5 @@
 import { FfmpegClass } from "../mod.ts";
+
 Deno.test({
   name: "empty constructor feature",
   fn: async () => {
@@ -9,6 +10,7 @@ Deno.test({
   sanitizeOps: true,
   sanitizeResources: true,
 });
+
 Deno.test({
   name: "empty constructor feature with progress",
   fn: async () => {
@@ -23,6 +25,7 @@ Deno.test({
   sanitizeOps: true,
   sanitizeResources: true,
 });
+
 Deno.test({
   name: "full constructor feature",
   fn: async () => {
@@ -34,6 +37,7 @@ Deno.test({
   sanitizeOps: true,
   sanitizeResources: true,
 });
+
 Deno.test({
   name: "full constructor feature with progress",
   fn: async () => {
@@ -42,7 +46,7 @@ Deno.test({
       input: "./tests/videos/input.mp4",
     }).saveWithProgress("./tests/videos/output.mp4");
     for await (const progress of thing) {
-      console.log(progress);
+      console.log(progress.percentage);
     }
   },
   sanitizeOps: true,

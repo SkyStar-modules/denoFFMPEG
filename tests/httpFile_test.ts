@@ -1,6 +1,8 @@
 import { FfmpegClass } from "../mod.ts";
+
 const link =
   "https://cdn.discordapp.com/attachments/764087395532406824/793974755731963904/crab.mp4";
+
 Deno.test({
   name: "http constructor feature",
   fn: async () => {
@@ -12,6 +14,7 @@ Deno.test({
   sanitizeOps: true,
   sanitizeResources: true,
 });
+
 Deno.test({
   name: "http constructor feature with progress",
   fn: async () => {
@@ -20,12 +23,13 @@ Deno.test({
       input: link,
     }).saveWithProgress("./tests/videos/output.mp4");
     for await (const progress of thing) {
-      console.log(progress);
+      console.log(progress.percentage);
     }
   },
   sanitizeOps: true,
   sanitizeResources: true,
 });
+
 Deno.test({
   name: "http inputFile feature",
   fn: async () => {
@@ -36,6 +40,7 @@ Deno.test({
   sanitizeOps: true,
   sanitizeResources: true,
 });
+
 Deno.test({
   name: "http inputFile feature with progress",
   fn: async () => {
@@ -43,7 +48,7 @@ Deno.test({
       ffmpegDir: "ffmpeg",
     }).addInput(link).saveWithProgress("./tests/videos/output.mp4");
     for await (const progress of thing) {
-      console.log(progress);
+      console.log(progress.percentage);
     }
   },
   sanitizeOps: true,

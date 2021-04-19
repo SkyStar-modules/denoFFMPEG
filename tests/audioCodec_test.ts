@@ -1,7 +1,9 @@
 import { FfmpegClass } from "../mod.ts";
+
 const options = {
   qscale: "6",
 };
+
 Deno.test({
   name: "audioCodec feature",
   fn: async () => {
@@ -13,6 +15,7 @@ Deno.test({
   sanitizeOps: true,
   sanitizeResources: true,
 });
+
 Deno.test({
   name: "audioCodec feature with progress",
   fn: async () => {
@@ -23,7 +26,7 @@ Deno.test({
       "./tests/videos/output.mp4",
     );
     for await (const progress of thing) {
-      console.log(progress);
+      console.log(progress.percentage);
     }
   },
   sanitizeOps: true,
