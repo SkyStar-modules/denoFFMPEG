@@ -223,7 +223,6 @@ export class FfmpegClass extends Processing {
 
   /**
   Set output fps
-  @deprecated
   @param { number } fps - framerate you want to use
   */
   public outputFPS(fps: number): this {
@@ -231,15 +230,6 @@ export class FfmpegClass extends Processing {
     return this;
   }
 
-  /**
-  Set output format
-  @deprecated
-  @param { string } format - format to use if no extention is provided
-  */
-  public outputFormat(format: string): this {
-    this.outputformat = format;
-    return this;
-  }
   /**
   Set output path and encode input. will return once the render is finished
   @param { string } output - output path

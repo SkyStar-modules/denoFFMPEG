@@ -1,22 +1,22 @@
 import { FfmpegClass } from "../mod.ts";
 Deno.test({
-  name: "outputformat feature",
+  name: "output options",
   fn: async () => {
     await new FfmpegClass({
       ffmpegDir: "ffmpeg",
       input: "./tests/videos/input.mp4",
-    }).outputFormat("mpegts").save("pipe:1");
+    }).save("pipe:1", { f: "mpegts" });
   },
   sanitizeOps: true,
   sanitizeResources: true,
 });
 Deno.test({
-  name: "outputformat feature with progress",
+  name: "output options with progress",
   fn: async () => {
     const thing = new FfmpegClass({
       ffmpegDir: "ffmpeg",
       input: "./tests/videos/input.mp4",
-    }).outputFormat("mpegts").saveWithProgress("pipe:1");
+    }).saveWithProgress("pipe:1", { f: "mpegts" });
     for await (const progress of thing) {
       console.log(progress);
     }

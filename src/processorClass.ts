@@ -15,7 +15,6 @@ Private Class for ffmpeg rendering
 export class Processing {
   protected ffmpegDir = "";
   protected outputFile = "";
-  protected outputformat = "";
   protected input: string[] = [];
   protected outputOptions: string[] = [];
   protected inputOptions: Record<string, string>[] = [];
@@ -242,7 +241,7 @@ export class Processing {
     if (this.abitrate.length > 0) temp = temp.concat(this.abitrate);
     if (this.vbitrate.length > 0) temp = temp.concat(this.vbitrate);
     if (this.fps > 0) temp.push("-r", this.fps.toString());
-    if (this.outputformat !== "") temp.push("-f", this.outputformat);
+    if (this.outputOptions.length > 0) temp = temp.concat(this.outputOptions);
     temp.push("-progress", "pipe:2", this.outputFile);
     return temp;
   }

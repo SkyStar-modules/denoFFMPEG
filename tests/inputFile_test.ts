@@ -60,7 +60,6 @@ Deno.test({
       ffmpegDir: "ffmpeg",
     }).addInput("./tests/videos/concat.txt", { f: "concat" }).save(
       "./tests/videos/output.mp4",
-      { r: "60" },
     );
   },
   sanitizeOps: true,
@@ -73,7 +72,6 @@ Deno.test({
       ffmpegDir: "ffmpeg",
     }).addInput("./tests/videos/concat.txt", { f: "concat" }).saveWithProgress(
       "./tests/videos/output.mp4",
-      { r: "60" },
     );
     for await (const progress of thing) {
       console.log(progress);
