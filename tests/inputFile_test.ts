@@ -54,24 +54,26 @@ Deno.test({
   sanitizeResources: true,
 });
 Deno.test({
-  name: "input options feature",
+  name: "input & output options feature",
   fn: async () => {
     await new FfmpegClass({
       ffmpegDir: "ffmpeg",
     }).addInput("./tests/videos/concat.txt", { f: "concat" }).save(
       "./tests/videos/output.mp4",
+      { r: "60" },
     );
   },
   sanitizeOps: true,
   sanitizeResources: true,
 });
 Deno.test({
-  name: "input options feature with progress",
+  name: "input & output options feature with progress",
   fn: async () => {
     const thing = new FfmpegClass({
       ffmpegDir: "ffmpeg",
     }).addInput("./tests/videos/concat.txt", { f: "concat" }).saveWithProgress(
       "./tests/videos/output.mp4",
+      { r: "60" },
     );
     for await (const progress of thing) {
       console.log(progress);
