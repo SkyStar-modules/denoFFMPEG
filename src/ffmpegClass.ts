@@ -83,7 +83,7 @@ export class FfmpegClass extends Processing {
         this.firstInputIsURL = true;
       }
       this.input.push(input);
-      this.inputOptions.push(options);
+      this.inputOptions.push(options)
     }
     return this;
   }
@@ -129,9 +129,10 @@ export class FfmpegClass extends Processing {
   */
   public audioCodec(
     codec: string,
-    options?: Record<string, string | number>,
+    options: Record<string, string | number> = {},
   ): this {
-    this.audCodec = formatter.codecFormatter("-c:a", codec, options);
+    this.audCodec = ["-c:a", codec];
+    formatter.optionsFormatter(this.audCodec, options);
     return this;
   }
 
@@ -140,8 +141,9 @@ export class FfmpegClass extends Processing {
   @param { string } codec - codec to use for encoding video
   @param { Record<string, string> } options - options to use with codec (usually not used)
   */
-  public videoCodec(codec: string, options?: Record<string, string>): this {
-    this.vidCodec = formatter.codecFormatter("-c:v", codec, options);
+  public videoCodec(codec: string, options: Record<string, string> = {}): this {
+    this.vidCodec = ["-c:v", codec];
+    formatter.optionsFormatter(this.vidCodec, options);
     return this;
   }
 
@@ -239,7 +241,14 @@ export class FfmpegClass extends Processing {
   * set output path and encode input. will return once the render is finished
   @param { string } output - output path
   */
-  public save(output: string): Promise<void> {
+  public save(
+    output: string,
+    options: Record<string, string> = {},
+  ): Promise<void> {
+    formatter.optionsFormatter(
+      this.outputOptions,
+      options,
+    );
     this.outputFile = output;
     return this.__run();
   }

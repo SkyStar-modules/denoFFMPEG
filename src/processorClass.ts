@@ -1,7 +1,7 @@
 import { Globals, Progress } from "./types.ts";
 import { readLines } from "../deps.ts";
 import * as log from "./logger.ts";
-import { globalOptionsFormatter } from "./formatter.ts";
+import { globalOptionsFormatter, optionsFormatter } from "./formatter.ts";
 
 /**
  * Private Class for ffmpeg rendering
@@ -11,6 +11,7 @@ export class Processing {
   protected outputFile = "";
   protected outputformat = "";
   protected input: string[] = [];
+  protected outputOptions: string[] = [];
   protected inputOptions: Record<string, string>[] = [];
   protected vbitrate: string[] = [];
   protected abitrate: string[] = [];
@@ -201,9 +202,7 @@ export class Processing {
 
     for (let i = 0; i < this.input.length; i++) {
       if (this.inputOptions[i]) {
-        Object.entries(this.inputOptions[i]).forEach(([key, value]) => {
-          temp.push("-" + key, value);
-        });
+        optionsFormatter(temp, this.inputOptions[i]);
       }
       temp.push("-i", this.input[i]);
     }
@@ -349,7 +348,7 @@ export class Processing {
     this.Process.close();
 
     if (!status.success) {
-      log.ffmpegError(stderr);
+      log.ffmpegError(stderr + "\nCLI: " + this.__formatting().join(" ") + "\n");
     }
     return;
   }
