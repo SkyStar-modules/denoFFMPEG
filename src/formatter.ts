@@ -1,14 +1,13 @@
 import { Filters, Globals } from "./types.ts";
+
 export function optionsFormatter(
   mutArray: string[],
   options: Record<string, string | number | undefined>,
 ): void {
-  const optArray = Object.entries(options);
-
-  optArray.forEach(([key, value]) => {
+  for (const [key, value] of Object.entries(options)) {
     mutArray.push("-" + key);
     if (value) mutArray.push(value.toString());
-  });
+  }
   return;
 }
 
@@ -28,16 +27,13 @@ export function globalOptionsFormatter(globals: Globals): string[] {
 
 export function filterFormatter(...filters: Filters[]): string[] {
   const filterArr: string[] = [];
-  filters.forEach((x: Filters) => {
-    let temp: string = x.filterName + "=";
-    Object.entries(x.options).forEach(
-      ([key, value], i: number) => {
-        temp += (i > 0) ? `: ${key}=${value}` : `${key}=${value}`;
-      },
+  for (const filter of filters) {
+    let temp: string = filter.filterName + "=";
+    Object.entries(filter.options).forEach(([key, value], i) =>
+      temp += ((i > 0) ? ": " : "") + `${key}=${value}`
     );
-
     filterArr.push(temp);
-  });
+  }
 
   return filterArr;
 }
