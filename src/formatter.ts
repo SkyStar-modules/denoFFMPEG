@@ -25,7 +25,7 @@ export function globalOptionsFormatter(globals: Globals): string[] {
   return temp;
 }
 
-export function filterFormatter(...filters: Filters[]): string[] {
+export function filterFormatter(filters: Filters[]): string[] {
   const filterArr: string[] = [];
   for (const filter of filters) {
     let temp: string = filter.filterName + "=";
