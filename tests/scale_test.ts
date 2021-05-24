@@ -16,8 +16,9 @@ Deno.test({
   fn: async () => {
     const thing = new FfmpegClass({
       input: "./tests/videos/input.mp4",
-    }).setFfmpegPath("ffmpeg").setHeight(710).saveWithProgress(
+    }).setFfmpegPath("ffmpeg").setHeight(710).save(
       "./tests/videos/output.mp4",
+      true,
     );
     for await (const progress of thing) {
       console.log(progress.percentage);
@@ -43,8 +44,9 @@ Deno.test({
   fn: async () => {
     const thing = new FfmpegClass({
       input: "./tests/videos/input.mp4",
-    }).setFfmpegPath("ffmpeg").setWidth(1280).saveWithProgress(
+    }).setFfmpegPath("ffmpeg").setWidth(1280).save(
       "./tests/videos/output.mp4",
+      true,
     );
     for await (const progress of thing) {
       console.log(progress.percentage);
@@ -73,7 +75,7 @@ Deno.test({
     const thing = new FfmpegClass({
       input: "./tests/videos/input.mp4",
     }).setFfmpegPath("ffmpeg").setWidth(1280).setHeight(720)
-      .saveWithProgress("./tests/videos/output.mp4");
+      .save("./tests/videos/output.mp4", true);
     for await (const progress of thing) {
       console.log(progress.percentage);
     }

@@ -18,7 +18,7 @@ Deno.test({
     const thing = new FfmpegClass({
       ffmpegDir: "ffmpeg",
       input: "./tests/videos/input.mp4",
-    }).outputFPS(12).saveWithProgress("./tests/videos/output.mp4");
+    }).outputFPS(12).save("./tests/videos/output.mp4", true);
     for await (const progress of thing) {
       console.log(progress.percentage);
     }

@@ -17,7 +17,7 @@ Deno.test({
     const thing = new FfmpegClass().addInput("./tests/videos/input.mp4")
       .setFfmpegPath(
         "ffmpeg",
-      ).saveWithProgress("./tests/videos/output.mp4");
+      ).save("./tests/videos/output.mp4", true);
     for await (const progress of thing) {
       console.log(progress.percentage);
     }
@@ -44,7 +44,7 @@ Deno.test({
     const thing = new FfmpegClass({
       ffmpegDir: "ffmpeg",
       input: "./tests/videos/input.mp4",
-    }).saveWithProgress("./tests/videos/output.mp4");
+    }).save("./tests/videos/output.mp4", true);
     for await (const progress of thing) {
       console.log(progress.percentage);
     }

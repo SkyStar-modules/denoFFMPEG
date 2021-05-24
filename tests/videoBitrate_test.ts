@@ -18,7 +18,7 @@ Deno.test({
     const progress = new FfmpegClass({
       ffmpegDir: "ffmpeg",
       input: "./tests/videos/input.mp4",
-    }).videoBitrate(1300).saveWithProgress("./tests/videos/output.mp4");
+    }).videoBitrate(1300).save("./tests/videos/output.mp4", true);
     for await (const obj of progress) {
       console.log(obj.percentage);
     }
@@ -45,7 +45,7 @@ Deno.test({
     const progress = new FfmpegClass({
       ffmpegDir: "ffmpeg",
       input: "./tests/videos/input.mp4",
-    }).videoBitrate(1300, false).saveWithProgress("./tests/videos/output.mp4");
+    }).videoBitrate(1300, false).save("./tests/videos/output.mp4", true);
     for await (const obj of progress) {
       console.log(obj.percentage);
     }

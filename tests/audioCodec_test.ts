@@ -22,8 +22,9 @@ Deno.test({
     const thing = new FfmpegClass({
       ffmpegDir: "ffmpeg",
       input: "./tests/videos/input.mp4",
-    }).audioCodec("libmp3lame", options).saveWithProgress(
+    }).audioCodec("libmp3lame", options).save(
       "./tests/videos/output.mp4",
+      true,
     );
     for await (const progress of thing) {
       console.log(progress.percentage);
