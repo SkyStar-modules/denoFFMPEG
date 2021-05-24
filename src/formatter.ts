@@ -1,4 +1,4 @@
-import { Filters, Globals } from "./types.ts";
+import type { Filters, Globals } from "./types.ts";
 
 export function optionsFormatter(
   mutArray: string[],
