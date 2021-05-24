@@ -1,6 +1,6 @@
 name: Testing
 
-on: 
+on:
   push:
     branches:
       - main
@@ -21,7 +21,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Setup Deno
-      - uses: denoland/setup-deno@v1
+        uses: denoland/setup-deno@v1
         with:
           deno-version: ${{ matrix.deno }}
 
