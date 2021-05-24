@@ -1,4 +1,4 @@
-import { Filters, Globals, Progress, Spawn } from "./types.ts";
+import { Filters, Globals, Progress, ProgressPiped, Spawn } from "./types.ts";
 import {
   FfmpegError,
   FormatError,
@@ -288,12 +288,49 @@ export class FfmpegClass {
   /**
   Set output path and encode input. will return once the render is finished
   @param { string } output - output path
-  @returns { Promise<void | Uint8Array> | AsyncGenerator<Progress> } - returns void, Uint8Array or asyncGenerator depending on settings
+  */
+  public save(
+    output: "pipe:1",
+    iterator?: false,
+    options?: Record<string, string | number | undefined>,
+  ): Promise<Uint8Array>;
+
+  /**
+  Set output path and encode input. will return once the render is finished
+  @param { string } output - output path
+  */
+  public save(
+    output: string,
+    iterator?: false,
+    options?: Record<string, string | number | undefined>,
+  ): Promise<void>;
+
+  /**
+  Set output path and encode input. will return once the render is finished
+  */
+  public save(
+    output: "pipe:1",
+    iterator?: true,
+    options?: Record<string, string | number | undefined>,
+  ): AsyncGenerator<ProgressPiped>;
+
+  /**
+  Set output path and encode input. will return once the render is finished
+  */
+  public save(
+    output: string,
+    iterator?: true,
+    options?: Record<string, string | number | undefined>,
+  ): AsyncGenerator<Progress>;
+
+  /**
+  Set output path and encode input. will return once the render is finished
+  @param { string } output - output path
   */
   public save(
     output: string | "pipe:1",
-    options: Record<string, string | number | undefined> = {},
     iterator?: boolean,
+    options: Record<string, string | number | undefined> = {},
   ): Promise<void | Uint8Array> | AsyncGenerator<Progress> {
     this.#outputFile = output;
     this.#pipedOutput = output === "pipe:1";
@@ -377,7 +414,9 @@ export class FfmpegClass {
               (currentFrame / totalFrames * 100).toFixed(2),
             ),
           };
-          if (this.#pipedOutput) progressOBJ.pipedData = new Uint8Array();
+          if (this.#pipedOutput) {
+            (progressOBJ as ProgressPiped).pipedData = new Uint8Array();
+          }
           if (
             !isNaN(totalFrames) && !isNaN(currentFrame) && !isNaN(currentFPS) &&
             currentFPS !== 0 && progressOBJ.percentage < 100
@@ -400,7 +439,9 @@ export class FfmpegClass {
       ETA: new Date(),
       percentage: 100,
     };
-    if (this.#pipedOutput) finalIter.pipedData = await this.#Process.output();
+    if (this.#pipedOutput) {
+      (finalIter as ProgressPiped).pipedData = await this.#Process.output();
+    }
     yield finalIter;
     await this.__closeProcess(true);
     return;
@@ -622,18 +663,19 @@ export class FfmpegClass {
     hasProgress: boolean,
   ): Promise<void | Uint8Array> {
     let stderr = this.#stderr.join("");
+    let buff: Uint8Array = new Uint8Array();
+    if (this.#pipedOutput && !hasProgress) {
+      buff = await this.#Process.output();
+    }
     if (!hasProgress) {
       stderr = new TextDecoder().decode(await this.#Process.stderrOutput());
     } else {
       this.#Process.stderr!.close();
     }
-    let buff: Uint8Array = new Uint8Array();
-    if (this.#pipedOutput && !hasProgress) buff = await this.#Process.output();
     const status = await this.#Process.status();
     this.#Process.close();
-
     if (!status.success) throw new FfmpegError(stderr);
-    if (this.#pipedOutput && !hasProgress) return buff;
+    if (this.#pipedOutput && !hasProgress && buff) return buff;
     return;
   }
 
