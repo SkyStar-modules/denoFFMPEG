@@ -1,4 +1,4 @@
-import { Filters, Globals, Progress, ProgressPiped, Spawn } from "./types.ts";
+import { Filters, Globals, Progress, Spawn } from "./types.ts";
 import {
   FfmpegError,
   FormatError,
@@ -9,9 +9,6 @@ import {
 import { readLines } from "../deps.ts";
 import * as formatter from "./formatter.ts";
 
-/**
-* Public Class for ffmpeg rendering
-*/
 export class FfmpegClass {
   #ffmpegDir = "";
   #outputFile: string | "pipe:1" = "";
@@ -41,9 +38,22 @@ export class FfmpegClass {
   #pipedInput: Uint8Array = new Uint8Array();
   #Process!: Deno.Process;
 
-  /**
-  Make new ffmpeg instance.
-  @param { Spawn } options - Spawn options
+  /** ### Create a new instance of ffmpeg
+  * #### Example
+  * ```ts
+  * import { FfmpegClass } from "../mod.ts";
+  *
+  * const ffmpeg = new FfmpegClass({
+  *     // Optional
+  *     threads: 5,
+  *     // Optional. can be set via `FfmpegClass#setFfmpegPath()`
+  *     ffmpegDir: "ffmpeg",
+  *     // Ignored on windows (should range between -20 and 20)
+  *     niceness: 20,
+  *     // Optional. can be set via `FfmpegClass#addInput()`
+  *     input: "./tests/videos/input.mp4",
+  * });
+  * ```
   */
   public constructor(options?: Spawn) {
     if (options) {
@@ -79,9 +89,16 @@ export class FfmpegClass {
     return this;
   }
 
-  /**
-  Set path to the ffmpeg binary file
-  @param { string } ffmpegPath
+  /** ### Set ffmpeg path
+  * #### Example
+  * ```ts
+  * import { FfmpegClass } from "../mod.ts"
+  *
+  * const ffmpeg = new FfmpegClass();
+  *
+  * ffmpeg.setFfmpegPath("./somedir/binary");
+  * ffmpeg.setFfmpegPath("ffmpeg"); // this works as long as ffmpeg is in your PATH
+  * ```
   */
   public setFfmpegPath(ffmpegPath: string): this {
     if (ffmpegPath) {
@@ -95,32 +112,55 @@ export class FfmpegClass {
     return this;
   }
 
-  /**
-  Set amount of threads
-  @param { number } amount - Amount of threads to use
+  /** ### Set amount of threads
+  * #### Example
+  * ```ts
+  * import { FfmpegClass } from "../mod.ts"
+  *
+  * const ffmpeg = new FfmpegClass();
+  *
+  * ffmpeg.threads(1);
+  * ffmpeg.threads(16);
+  * ```
   */
   public threads(amount: number): this {
     this.#threadCount = amount;
     return this;
   }
 
-  /**
-  Set path to the inputfile
-  @param { string } input - input file
-  @param { Record<string, string | undefined> } options - Options for input
+  /** ### Add a input
+  * #### Example
+  * ```ts
+  * import { FfmpegClass } from "../mod.ts"
+  *
+  * const ffmpeg = new FfmpegClass();
+  *
+  * ffmpeg.addInput("file.mp4");
+  * ffmpeg.addInput("https://some.link/file.mp4");
+  * ffmpeg.addInput("./tests/videos/concat.txt", { f: "concat" });
+  * ```
   */
   public addInput(
     input: string,
     options?: Record<string, string | undefined>,
   ): this;
-  /**
-  Set path to the inputfile
-  @param { Uint8Array } input - input data for pipes
+
+  /** ### Add a input
+  * #### Example
+  * ```ts
+  * import { FfmpegClass } from "../mod.ts"
+  *
+  * const ffmpeg = new FfmpegClass();
+  * const binaryData = await Deno.readFile("file.mp4");
+  *
+  * ffmpeg.addInput(binaryData);
+  * ```
   */
   public addInput(
     input: Uint8Array,
     options?: Record<string, string | undefined>,
   ): this;
+
   public addInput(
     input: string | Uint8Array,
     options: Record<string, string | undefined> = {},
@@ -138,44 +178,77 @@ export class FfmpegClass {
     return this;
   }
 
-  /**
-  Disable Audio and remove all audio settings
+  /** ### Disable audio
+  * #### Example
+  * ```ts
+  * import { FfmpegClass } from "../mod.ts"
+  *
+  * const ffmpeg = new FfmpegClass();
+  *
+  * ffmpeg.noAudio();
+  * ```
   */
   public noAudio(): this {
     this.#noAudio = true;
     return this;
   }
 
-  /**
-  Disable video and remove all video settings
+  /** ### Disable video
+  * #### Example
+  * ```ts
+  * import { FfmpegClass } from "../mod.ts"
+  *
+  * const ffmpeg = new FfmpegClass();
+  *
+  * ffmpeg.noVideo();
+  * ```
   */
   public noVideo(): this {
     this.#noVideo = true;
     return this;
   }
 
-  /**
-  Set height of the video
-  @param { number } height - height of the output
+  /** ### Set the frame height
+  * #### Example
+  * ```ts
+  * import { FfmpegClass } from "../mod.ts"
+  *
+  * const ffmpeg = new FfmpegClass();
+  *
+  * ffmpeg.setHeight(720);
+  * ffmpeg.setHeight(-1); // Auto scales to aspect ratio
+  * ```
   */
   public setHeight(height: number): this {
     this.#height = height;
     return this;
   }
 
-  /**
-  Set width of the video
-  @param { number } width - width of the output
+  /** ### Set the frame width
+  * #### Example
+  * ```ts
+  * import { FfmpegClass } from "../mod.ts"
+  *
+  * const ffmpeg = new FfmpegClass();
+  *
+  * ffmpeg.setWidth(720);
+  * ffmpeg.setWidth(-1); // Auto scales to aspect ratio
+  * ```
   */
   public setWidth(width: number): this {
     this.#width = width;
     return this;
   }
 
-  /**
-  Set audio codec
-  @param { string } codec - codec to use for encoding audio
-  @param { Record<string, string | number | undefined> } options - options to use with codec (usually not used)
+  /** ### Set the audio codec
+  * #### Example
+  * ```ts
+  * import { FfmpegClass } from "../mod.ts"
+  *
+  * const ffmpeg = new FfmpegClass();
+  *
+  * ffmpeg.audioCodec("libmp3lame");
+  * ```
   */
   public audioCodec(
     codec: string,
@@ -186,10 +259,15 @@ export class FfmpegClass {
     return this;
   }
 
-  /**
-  Set video codec
-  @param { string } codec - codec to use for encoding video
-  @param { Record<string, string | undefined> } options - options to use with codec (usually not used)
+  /** ### Set the video codec
+  * #### Example
+  * ```ts
+  * import { FfmpegClass } from "../mod.ts"
+  *
+  * const ffmpeg = new FfmpegClass();
+  *
+  * ffmpeg.videoCodec("libx264");
+  * ```
   */
   public videoCodec(
     codec: string,
@@ -200,9 +278,15 @@ export class FfmpegClass {
     return this;
   }
 
-  /**
-  Set audio bitrate in kbps
-  @param { number } bitrate - audio bitrate to use
+  /** ### Set the audio bitrate in kbps
+  * #### Example
+  * ```ts
+  * import { FfmpegClass } from "../mod.ts"
+  *
+  * const ffmpeg = new FfmpegClass();
+  *
+  * ffmpeg.audioBitrate(128);
+  * ```
   */
   public audioBitrate(bitrate: number): this {
     this.#audioBitrate = bitrate * 1024;
@@ -210,83 +294,160 @@ export class FfmpegClass {
     return this;
   }
 
-  /**
-  Set video bitrate in mbps or kbps
-  @param { number | string } bitrate - bitrate use bitrate you want in mbps(15m) or kbps(15000k)
-  @param cbr - enable constant bitrate (default = true)
+  /** ### Set the video bitrate in kbps or mbps
+  * #### Example
+  * ```ts
+  * import { FfmpegClass } from "../mod.ts"
+  *
+  * const ffmpeg = new FfmpegClass();
+  *
+  * ffmpeg.videoBitrate("10m"); // 10 mbps with cbr enabled
+  * ffmpeg.videoBitrate("1000k"); // 1000 kbps with cbr enabled
+  * ffmpeg.videoBitrate("1000k", true); // 1000 kbps with cbr enabled
+  * ffmpeg.videoBitrate("1000k", false); // 1000 kbps with vbr enabled
+  * ```
   */
-  public videoBitrate(bitrate: number | string, cbr = true): this {
-    const brString = String(bitrate);
-    this.#videoBitrate = parseInt(brString);
-    let lastChar = brString.charAt(brString.length - 1).toLowerCase();
+  public videoBitrate(bitrate: string, cbr = true): this {
+    this.#videoBitrate = parseInt(bitrate);
+    let lastChar = bitrate.charAt(bitrate.length - 1).toLowerCase();
     if (lastChar !== "m" && lastChar !== "k") {
       lastChar = "k";
     }
     if (cbr) {
       this.#videoBitrateOptions = [
         "-maxrate",
-        brString,
+        bitrate,
         "-minrate",
-        brString,
+        bitrate,
         "-b:v",
-        brString,
+        bitrate,
         "-bufsize",
         "3M",
       ];
     } else {
       this.#videoBitrateOptions = [
         "-maxrate",
-        (parseFloat(brString) * 2 + lastChar).toString(),
+        (parseFloat(bitrate) * 2 + lastChar).toString(),
         "-minrate",
-        (parseFloat(brString) / 3).toString(),
+        (parseFloat(bitrate) / 3).toString(),
         "-b:v",
-        brString.toString(),
+        bitrate,
         "-bufsize",
-        (parseFloat(brString) * 4).toString(),
+        (parseFloat(bitrate) * 4).toString(),
       ];
     }
     return this;
   }
 
-  /**
-  Set audio filters
-  @param { Filters[] } fiters - Filters Array of filter Objects you want to use for processing
+  /** ### Set audio filters
+  * #### Example
+  * ```ts
+  * import { FfmpegClass } from "../mod.ts"
+  *
+  * const ffmpeg = new FfmpegClass();
+  *
+  * ffmpeg.audioFilters(
+  *     {
+  *       filterName: "afade",
+  *       options: {
+  *         t: "in",
+  *         ss: 0,
+  *         d: 15,
+  *       },
+  *     },
+  *     {
+  *       filterName: "afade",
+  *       options: {
+  *         t: "out",
+  *         ss: 0,
+  *         d: 15,
+  *       },
+  *     },
+  * );
+  *
+  * ```
   */
   public audioFilters(...filters: Filters[]): this {
     this.#audioFilter = formatter.filterFormatter(filters);
     return this;
   }
 
-  /**
-  Set video filters
-  @param { Filters[] } Filters - Filters Array of filter Objects you want to use for processing
+  /** ### Set complex filters
+  * #### Example
+  * ```ts
+  * import { FfmpegClass } from "../mod.ts"
+  *
+  * const ffmpeg = new FfmpegClass();
+  *
+  * ffmpeg.complexFilters(
+  *     {
+  *       filterName: "overlay",
+  *       options: {
+  *         x: "150",
+  *       },
+  *     },
+  * );
+  *
+  * ```
   */
   public complexFilters(...Filters: Filters[]): this {
     this.#complexFilter = formatter.filterFormatter(Filters);
     return this;
   }
 
-  /**
-  Set video filters
-  @param { Filters[] } Filters - Filters Array of filter Objects you want to use for processing
+  /** ### Set video filters
+  * #### Example
+  * ```ts
+  * import { FfmpegClass } from "../mod.ts"
+  *
+  * const ffmpeg = new FfmpegClass();
+  *
+  * ffmpeg.videoFilters(
+  *     {
+  *       filterName: "drawtext",
+  *       options: {
+  *         text: "thingy",
+  *         fontsize: "60",
+  *         x: (856 / 2 - 30 * "thingy".length / 2),
+  *         y: "H-240",
+  *         fontcolor: "white",
+  *         shadowcolor: "black",
+  *         shadowx: "2",
+  *         shadowy: "2",
+  *       },
+  *     },
+  * );
+  *
+  * ```
   */
   public videoFilters(...Filters: Filters[]): this {
     this.#videoFilter = formatter.filterFormatter(Filters);
     return this;
   }
 
-  /**
-  Set output fps
-  @param { number } fps - framerate you want to use
+  /** ### Set output framerate
+  * #### Example
+  * ```ts
+  * import { FfmpegClass } from "../mod.ts"
+  *
+  * const ffmpeg = new FfmpegClass();
+  *
+  * ffmpeg.outputFPS(60);
   */
   public outputFPS(fps: number): this {
     this.#outputFPS = fps;
     return this;
   }
 
-  /**
-  Set output path and encode input. will return once the render is finished
-  @param { string } output - output path
+  /** ### Start render and get Uint8Array
+  * #### Example
+  * ```ts
+  * import { FfmpegClass } from "../mod.ts"
+  *
+  * const ffmpeg = new FfmpegClass();
+  *
+  * const data = await ffmpeg.save("pipe:1");
+  * ```
   */
   public save(
     output: "pipe:1",
@@ -294,9 +455,15 @@ export class FfmpegClass {
     options?: Record<string, string | number | undefined>,
   ): Promise<Uint8Array>;
 
-  /**
-  Set output path and encode input. will return once the render is finished
-  @param { string } output - output path
+  /** ### Start render and save to disk
+  * #### Example
+  * ```ts
+  * import { FfmpegClass } from "../mod.ts"
+  *
+  * const ffmpeg = new FfmpegClass();
+  *
+  * await ffmpeg.save("outputfile.mp4");
+  * ```
   */
   public save(
     output: string,
@@ -304,8 +471,19 @@ export class FfmpegClass {
     options?: Record<string, string | number | undefined>,
   ): Promise<void>;
 
-  /**
-  Set output path and encode input. will return once the render is finished
+  /** ### Start render with iterator
+  * #### Example
+  * ```ts
+  * import { FfmpegClass } from "../mod.ts"
+  *
+  * const ffmpeg = new FfmpegClass();
+  *
+  * const iterator = await ffmpeg.save("outputfile.mp4", true);
+  *
+  * for await (const iter of iterator) {
+  *     console.log(iter.percentage)
+  * }
+  * ```
   */
   public save(
     output: string,
@@ -313,10 +491,6 @@ export class FfmpegClass {
     options?: Record<string, string | number | undefined>,
   ): Promise<AsyncGenerator<Progress>>;
 
-  /**
-  Set output path and encode input. will return once the render is finished
-  @param { string } output - output path
-  */
   public async save(
     output: string | "pipe:1",
     iterator = false,
