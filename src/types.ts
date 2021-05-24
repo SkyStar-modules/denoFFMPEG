@@ -15,12 +15,6 @@ export interface Progress {
   percentage: number;
 }
 
-export interface ProgressPiped {
-  ETA: Date;
-  percentage: number;
-  pipedData: Uint8Array;
-}
-
 export interface Globals {
   ffmpegdir: string;
   niceness: number;
