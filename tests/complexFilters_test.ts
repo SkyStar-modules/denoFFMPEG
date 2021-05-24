@@ -4,7 +4,6 @@ const link =
   "https://cdn.discordapp.com/attachments/467182812382887936/800066821713297448/zZpCsH2uswobVSd2L2OplA4ad59L2arVxYtsFpJSEc3hqYB5DeyhfosH8VO4hgOUxi9oJHsRNHFsUQEV98au4w.png";
 
 const overlay: Filters = {
-  complex: true,
   filterName: "overlay",
   options: {
     x: "150",
