@@ -523,10 +523,6 @@ export class FfmpegClass {
     return !iterator ? this.__closeProcess(false) : this.__getProgress();
   }
 
-  /**
-  Get the progress of the ffmpeg instancegenerator
-  @returns { AsyncGenerator<Progress> } - Returns async iterable
-  */
   private async *__getProgress(): AsyncGenerator<Progress> {
     let i = 1;
     let stderrStart = true;
@@ -624,9 +620,6 @@ export class FfmpegClass {
     return;
   }
 
-  /**
-  Clear all filters and everything for audio or video
-  */
   private __clear(input: string): void {
     if (input.toLowerCase() === "audio") {
       if (this.#audioBitrate !== 0) {
@@ -678,9 +671,6 @@ export class FfmpegClass {
     return;
   }
 
-  /**
-  Format & process all data to run ffmpeg
-  */
   private __formatting(): string[] {
     const thing: Globals = {
       ffmpegdir: this.#ffmpegDir,
@@ -735,9 +725,6 @@ export class FfmpegClass {
     return temp;
   }
 
-  /**
-  Check's for common error's made by the user
-  */
   private __errorCheck(): void {
     const errors: string[] = [];
     if (this.#outputFPS > 0 && isNaN(this.#outputFPS)) {
@@ -833,9 +820,6 @@ export class FfmpegClass {
     return;
   }
 
-  /**
-  Wait method for run
-  */
   private async __closeProcess(
     hasProgress: boolean,
   ): Promise<void | Uint8Array> {
@@ -857,6 +841,14 @@ export class FfmpegClass {
   }
 }
 
+/** ### Create a new instance of FfmpegClass
+  * #### Example
+  * ```ts
+  * import { ffmpeg } from "../mod.ts"
+  *
+  * const instance = ffmpeg();
+  * ```
+  */
 export function ffmpeg(options?: Spawn): FfmpegClass {
   return new FfmpegClass(options);
 }
