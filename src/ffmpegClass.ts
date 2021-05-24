@@ -311,17 +311,17 @@ export class FfmpegClass {
     output: string,
     iterator?: true,
     options?: Record<string, string | number | undefined>,
-  ): AsyncGenerator<Progress>;
+  ): Promise<AsyncGenerator<Progress>>;
 
   /**
   Set output path and encode input. will return once the render is finished
   @param { string } output - output path
   */
-  public save(
+  public async save(
     output: string | "pipe:1",
     iterator = false,
     options: Record<string, string | number | undefined> = {},
-  ): Promise<void | Uint8Array> | AsyncGenerator<Progress> {
+  ): Promise<void | Uint8Array | AsyncGenerator<Progress>> {
     this.#outputFile = output;
     this.#pipedOutput = output === "pipe:1";
     formatter.optionsFormatter(
@@ -332,16 +332,20 @@ export class FfmpegClass {
     this.__errorCheck();
     this.#Process = Deno.run({
       cmd: this.__formatting(),
+      stdin: this.#pipedInput.length > 0 ? "piped" : "null",
       stderr: "piped",
       stdout: this.#pipedOutput ? "piped" : "null",
     });
 
-    if (this.#pipedOutput && iterator) {
+    if ((this.#pipedInput.length > 0 || this.#pipedOutput) && iterator) {
       throw new FfmpegError(
         "Cannot use iterator and piped stream\nThis will result in a deadlock",
       );
     }
-
+    if (this.#pipedInput.length > 0) {
+      await this.#Process.stdin?.write(this.#pipedInput);
+      this.#Process.stdin?.close();
+    }
     return !iterator ? this.__closeProcess(false) : this.__getProgress();
   }
 
