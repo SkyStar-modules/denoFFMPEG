@@ -28,4 +28,4 @@ jobs:
         uses: FedericoCarboni/setup-ffmpeg@v1
 
       - name: Run tests
-        run: deno test -A --fail-fast tests
+        run: deno test --doc src/ffmpegClass.ts && deno test -A --fail-fast tests
