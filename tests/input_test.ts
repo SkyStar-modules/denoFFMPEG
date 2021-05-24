@@ -1,4 +1,5 @@
 import { FfmpegClass } from "../mod.ts";
+const data = await Deno.readFile("./tests/videos/input.ts");
 
 Deno.test({
   name: "inputFile feature",
@@ -14,7 +15,7 @@ Deno.test({
 Deno.test({
   name: "inputFile feature with progress",
   fn: async () => {
-    const thing = new FfmpegClass({
+    const thing = await new FfmpegClass({
       ffmpegDir: "ffmpeg",
     }).addInput("./tests/videos/input.mp4").save(
       "./tests/videos/output.mp4",
@@ -44,7 +45,7 @@ Deno.test({
 Deno.test({
   name: "double input feature with progress",
   fn: async () => {
-    const thing = new FfmpegClass({
+    const thing = await new FfmpegClass({
       ffmpegDir: "ffmpeg",
     }).addInput("./tests/videos/input.mp4").addInput(
       "./tests/videos/another.mp4",
@@ -58,7 +59,7 @@ Deno.test({
 });
 
 Deno.test({
-  name: "input options feature",
+  name: "input options concat feature",
   fn: async () => {
     await new FfmpegClass({
       ffmpegDir: "ffmpeg",
@@ -71,9 +72,9 @@ Deno.test({
 });
 
 Deno.test({
-  name: "input options feature with progress",
+  name: "input options concat feature with progress",
   fn: async () => {
-    const thing = new FfmpegClass({
+    const thing = await new FfmpegClass({
       ffmpegDir: "ffmpeg",
     }).addInput("./tests/videos/concat.txt", { f: "concat" }).save(
       "./tests/videos/output.mp4",
@@ -82,6 +83,17 @@ Deno.test({
     for await (const progress of thing) {
       console.log(progress.percentage);
     }
+  },
+  sanitizeOps: true,
+  sanitizeResources: true,
+});
+
+Deno.test({
+  name: "input pipe feature",
+  fn: async () => {
+    await new FfmpegClass({
+      ffmpegDir: "ffmpeg",
+    }).addInput(data, { f: "mpegts" }).save("./tests/videos/output.mp4");
   },
   sanitizeOps: true,
   sanitizeResources: true,

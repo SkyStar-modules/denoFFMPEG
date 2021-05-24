@@ -15,7 +15,7 @@ Deno.test({
 Deno.test({
   name: "SaveWithProgress feature",
   fn: async () => {
-    const thing = new FfmpegClass({
+    const thing = await new FfmpegClass({
       ffmpegDir: "ffmpeg",
       input: "./tests/videos/input.mp4",
     }).save("./tests/videos/output.mp4", true);

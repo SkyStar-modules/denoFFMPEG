@@ -25,7 +25,7 @@ Deno.test({
 Deno.test({
   name: "audioFilters feature with progress",
   fn: async () => {
-    const thing = new FfmpegClass({
+    const thing = await new FfmpegClass({
       input: "./tests/videos/input.mp4",
     }).setFfmpegPath("ffmpeg").audioFilters(filter)
       .save("./tests/videos/output.mp4", true);

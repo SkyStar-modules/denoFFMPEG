@@ -15,7 +15,7 @@ Deno.test({
 Deno.test({
   name: "audiobitrate feature with progress",
   fn: async () => {
-    const thing = new FfmpegClass({
+    const thing = await new FfmpegClass({
       ffmpegDir: "ffmpeg",
       input: "./tests/videos/input.mp4",
     }).audioBitrate(8).save("./tests/videos/output.mp4", true);

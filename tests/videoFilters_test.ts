@@ -31,7 +31,7 @@ Deno.test({
 Deno.test({
   name: "simple videoFilter feature with progress",
   fn: async () => {
-    const thing = new FfmpegClass({
+    const thing = await new FfmpegClass({
       ffmpegDir: "ffmpeg",
       input: "./tests/videos/input.mp4",
     }).videoFilters(text).save("./tests/videos/output.mp4", true);

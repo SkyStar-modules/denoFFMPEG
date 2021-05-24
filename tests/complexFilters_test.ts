@@ -26,7 +26,7 @@ Deno.test({
 Deno.test({
   name: "complex videoFilter feature with progress",
   fn: async () => {
-    const thing = new FfmpegClass({
+    const thing = await new FfmpegClass({
       ffmpegDir: "ffmpeg",
       input: "./tests/videos/input.mp4",
     }).addInput(link).complexFilters(overlay).save(

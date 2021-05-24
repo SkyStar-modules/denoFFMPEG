@@ -14,7 +14,7 @@ Deno.test({
 Deno.test({
   name: "setHeight feature with progress",
   fn: async () => {
-    const thing = new FfmpegClass({
+    const thing = await new FfmpegClass({
       input: "./tests/videos/input.mp4",
     }).setFfmpegPath("ffmpeg").setHeight(710).save(
       "./tests/videos/output.mp4",
@@ -42,7 +42,7 @@ Deno.test({
 Deno.test({
   name: "setWidth feature with progress",
   fn: async () => {
-    const thing = new FfmpegClass({
+    const thing = await new FfmpegClass({
       input: "./tests/videos/input.mp4",
     }).setFfmpegPath("ffmpeg").setWidth(1280).save(
       "./tests/videos/output.mp4",
@@ -72,7 +72,7 @@ Deno.test({
 Deno.test({
   name: "setHeight+setWidth feature with progress",
   fn: async () => {
-    const thing = new FfmpegClass({
+    const thing = await new FfmpegClass({
       input: "./tests/videos/input.mp4",
     }).setFfmpegPath("ffmpeg").setWidth(1280).setHeight(720)
       .save("./tests/videos/output.mp4", true);

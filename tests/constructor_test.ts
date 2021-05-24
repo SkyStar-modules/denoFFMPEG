@@ -14,7 +14,7 @@ Deno.test({
 Deno.test({
   name: "empty constructor feature with progress",
   fn: async () => {
-    const thing = new FfmpegClass().addInput("./tests/videos/input.mp4")
+    const thing = await new FfmpegClass().addInput("./tests/videos/input.mp4")
       .setFfmpegPath(
         "ffmpeg",
       ).save("./tests/videos/output.mp4", true);
@@ -41,7 +41,7 @@ Deno.test({
 Deno.test({
   name: "full constructor feature with progress",
   fn: async () => {
-    const thing = new FfmpegClass({
+    const thing = await new FfmpegClass({
       ffmpegDir: "ffmpeg",
       input: "./tests/videos/input.mp4",
     }).save("./tests/videos/output.mp4", true);

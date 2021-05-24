@@ -15,7 +15,7 @@ Deno.test({
 Deno.test({
   name: "noAudio feature with progress",
   fn: async () => {
-    const thing = new FfmpegClass({
+    const thing = await new FfmpegClass({
       ffmpegDir: "ffmpeg",
       input: "./tests/videos/input.mp4",
     }).noAudio().save("./tests/videos/output.mp4", true);
@@ -42,7 +42,7 @@ Deno.test({
 Deno.test({
   name: "noVideo feature with progress",
   fn: async () => {
-    const thing = new FfmpegClass({
+    const thing = await new FfmpegClass({
       ffmpegDir: "ffmpeg",
       input: "./tests/videos/input.mp4",
     }).noVideo().save("./tests/videos/output.mp4", true);

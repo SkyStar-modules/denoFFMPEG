@@ -18,7 +18,7 @@ Deno.test({
 Deno.test({
   name: "http constructor feature with progress",
   fn: async () => {
-    const thing = new FfmpegClass({
+    const thing = await new FfmpegClass({
       ffmpegDir: "ffmpeg",
       input: link,
     }).save("./tests/videos/output.mp4", true);
@@ -44,7 +44,7 @@ Deno.test({
 Deno.test({
   name: "http inputFile feature with progress",
   fn: async () => {
-    const thing = new FfmpegClass({
+    const thing = await new FfmpegClass({
       ffmpegDir: "ffmpeg",
     }).addInput(link).save("./tests/videos/output.mp4", true);
     for await (const progress of thing) {
