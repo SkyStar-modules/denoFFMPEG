@@ -329,16 +329,6 @@ let render = ffmpeg().complexFilters(
 await render.save("video.mp4");
 ```
 
-# Releases
-
-Currently I have 2 branches.\
-Dev which will get all the latest pushes and commit's after v2.1\
-and I have main which will be all official releases like v2.1 and v2.2 etc.\
-The dev branch might be unstable or broken but it will have the latest
-features.\
-These features may not be documented yet!
-<br><br>
-
 # Authors & Acknowledgments
 
 - Skyler "MierenMans" van Boheemen - Author
