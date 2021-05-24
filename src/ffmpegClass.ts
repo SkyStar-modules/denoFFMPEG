@@ -618,9 +618,7 @@ export class FfmpegClass {
       ETA: new Date(),
       percentage: 100,
     };
-    if (this.#pipedOutput) {
-      (finalIter as ProgressPiped).pipedData = await this.#Process.output();
-    }
+
     yield finalIter;
     await this.__closeProcess(true);
     return;
