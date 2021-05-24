@@ -116,7 +116,6 @@ export class FfmpegClass {
   /**
   Set path to the inputfile
   @param { Uint8Array } input - input data for pipes
-  @param { Record<string, string | undefined> } options - Options for input
   */
   public addInput(
     input: Uint8Array,
@@ -309,15 +308,6 @@ export class FfmpegClass {
   Set output path and encode input. will return once the render is finished
   */
   public save(
-    output: "pipe:1",
-    iterator?: true,
-    options?: Record<string, string | number | undefined>,
-  ): AsyncGenerator<ProgressPiped>;
-
-  /**
-  Set output path and encode input. will return once the render is finished
-  */
-  public save(
     output: string,
     iterator?: true,
     options?: Record<string, string | number | undefined>,
@@ -329,7 +319,7 @@ export class FfmpegClass {
   */
   public save(
     output: string | "pipe:1",
-    iterator?: boolean,
+    iterator = false,
     options: Record<string, string | number | undefined> = {},
   ): Promise<void | Uint8Array> | AsyncGenerator<Progress> {
     this.#outputFile = output;
@@ -338,14 +328,28 @@ export class FfmpegClass {
       this.#outputOptions,
       options,
     );
-    return this.__run(iterator);
+
+    this.__errorCheck();
+    this.#Process = Deno.run({
+      cmd: this.__formatting(),
+      stderr: "piped",
+      stdout: this.#pipedOutput ? "piped" : "null",
+    });
+
+    if (this.#pipedOutput && iterator) {
+      throw new FfmpegError(
+        "Cannot use iterator and piped stream\nThis will result in a deadlock",
+      );
+    }
+
+    return !iterator ? this.__closeProcess(false) : this.__getProgress();
   }
 
   /**
   Get the progress of the ffmpeg instancegenerator
   @returns { AsyncGenerator<Progress> } - Returns async iterable
   */
-  protected async *__getProgress(): AsyncGenerator<Progress> {
+  private async *__getProgress(): AsyncGenerator<Progress> {
     let i = 1;
     let stderrStart = true;
     let timeS = 0;
@@ -414,9 +418,6 @@ export class FfmpegClass {
               (currentFrame / totalFrames * 100).toFixed(2),
             ),
           };
-          if (this.#pipedOutput) {
-            (progressOBJ as ProgressPiped).pipedData = new Uint8Array();
-          }
           if (
             !isNaN(totalFrames) && !isNaN(currentFrame) && !isNaN(currentFPS) &&
             currentFPS !== 0 && progressOBJ.percentage < 100
@@ -677,21 +678,6 @@ export class FfmpegClass {
     if (!status.success) throw new FfmpegError(stderr);
     if (this.#pipedOutput && !hasProgress && buff) return buff;
     return;
-  }
-
-  /**
-  Run method without progress data
-  */
-  protected __run(
-    iterator: boolean | undefined = false,
-  ): Promise<void | Uint8Array> | AsyncGenerator<Progress> {
-    this.__errorCheck();
-    this.#Process = Deno.run({
-      cmd: this.__formatting(),
-      stderr: "piped",
-      stdout: this.#pipedOutput ? "piped" : "null",
-    });
-    return !iterator ? this.__closeProcess(false) : this.__getProgress();
   }
 }
 
