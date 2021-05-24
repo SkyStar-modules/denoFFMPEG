@@ -6,7 +6,7 @@ Deno.test({
     await new FfmpegClass({
       ffmpegDir: "ffmpeg",
       input: "./tests/videos/input.mp4",
-    }).videoBitrate(1300).save("./tests/videos/output.mp4");
+    }).videoBitrate("1300").save("./tests/videos/output.mp4");
   },
   sanitizeOps: true,
   sanitizeResources: true,
@@ -18,7 +18,7 @@ Deno.test({
     const progress = await new FfmpegClass({
       ffmpegDir: "ffmpeg",
       input: "./tests/videos/input.mp4",
-    }).videoBitrate(1300).save("./tests/videos/output.mp4", true);
+    }).videoBitrate("1300").save("./tests/videos/output.mp4", true);
     for await (const obj of progress) {
       console.log(obj.percentage);
     }
@@ -33,7 +33,7 @@ Deno.test({
     await new FfmpegClass({
       ffmpegDir: "ffmpeg",
       input: "./tests/videos/input.mp4",
-    }).videoBitrate(1300, false).save("./tests/videos/output.mp4");
+    }).videoBitrate("1300", false).save("./tests/videos/output.mp4");
   },
   sanitizeOps: true,
   sanitizeResources: true,
@@ -45,7 +45,7 @@ Deno.test({
     const progress = await new FfmpegClass({
       ffmpegDir: "ffmpeg",
       input: "./tests/videos/input.mp4",
-    }).videoBitrate(1300, false).save("./tests/videos/output.mp4", true);
+    }).videoBitrate("1300", false).save("./tests/videos/output.mp4", true);
     for await (const obj of progress) {
       console.log(obj.percentage);
     }
