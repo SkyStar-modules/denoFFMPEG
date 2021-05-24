@@ -8,24 +8,31 @@ on:
   pull_request:
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
+  CI:
+    runs-on: ${{ matrix.os }}
 
     strategy:
       matrix:
-        deno: ['v1.x', 'nightly']
+        deno: ['v1.x', 'canary']
+        os: ['windows-latest', 'ubuntu-latest', 'macos-latest']
 
     steps:
       - name: Setup repo
         uses: actions/checkout@v2
 
       - name: Setup Deno
-        uses: denolib/setup-deno@v2.3.0
+      - uses: denoland/setup-deno@v1
         with:
           deno-version: ${{ matrix.deno }}
 
       - name: Setup ffmpeg
         uses: FedericoCarboni/setup-ffmpeg@v1
+
+      - name: Run lint
+        run: deno lint --ignore="tests/videos"
+
+      - name: Run Formatting
+        run: deno fmt --ignore="tests/videos"
 
       - name: Run tests
         run: deno test --doc src/ffmpegClass.ts && deno test -A --fail-fast tests
