@@ -1,4 +1,4 @@
-import { Filters, Globals, Progress, Spawn } from "./types.ts";
+import type { Filters, Globals, Progress, Spawn } from "./types.ts";
 import {
   FfmpegError,
   FormatError,
