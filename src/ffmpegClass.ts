@@ -1,11 +1,5 @@
 import type { Filters, Globals, Progress, Spawn } from "./types.ts";
-import {
-  FfmpegError,
-  FormatError,
-  InternalError,
-  internalWarning,
-  warning,
-} from "./error.ts";
+import { FfmpegError, FormatError, internalWarning, warning } from "./error.ts";
 import { readLines } from "../deps.ts";
 import * as formatter from "./formatter.ts";
 
