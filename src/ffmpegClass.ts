@@ -33,7 +33,6 @@ export class FfmpegClass {
   #height = -1;
   #noAudio = false;
   #noVideo = false;
-  #firstInputIsURL = false;
   #pipedOutput = false;
   #pipedInput: Uint8Array = new Uint8Array();
   #Process!: Deno.Process;
@@ -75,14 +74,11 @@ export class FfmpegClass {
             }
             break;
           case "input":
-            if (value.includes("http") && this.#input.length == 0) {
-              this.#firstInputIsURL = true;
-            }
             this.#input.push(value);
             this.#inputOptions.push({});
             break;
           default:
-            warning(`option '${value}' not found! Please remove it`);
+            warning(`Option '${value}' not found! Please remove it`);
         }
       }
     }
@@ -104,7 +100,7 @@ export class FfmpegClass {
     if (ffmpegPath) {
       if (this.#ffmpegDir.length > 0 && this.#ffmpegDir !== "ffmpeg") {
         warning(
-          "changing ffmpeg path from " + this.#ffmpegDir + " to " + ffmpegPath,
+          "Changing ffmpeg path from " + this.#ffmpegDir + " to " + ffmpegPath,
         );
       }
       this.#ffmpegDir = ffmpegPath;
@@ -169,9 +165,6 @@ export class FfmpegClass {
       this.#input.push("pipe:0");
       this.#pipedInput = new Uint8Array([...this.#pipedInput, ...input]);
     } else {
-      if (input.includes("http") && this.#input.length === 0) {
-        this.#firstInputIsURL = true;
-      }
       this.#input.push(input);
     }
     this.#inputOptions.push(options);
@@ -449,7 +442,7 @@ export class FfmpegClass {
   * const data = await ffmpeg.save("pipe:1");
   * ```
   */
-  public save(
+  public async save(
     output: "pipe:1",
     iterator?: false,
     options?: Record<string, string | number | undefined>,
@@ -465,7 +458,7 @@ export class FfmpegClass {
   * await ffmpeg.save("outputfile.mp4");
   * ```
   */
-  public save(
+  public async save(
     output: string,
     iterator?: false,
     options?: Record<string, string | number | undefined>,
@@ -485,7 +478,7 @@ export class FfmpegClass {
   * }
   * ```
   */
-  public save(
+  public async save(
     output: string,
     iterator?: true,
     options?: Record<string, string | number | undefined>,
@@ -602,7 +595,7 @@ export class FfmpegClass {
             progressOBJ.percentage < 100
           ) {
             internalWarning(
-              `progress yield is invalid because one of the following values is NaN\ntotalFrames:${totalFrames}\ncurrentFrame:${currentFrame}\ncurrentFPS:${currentFPS}`,
+              `Progress yield is invalid because one of the following values is NaN\ntotalFrames:${totalFrames}\ncurrentFrame:${currentFrame}\ncurrentFPS:${currentFPS}`,
             );
           }
           i = 0;
@@ -620,17 +613,17 @@ export class FfmpegClass {
     return;
   }
 
-  private __clear(input: string): void {
-    if (input.toLowerCase() === "audio") {
+  private __clear(input: "audio" | "video"): void {
+    if (input === "audio") {
       if (this.#audioBitrate !== 0) {
         warning(
-          "video bitrate was selected while no audio mode was selected!\nPlease remove video bitrate",
+          "Video bitrate was selected while no audio mode was selected!\nPlease remove video bitrate",
         );
       }
 
       if (this.#audioCodec.length > 0) {
         warning(
-          "video codec was selected while no audio mode was selected!\nPlease remove video codec",
+          "Video codec was selected while no audio mode was selected!\nPlease remove video codec",
         );
       }
 
@@ -638,16 +631,16 @@ export class FfmpegClass {
       this.#audioBitrate = 0;
       this.#audioBitrateOptions = [];
       this.#audioFilter = [];
-    } else if (input.toLowerCase() === "video") {
+    } else {
       if (this.#videoFilter.length > 0) {
         warning(
-          "video Filters was selected while no video mode was selected!\nPlease remove video filters",
+          "Video Filters was selected while no video mode was selected!\nPlease remove video filters",
         );
       }
 
       if (this.#videoBitrate !== 0) {
         warning(
-          "video bitrate was selected while no video mode was selected!\nPlease remove video bitrate",
+          "Video bitrate was selected while no video mode was selected!\nPlease remove video bitrate",
         );
       }
 
@@ -663,10 +656,6 @@ export class FfmpegClass {
       this.#height = -1;
       this.#width = -1;
       this.#outputFPS = 0;
-    } else {
-      throw new InternalError(
-        "tried to clear input. But invalid input was specified!",
-      );
     }
     return;
   }
@@ -732,7 +721,7 @@ export class FfmpegClass {
     }
 
     if (this.#threadCount > 0 && isNaN(this.#threadCount)) {
-      errors.push("amount of threads is NaN");
+      errors.push("Amount of threads is NaN");
     }
 
     if (
@@ -740,7 +729,7 @@ export class FfmpegClass {
       (this.#audioCodec.join("").includes("undefined") ||
         this.#audioCodec.includes("null"))
     ) {
-      errors.push("one or more audio codec options are undefined");
+      errors.push("One or more audio codec options are undefined");
     }
 
     if (
@@ -748,21 +737,21 @@ export class FfmpegClass {
       (this.#videoCodec.join("").includes("undefined") ||
         this.#videoCodec.includes("null"))
     ) {
-      errors.push("one or more video codec options are undefined");
+      errors.push("One or more video codec options are undefined");
     }
 
     if (
       this.#videoBitrateOptions.length > 0 &&
       (this.#videoBitrate === 0 || isNaN(this.#videoBitrate))
     ) {
-      errors.push("video Bitrate is NaN");
+      errors.push("Video bitrate is NaN");
     }
 
     if (
       this.#audioBitrateOptions.length > 0 &&
       (this.#audioBitrate === 0 || isNaN(this.#audioBitrate))
     ) {
-      errors.push("audio Bitrate is NaN");
+      errors.push("Audio bitrate is NaN");
     }
 
     if (this.#input.length === 0) {
@@ -784,7 +773,7 @@ export class FfmpegClass {
       errors.push("Width is not divisible by 2");
     }
     if (this.#height % 2 !== 0 && this.#height !== -1) {
-      errors.push("height is not divisible by 2");
+      errors.push("Height is not divisible by 2");
     }
     if (
       this.#complexFilter.length > 0 &&
@@ -800,7 +789,7 @@ export class FfmpegClass {
       this.#videoFilter.join("").includes("undefined")
     ) {
       errors.push(
-        "Simple video Filter(s) were selected, but the field is incorrect or empty",
+        "Video Filter(s) were selected, but the field is incorrect or empty",
       );
     }
 
@@ -841,7 +830,7 @@ export class FfmpegClass {
   }
 }
 
-/** ### Create a new instance of FfmpegClass
+/** ### Create a new instance of FfmpegClass. This does the same as `new FfmpegClass()`
   * #### Example
   * ```ts
   * import { ffmpeg } from "../mod.ts"
