@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.0.1
+
+- fixed writing to stdin of ffmpeg only writing 64kb
+
 ## 3.0.0
 
 - added pipe support for `save()`

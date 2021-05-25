@@ -1,6 +1,6 @@
 import type { Filters, Globals, Progress, Spawn } from "./types.ts";
 import { FfmpegError, FormatError, internalWarning, warning } from "./error.ts";
-import { readLines } from "../deps.ts";
+import { readLines, writeAll } from "../deps.ts";
 import * as formatter from "./formatter.ts";
 
 export class FfmpegClass {
@@ -516,7 +516,7 @@ export class FfmpegClass {
       );
     }
     if (this.#pipedInput.length > 0) {
-      await this.#Process.stdin?.write(this.#pipedInput);
+      await writeAll(this.#Process.stdin!, this.#pipedInput);
       this.#Process.stdin?.close();
     }
     return !iterator ? this.__closeProcess(false) : this.__getProgress();
