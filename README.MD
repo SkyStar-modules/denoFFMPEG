@@ -39,7 +39,9 @@ await videoRender.videoBitrate(1000).save("./output.mp4");
 
 Format code with `deno fmt --ignore="tests/videos"`\
 Lint with `deno lint --ignore="tests/videos"`\
-Run tests with `deno test --doc src/ffmpegClass.ts && deno test -A --fail-fast tests`
+Run tests with
+`deno test --doc src/ffmpegClass.ts && deno test -A --fail-fast tests`
+
 ## Authors & Acknowledgments
 
 - Skyler "MierenMans" van Boheemen - Author

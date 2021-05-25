@@ -40,7 +40,7 @@
 ## 2.0.0
 
 - added path check. If ffmpegDirectory is not specified it is assumed that
-  ffmpeg is in path\
+  ffmpeg is in path
 
 - fixed filter options not working properly like fontfile
 - changed source key in spawn interface is now input
@@ -57,9 +57,8 @@
 - added pipe method
 - added 'data' eventEmitter for pipe method
 - added fatalError in constructor object
-- added ffmpeg function as default export. Use
-  `import namehere from "./mod.ts"` for the function or
-  `import { FfmpegClass } from "./mod.ts"` for the class
+- added ffmpeg function as default export. Use `import namehere from "./mod.ts"`
+  for the function or `import { FfmpegClass } from "./mod.ts"` for the class
 
 - rewrote constructor into one parameter with an object for everything. Check
   docs
