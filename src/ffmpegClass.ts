@@ -458,6 +458,15 @@ export class FfmpegClass {
     options?: Record<string, string | number | undefined>,
   ): Promise<void>;
 
+  /**
+   * # NOT SUPPORTED!
+   */
+  public async save(
+    output: "pipe:1",
+    iterator?: true,
+    options?: Record<string, string | number | undefined>,
+  ): Promise<AsyncGenerator<Progress>>;
+
   /** ### Start render with iterator
   * #### Example
   * ```ts
@@ -478,6 +487,9 @@ export class FfmpegClass {
     options?: Record<string, string | number | undefined>,
   ): Promise<AsyncGenerator<Progress>>;
 
+  /**
+   * # If you see this overload, you will probably get an error
+   */
   public async save(
     output: string | "pipe:1",
     iterator = false,
