@@ -47,7 +47,7 @@ jobs:
           deno-version: ${{ matrix.deno }}
 
       - name: Run Linter
-        run: deno lint --ignore="tests/videos"
+        run: deno lint
 
   Formatting:
     runs-on: 'ubuntu-latest'
@@ -66,4 +66,4 @@ jobs:
           deno-version: ${{ matrix.deno }}
 
       - name: Run Formatter
-        run: deno fmt --ignore="tests/videos"
+        run: deno fmt
