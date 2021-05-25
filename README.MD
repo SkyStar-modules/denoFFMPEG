@@ -10,15 +10,6 @@
 - All methods are chainable
 - Frequently updated and maintained by me
 
----
-
-## V2 information
-
-denoFFMPEG v2 is alot different from v1\
-it breaks alot of stuff that used to work.
-
-please read the doc's below to see what changed
-
 ## Basic example
 
 `save()` is used to start the render process.
