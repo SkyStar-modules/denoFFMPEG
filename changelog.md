@@ -1,96 +1,98 @@
 # Changelog
 
+## 3.0.0
+
+- added pipe support for `save()`
+- added piping support for `addInput()`
+
+- removed `saveWithProgress()` in favor of combining it with `save()`
+- removed unneeded complexity
+- removed documentation from [readme](./README.MD)
+
+- intergrated doc's into code for [deno docs](doc.deno.land)
+
 ## 2.1.1
 
-- _fixed_ Small bug
-  <br>
+- fixed Small bug
 
-- _updated_ Dependencies
+- updated Dependencies
 
-## 2.1
+## 2.1.0
 
-- _added_ `threads()` method to set a custom amount of cpu threads used for
+- added `threads()` method to set a custom amount of cpu threads used for
   processing
-- _added_ `outputFPS()` method to set a different output fps
-- _added_ `setWidth()` method to set a custom width
-- _added_ `setHeight()` method to set a custom height
-- _added_ `audioFilters()` method. It's almost like videoFilters but for audio
-- _added_ `complexFilters()` method. It allow's or complex video/audio filters\
+- added `outputFPS()` method to set a different output fps
+- added `setWidth()` method to set a custom width
+- added `setHeight()` method to set a custom height
+- added `audioFilters()` method. It's almost like videoFilters but for audio
+- added `complexFilters()` method. It allow's or complex video/audio filters\
   **Complex filters and simple filters are not compatible!**
-  <br>
 
-- _fixed_ progress being wrong when using different output fps
-- _fixed_ url input's not outputting progress
-- _fixed_ videoFilters not working because they get formatted wrong
-  <br>
+- fixed progress being wrong when using different output fps
+- fixed url input's not outputting progress
+- fixed videoFilters not working because they get formatted wrong
 
-- _changed_ video & audio codec to use less code
-- _changed_ all filter methods to use less code
-- _changed_ filters now allow numbers & strings instead of only strings
-- _updated_ dependencies
+- changed video & audio codec to use less code
+- changed all filter methods to use less code
+- changed filters now allow numbers & strings instead of only strings
+- updated dependencies
 
-## 2.0
+## 2.0.0
 
-- _added_ path check. If ffmpegDirectory is not specified it is assumed that
+- added path check. If ffmpegDirectory is not specified it is assumed that
   ffmpeg is in path\
-  <br>
 
-- _fixed_ filter options not working properly like fontfile
-- _changed_ source key in spawn interface is now input
-- _changed_ from event emitters to async generators
-- _changed_ there is no default export anymore
-- _rewrote_ private `__getProgress()` method for more reliable yield's
-  <br>
+- fixed filter options not working properly like fontfile
+- changed source key in spawn interface is now input
+- changed from event emitters to async generators
+- changed there is no default export anymore
+- rewrote private `getProgress()` method for more reliable yield's
 
-- _removed_ pipe method. It just didn't work. Gonna revisit this in v2.2
-- _removed_ default export use `import { ffmpeg } from "./mod.ts";` or use\
+- removed pipe method. It just didn't work. Gonna revisit this in v2.2
+- removed default export use `import { ffmpeg } from "./mod.ts";` or use\
   `import { FfmpegClass } from "./mod.ts";`
 
-## 1.2
+## 1.2.0
 
-- _added_ pipe method
-- _added_ 'data' eventEmitter for pipe method
-- _added_ fatalError in constructor object
-- _added_ ffmpeg function as default export. Use
+- added pipe method
+- added 'data' eventEmitter for pipe method
+- added fatalError in constructor object
+- added ffmpeg function as default export. Use
   `import namehere from "./mod.ts"` for the function or
   `import { FfmpegClass } from "./mod.ts"` for the class
-  <br>
 
-- _rewrote_ constructor into one parameter with an object for everything. Check
+- rewrote constructor into one parameter with an object for everything. Check
   docs
-- _changed_ constructer. Now it is one object like with the following options
+- changed constructer. Now it is one object like with the following options
   `ffmpegDir`, `niceness` (not used on windows), `fatalError`(on by default) and
   `source` which is the inputfile You don't need to specify all these, but you
   can
 
 ## 1.1.1
 
-- _added_ url input's
-  <br>
+- added url input's
 
-- _changed_ variable **sumshit** => to **progressOBJ**
+- changed variable **sumshit** => to **progressOBJ**
 
-## 1.1
+## 1.1.0
 
-- _added_ `noAudio()` method
-- _added_ `noVideo()` method
-- _added_ 'progress' eventEmitter
-- _added_ `audiobitrate()` method
-  <br>
+- added `noAudio()` method
+- added `noVideo()` method
+- added 'progress' eventEmitter
+- added `audiobitrate()` method
 
-- _rewrote_ `videoFilters()` method for better filtering
-- _changed_ `addFilters()` => `videoFilters()`
-- _changed_ `ffmpegWrapper.ts` => `mod.ts`
-- _changed_
+- rewrote `videoFilters()` method for better filtering
+- changed `addFilters()` => `videoFilters()`
+- changed `ffmpegWrapper.ts` => `mod.ts`
+- changed
   [std@0.79.0/node/events.ts](https://deno.land/std@0.79.0/node/events.ts) =>
   [event@0.2.0](https://deno.land/x/event@0.2.0)
-- _merged_ interfaces.ts & mod.ts
-- _updated_ external libs
-  <br>
+- merged interfaces.ts & mod.ts
+- updated external libs
 
-- _fucked_ up a bunch
-- _removed_ deprecated code
+- fucked up a bunch
+- removed deprecated code
 
-## 1.0
+## 1.0.0
 
-- _added_ buggy ffmpeg wrapper
+- added buggy ffmpeg wrapper
