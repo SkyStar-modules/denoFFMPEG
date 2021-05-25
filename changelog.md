@@ -3,6 +3,7 @@
 ## 3.0.1
 
 - fixed writing to stdin of ffmpeg only writing 64kb
+- replaced `/tests/videos/input.ts` to not conflict with tools
 
 ## 3.0.0
 

@@ -28,8 +28,8 @@ await videoRender.videoBitrate(1000).save("./output.mp4");
 
 ## How to contribute
 
-Format code with `deno fmt --ignore="tests/videos"`\
-Lint with `deno lint --ignore="tests/videos"`\
+Format code with `deno fmt`\
+Lint with `deno lint`\
 Run tests with
 `deno test --doc src/ffmpegClass.ts && deno test -A --fail-fast tests`
 
