@@ -28,10 +28,13 @@ export function globalOptionsFormatter(globals: Globals): string[] {
 export function filterFormatter(filters: Filters[]): string[] {
   const filterArr: string[] = [];
   for (const filter of filters) {
-    let temp: string = filter.filterName + "=";
-    Object.entries(filter.options).forEach(([key, value], i) =>
-      temp += ((i > 0) ? ": " : "") + `${key}=${value}`
-    );
+    let temp: string = filter.filterName;
+    if (filter.options) {
+      temp += "=";
+      Object.entries(filter.options).forEach(([key, value], i) =>
+        temp += ((i > 0) ? ": " : "") + `${key}=${value}`
+      );
+    }
     filterArr.push(temp);
   }
 

@@ -1,6 +1,6 @@
 export interface Filters {
   filterName: string;
-  options: Record<string, string | number>;
+  options?: Record<string, string | number>;
 }
 
 export interface Spawn {
