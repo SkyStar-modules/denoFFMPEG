@@ -1,7 +1,8 @@
 # Changelog
 
-## 3.0.1
+## 3.1.0
 
+- made filter options optional. You can now do `filterName: "volume=1.5dB"` etc.
 - fixed writing to stdin of ffmpeg only writing 64kb
 - replaced `/tests/videos/input.ts` to not conflict with tools
 
