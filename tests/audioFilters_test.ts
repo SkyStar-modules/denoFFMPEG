@@ -36,3 +36,32 @@ Deno.test({
   sanitizeOps: true,
   sanitizeResources: true,
 });
+
+Deno.test({
+  name: "audioFilters feature single line with progress",
+  fn: async () => {
+    await new FfmpegClass({
+      input: "./tests/videos/input.mp4",
+    }).setFfmpegPath("ffmpeg")
+      .audioFilters({ filterName: "volume=1.5dB" })
+      .save("./tests/videos/output.mp4");
+  },
+  sanitizeOps: true,
+  sanitizeResources: true,
+});
+
+Deno.test({
+  name: "audioFilters feature single line with progress",
+  fn: async () => {
+    const thing = await new FfmpegClass({
+      input: "./tests/videos/input.mp4",
+    }).setFfmpegPath("ffmpeg")
+      .audioFilters({ filterName: "volume=1.5dB" })
+      .save("./tests/videos/output.mp4", true);
+    for await (const progress of thing) {
+      console.log(progress.percentage);
+    }
+  },
+  sanitizeOps: true,
+  sanitizeResources: true,
+});
