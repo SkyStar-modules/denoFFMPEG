@@ -21,7 +21,7 @@ you should always specify the ffmpegDir in the constructor or via the
 ```js
 import { ffmpeg } from "./mod.ts";
 let videoRender = ffmpeg({ input: "./dev/video0", ffmpegDir: "./dev/ffmpeg" });
-await videoRender.videoBitrate(1000).save("./output.mp4");
+await videoRender.videoBitrate("1000k").save("./output.mp4");
 ```
 
 <br>
