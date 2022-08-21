@@ -4,7 +4,7 @@ import { readLines, writeAll } from "../deps.ts";
 import * as formatter from "./formatter.ts";
 
 export class FfmpegClass {
-  #ffmpegDir = "";
+  #ffmpegDir = "ffmpeg";
   #outputFile: string | "pipe:1" = "";
   #input: string[] = [];
   #outputOptions: string[] = [];
