@@ -1,7 +1,7 @@
 import { FfmpegClass } from "../mod.ts";
 
 const link =
-  "https://github.com/SkyStar-modules/denoFFMPEG/blob/main/tests/videos/input.mp4";
+  "https://github.com/SkyStar-modules/denoFFMPEG/blob/main/tests/videos/input.mp4?raw=true";
 
 Deno.test({
   name: "http constructor feature",
