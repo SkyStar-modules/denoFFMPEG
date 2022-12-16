@@ -1,7 +1,7 @@
 import { FfmpegClass } from "../mod.ts";
 
 const link =
-  "https://cdn.discordapp.com/attachments/764087395532406824/793974755731963904/crab.mp4";
+  "https://github.com/SkyStar-modules/denoFFMPEG/blob/main/tests/videos/input.mp4?raw=true";
 
 Deno.test({
   name: "http constructor feature",
